@@ -1,5 +1,7 @@
 .idea/
 .gradle/
-gradle/
-build/
-gradlew*
+/gradle/
+/build/
+/gradlew*
+/docker-compose
+/docker-compose.yml
