@@ -1,5 +1,14 @@
 package ru.majordomo.hms.rc.staff.api.message;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 public class ServiceMessage {
     static final Logger logger = LoggerFactory.getLogger(ServiceMessage.class);
     private String operationIdentity;
