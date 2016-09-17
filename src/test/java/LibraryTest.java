@@ -1,3 +1,4 @@
+import org.apache.tomcat.jni.Library;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -8,8 +9,5 @@ import static org.junit.Assert.*;
  * @author klimov, @date 10.08.16 11:09
  */
 public class LibraryTest {
-    @Test public void testSomeLibraryMethod() {
-        Library classUnderTest = new Library();
-        assertTrue("someLibraryMethod should return 'true'", classUnderTest.someLibraryMethod());
-    }
+
 }

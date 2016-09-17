@@ -9,7 +9,6 @@ import ru.majordomo.hms.rc.staff.Resource;
 @Document
 public class ConfigTemplate extends Resource {
 
-    private String fileName;
     private String fileLink;
 
     @Override
@@ -17,11 +16,11 @@ public class ConfigTemplate extends Resource {
         switchedOn = !switchedOn;
     }
 
-    public String getContent() {
+    public String getFileLink() {
         return fileLink;
     }
 
-    public void setContent(String fileLink) {
+    public void setFileLink(String fileLink) {
         this.fileLink = fileLink;
     }
 }
