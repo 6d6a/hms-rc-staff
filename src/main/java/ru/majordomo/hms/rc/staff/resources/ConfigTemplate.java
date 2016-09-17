@@ -9,18 +9,19 @@ import ru.majordomo.hms.rc.staff.Resource;
 @Document
 public class ConfigTemplate extends Resource {
 
-    private File content;
+    private String fileName;
+    private String fileLink;
 
     @Override
     public void switchResource() {
         switchedOn = !switchedOn;
     }
 
-    public File getContent() {
-        return content;
+    public String getContent() {
+        return fileLink;
     }
 
-    public void setContent(File content) {
-        this.content = content;
+    public void setContent(String fileLink) {
+        this.fileLink = fileLink;
     }
 }

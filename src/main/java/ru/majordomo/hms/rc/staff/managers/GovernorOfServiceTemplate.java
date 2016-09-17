@@ -11,6 +11,6 @@ public class GovernorOfServiceTemplate {
     ServiceTemplateRepository serviceTemplateRepository;
 
     public ServiceTemplate create() {
-
+        return new ServiceTemplate();
     }
 }
