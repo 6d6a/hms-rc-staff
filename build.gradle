@@ -4,23 +4,23 @@ buildscript {
     }
     repositories {
         mavenCentral()
-	jcenter()
-	maven {
-		url 'http://maven.intr'
-	}
+        jcenter()
+        ¬ maven {
+            url 'http://maven.intr'
+        }
     }
     dependencies {
         classpath("io.spring.gradle:dependency-management-plugin:0.6.0.RELEASE")
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         classpath("se.transmode.gradle:gradle-docker:1.2")
         classpath "com.avast.gradle:docker-compose-gradle-plugin:0.3.9"
-	classpath("ru.majordomo:copycompose:1.0")
+        classpath("ru.majordomo:copycompose:1.0")
 
     }
 }
 
 plugins {
-	id 'org.ajoberstar.grgit' version '1.5.1'
+    id 'org.ajoberstar.grgit' version '1.5.1'
 }
 
 
@@ -44,23 +44,6 @@ repositories {
     mavenCentral()
 }
 
-sourceSets {
-    integrationTest {
-        java {
-            compileClasspath += main.output + test.output
-            runtimeClasspath += main.output + test.output
-            srcDir file("src/integration-test/java")
-        }
-        resources.srcDir(file("src/integration-test/resources"))
-    }
-}
-
-configurations {
-    integrationTestCompile.extendsFrom testCompile
-    integrationTestRuntime.extendsFrom testRuntime
-}
-
-
 dependencies {
     compile('org.springframework.cloud:spring-cloud-starter-config')
     compile('org.springframework.cloud:spring-cloud-starter-eureka')
@@ -75,28 +58,22 @@ dependencyManagement {
     }
 }
 
-task integrationTest(type: Test) {
-    testClassesDir = sourcesSets.integrationTest.output.classesDir
-    classPath = sourcesSets.integrationTest.runtimeClasspath
-    outputs.upToDateWhen { false }
-}
-
 task buildDocker(type: Docker, dependsOn: build) {
     def dockerDir = "docker"
     def git = org.ajoberstar.grgit.Grgit.open(file('.'))
     tagVersion = git.branch.getCurrent().getName()
-    if(tagVersion=="HEAD") {
-	tagVersion="master"
+    if (tagVersion == "HEAD") {
+        tagVersion = "master"
     }
     push = true
-    project.group = "docker-registry.intr/"+project.group
+    project.group = "docker-registry.intr/" + project.group
     applicationName = jar.baseName
     dockerfile = file("${buildDir}/Dockerfile")
     doFirst {
         copy {
             from "${dockerDir}/Dockerfile"
             into buildDir
-            expand(jarBuildName:jar.getArchiveName(),projectName:project.name)
+            expand(jarBuildName: jar.getArchiveName(), projectName: project.name)
         }
         copy {
             from jar
@@ -105,15 +82,15 @@ task buildDocker(type: Docker, dependsOn: build) {
     }
 }
 task cloneCompose(type: Exec) {
-	commandLine 'git','clone','git@gitlab.intr:hms/docker-compose.git'
+    commandLine 'git', 'clone', 'git@gitlab.intr:hms/docker-compose.git'
 }
 
 task composePull(type: Exec) {
-	commandLine 'docker-compose', 'pull'
+    commandLine 'docker-compose', 'pull'
 }
 
 task delCompose(type: Delete) {
-	delete 'docker-compose'
+    delete 'docker-compose'
 }
 
 cookCompose.dependsOn("cloneCompose")
@@ -121,7 +98,12 @@ composePull.dependsOn("cookCompose")
 composeUp.dependsOn("composePull")
 composeUp.finalizedBy delCompose
 
+clean.doFirst {
+    delete "${rootDir}/docker-compose"
+    delete "${rootDir}/docker-compose.yml"
+}
+
 composeDown {
-	doLast { delete 'docker-compose.yml' }
+    doLast { delete 'docker-compose.yml' }
 }
 
