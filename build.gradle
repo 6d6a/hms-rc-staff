@@ -5,7 +5,7 @@ buildscript {
     repositories {
         mavenCentral()
         jcenter()
-        ¬ maven {
+        maven {
             url 'http://maven.intr'
         }
     }
