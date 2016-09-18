@@ -121,6 +121,11 @@ composePull.dependsOn("cookCompose")
 composeUp.dependsOn("composePull")
 composeUp.finalizedBy delCompose
 
+clean.doFirst {
+    delete "${rootDir}/docker-compose"
+    delete "${rootDir}/docker-compose.yml"
+}
+
 composeDown {
 	doLast { delete 'docker-compose.yml' }
 }
