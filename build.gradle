@@ -76,8 +76,8 @@ dependencyManagement {
 }
 
 task integrationTest(type: Test) {
-    testClassesDir = sourcesSets.integrationTest.output.classesDir
-    classPath = sourcesSets.integrationTest.runtimeClasspath
+    testClassesDir = sourceSets.integrationTest.output.classesDir
+    classpath = sourceSets.integrationTest.runtimeClasspath
     outputs.upToDateWhen { false }
 }
 
