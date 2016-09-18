@@ -49,6 +49,7 @@ dependencies {
     compile('org.springframework.cloud:spring-cloud-starter-eureka')
     compile('org.springframework.boot:spring-boot-starter-data-mongodb')
     compile 'org.springframework.amqp:spring-rabbit:1.6.2.RELEASE'
+    testCompile('com.github.fakemongo:fongo:1.5.6')
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }
 

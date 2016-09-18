@@ -5,9 +5,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
+import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 
 @Repository
-public interface ConfigTemplateRepository extends MongoRepository<ConfigTemplate,String> {
-    List<ConfigTemplate> findAll();
+public interface ServiceTemplateRepository extends MongoRepository<ServiceTemplate,String> {
+    List<ServiceTemplate> findAll();
 }
