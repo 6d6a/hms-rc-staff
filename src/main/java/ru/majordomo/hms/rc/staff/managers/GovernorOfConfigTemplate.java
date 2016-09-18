@@ -40,9 +40,7 @@ public class GovernorOfConfigTemplate extends LordOfResources {
         } else {
             throw new ParameterValidateException(loggerPrefix + "fileLink не может быть пустым");
         }
-
         configTemplateRepository.save(configTemplate);
-
         return configTemplate;
     }
 }

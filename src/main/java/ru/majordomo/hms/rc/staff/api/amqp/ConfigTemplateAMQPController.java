@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfConfigTemplate;
+import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
 import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
 
 @EnableRabbit
@@ -41,15 +42,15 @@ public class ConfigTemplateAMQPController {
         String loggerPrefix = "OPERATION IDENTITY:" + serviceMessage.getOperationIdentity() + "ACTION IDENTITY:" + serviceMessage.getActionIdentity() + " ";
 
         try {
-            ConfigTemplate configTemplate = (ConfigTemplate)governorOfConfigTemplate.createResource(serviceMessage);
+            ConfigTemplate configTemplate = (ConfigTemplate) governorOfConfigTemplate.createResource(serviceMessage);
             reportServiceMessage.setObjRef("http://" + applicationName + "/config-template/" + configTemplate.getId());
-            reportServiceMessage.addParam("success",Boolean.TRUE);
+            reportServiceMessage.addParam("success", Boolean.TRUE);
+
         } catch (ParameterValidateException e) {
-            reportServiceMessage.addParam("success",Boolean.FALSE);
+            reportServiceMessage.addParam("success", Boolean.FALSE);
         } finally {
-            sender.send("config-template.create","service.pm",reportServiceMessage);
+            sender.send("config-template.create", "service.pm", reportServiceMessage);
             logger.info(loggerPrefix + "Сообщение с отчетом отправлено");
         }
     }
-
 }
