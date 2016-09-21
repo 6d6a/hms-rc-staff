@@ -5,3 +5,4 @@
 /gradlew*
 /docker-compose
 /docker-compose.yml
+.gradletasknamecache
