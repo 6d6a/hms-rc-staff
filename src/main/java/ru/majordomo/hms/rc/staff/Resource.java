@@ -29,4 +29,12 @@ public abstract class Resource {
     public void setName(String name) {
         this.name = name;
     }
+
+    public Boolean getSwitchedOn() {
+        return switchedOn;
+    }
+
+    public void setSwitchedOn(Boolean switchedOn) {
+        this.switchedOn = switchedOn;
+    }
 }

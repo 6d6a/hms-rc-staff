@@ -26,7 +26,6 @@ import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
 import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 
 @Configuration
-@EnableMongoRepositories({"ru.majordomo.hms.rc.staff.repositories"})
 public class GovernorOfServiceTemplateConfig {
     @Bean
     public GovernorOfServiceTemplate governorOfServiceTemplate() {

@@ -6,8 +6,10 @@ import com.mongodb.Mongo;
 import org.bson.types.ObjectId;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 @Configuration
+@EnableMongoRepositories({"ru.majordomo.hms.rc.staff.repositories"})
 public class FongoConfig extends AbstractMongoConfiguration {
 
     @Override
