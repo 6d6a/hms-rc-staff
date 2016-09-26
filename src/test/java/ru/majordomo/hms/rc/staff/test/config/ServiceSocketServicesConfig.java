@@ -1,23 +1,21 @@
-package config;
+package ru.majordomo.hms.rc.staff.test.config;
 
-import org.springframework.boot.context.embedded.EmbeddedServletContainer;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory;
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
-import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-import ru.majordomo.hms.rc.staff.api.http.NetworkRestController;
+import ru.majordomo.hms.rc.staff.api.http.ServiceSocketRestController;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
-import ru.majordomo.hms.rc.staff.managers.GovernorOfNetwork;
+import ru.majordomo.hms.rc.staff.managers.GovernorOfServiceSocket;
 
 @Configuration
 @EnableWebMvc
-public class GovernorOfNetworkConfig {
+public class ServiceSocketServicesConfig {
     @Bean
-    public GovernorOfNetwork governorOfNetwork() {
-        return new GovernorOfNetwork();
+    public GovernorOfServiceSocket governorOfServiceSocket() {
+        return new GovernorOfServiceSocket();
     }
 
     @Bean
@@ -31,8 +29,7 @@ public class GovernorOfNetworkConfig {
     }
 
     @Bean
-    public NetworkRestController networkRestController() {
-        return new NetworkRestController();
+    public ServiceSocketRestController serviceSocketRestController() {
+        return new ServiceSocketRestController();
     }
 }
-

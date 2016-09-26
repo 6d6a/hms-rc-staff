@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.majordomo.hms.rc.staff.Resource;
-
+//TODO
 public class Service extends Resource {
 
     private ServiceTemplate serviceTemplate;

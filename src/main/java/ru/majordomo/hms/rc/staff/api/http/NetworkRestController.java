@@ -16,31 +16,20 @@ import ru.majordomo.hms.rc.staff.resources.Network;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping("/rc/network")
+@RequestMapping("/${spring.application.name}/network")
 public class NetworkRestController {
     @Autowired
     NetworkRepository networkRepository;
 
-    @Autowired
-    GovernorOfNetwork governorOfNetwork;
-
     @RequestMapping(value = "/{networkId}", method = RequestMethod.GET)
     public Network readOne(@PathVariable String networkId) {
         Network network = networkRepository.findOne(networkId);
-        if (network != null) {
-            network.setAddressAsString(governorOfNetwork.ipAddressInIntegerToString(network.getAddress()));
-            network.setGatewayAsString(governorOfNetwork.ipAddressInIntegerToString(network.getGatewayAddress()));
-        }
         return network;
     }
 
     @RequestMapping(value = {"","/"}, method = RequestMethod.GET)
     public Collection<Network> readAll() {
         List<Network> networks = networkRepository.findAll();
-        for (Network network: networks) {
-            network.setAddressAsString(governorOfNetwork.ipAddressInIntegerToString(network.getAddress()));
-            network.setGatewayAsString(governorOfNetwork.ipAddressInIntegerToString(network.getGatewayAddress()));
-        }
         return networks;
     }
 

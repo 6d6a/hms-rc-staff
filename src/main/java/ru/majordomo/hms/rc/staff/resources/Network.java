@@ -1,9 +1,14 @@
 package ru.majordomo.hms.rc.staff.resources;
 
+import com.google.common.net.InetAddresses;
+
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import org.springframework.data.annotation.Transient;
+import org.apache.commons.net.util.SubnetUtils;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.net.InetAddress;
 
 import ru.majordomo.hms.rc.staff.Resource;
 
@@ -14,10 +19,6 @@ public class Network extends Resource {
     private Integer mask;
     private Integer gatewayAddress;
     private Integer vlanNumber;
-    @Transient
-    private String addressAsString;
-    @Transient
-    private String gatewayAsString;
 
     @Override
     public void switchResource() {
@@ -29,9 +30,17 @@ public class Network extends Resource {
         return address;
     }
 
-    @JsonIgnore
+    @JsonGetter(value = "address")
+    public String getAddressAsString() {
+        return ipAddressInIntegerToString(address);
+    }
+
     public void setAddress(Integer address) {
         this.address = address;
+    }
+
+    public void setAddress(String address) {
+        this.address = ipAddressInStringToInteger(address);
     }
 
     public Integer getMask() {
@@ -47,9 +56,17 @@ public class Network extends Resource {
         return gatewayAddress;
     }
 
-    @JsonIgnore
+    @JsonGetter(value = "gatewayAddress")
+    public String getGatewayAddressAsString() {
+        return ipAddressInIntegerToString(gatewayAddress);
+    }
+
     public void setGatewayAddress(Integer gatewayAddress) {
         this.gatewayAddress = gatewayAddress;
+    }
+
+    public void setGatewayAddress(String gatewayAddress) {
+        this.gatewayAddress = ipAddressInStringToInteger(gatewayAddress);
     }
 
     public Integer getVlanNumber() {
@@ -60,20 +77,25 @@ public class Network extends Resource {
         this.vlanNumber = vlanNumber;
     }
 
-    public String getAddressAsString() {
-        return addressAsString;
+    public Boolean isAddressIn(String address) {
+        SubnetUtils subnetUtils = new SubnetUtils(getAddressAsString() + "/" + getMask());
+        SubnetUtils.SubnetInfo subnetInfo = subnetUtils.getInfo();
+        return subnetInfo.isInRange(address);
     }
 
-    public void setAddressAsString(String addressAsString) {
-        this.addressAsString = addressAsString;
+    public static String ipAddressInIntegerToString(Integer inetAddress) {
+        return InetAddresses.fromInteger(inetAddress).toString().replace("/", "");
     }
 
-    public String getGatewayAsString() {
-        return gatewayAsString;
-    }
-
-    public void setGatewayAsString(String gatewayAsString) {
-        this.gatewayAsString = gatewayAsString;
+    public static Integer ipAddressInStringToInteger(String address) {
+        InetAddress inetAddress = InetAddresses.forString(address);
+        byte[] octets = inetAddress.getAddress();
+        Integer result = 0;
+        for (byte octet : octets) {
+            result <<= 8;
+            result |= octet & 0xff;
+        }
+        return result;
     }
 
     @Override
@@ -82,12 +104,10 @@ public class Network extends Resource {
                 "id=" + this.getId() +
                 ", name=" + this.getName() +
                 ", switchedOn=" + this.getSwitchedOn() +
-                ", address=" + address +
+                ", address=" + this.getAddressAsString() +
                 ", mask=" + mask +
-                ", gatewayAddress=" + gatewayAddress +
+                ", gatewayAddress=" + this.getAddressAsString() +
                 ", vlanNumber=" + vlanNumber +
-                ", addressAsString='" + addressAsString + '\'' +
-                ", gatewayAsString='" + gatewayAsString + '\'' +
                 '}';
     }
 }

@@ -1,28 +1,15 @@
-import com.google.common.net.InetAddresses;
+package ru.majordomo.hms.rc.staff.test.managers;
 
 import org.bson.types.ObjectId;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.IntegrationTest;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.WebIntegrationTest;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.client.RestTemplate;
 
-import java.net.InetAddress;
-
-import config.FongoConfig;
-import config.GovernorOfNetworkConfig;
-import config.GovernorOfServiceTemplateConfig;
-import ru.majordomo.hms.rc.staff.api.http.NetworkRestController;
+import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
+import ru.majordomo.hms.rc.staff.test.config.NetworkServicesConfig;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfNetwork;
@@ -30,7 +17,7 @@ import ru.majordomo.hms.rc.staff.repositories.NetworkRepository;
 import ru.majordomo.hms.rc.staff.resources.Network;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {FongoConfig.class, GovernorOfNetworkConfig.class})
+@SpringBootTest(classes = {RepositoriesConfig.class, NetworkServicesConfig.class})
 public class GovernorOfNetworkTest {
 
     @Autowired
@@ -64,10 +51,11 @@ public class GovernorOfNetworkTest {
 
     @Test
     public void addressConversions() {
-        Integer ipInteger = governorOfNetwork.ipAddressInStringToInteger(address);
+        Network network = new Network();
+        network.setAddress(address);
         Assert.assertEquals("Коневертация адреса из строки в integer и/или обратно проходит некорректно",
                 address,
-                governorOfNetwork.ipAddressInIntegerToString(ipInteger));
+                network.getAddressAsString());
     }
 
     @Test
@@ -78,9 +66,9 @@ public class GovernorOfNetworkTest {
             Network network1 = networkRepository.findOne(network.getId());
             Assert.assertEquals("Имя сети, полученное из базы не совпадает с ожидаемым", name, network1.getName());
             Assert.assertEquals("Флаг switchedOn не совпадает с ожидаемым", switchedOn, network1.getSwitchedOn());
-            Assert.assertEquals("Адрес сети не совпадает с ожидаемым", governorOfNetwork.ipAddressInStringToInteger(address), network1.getAddress());
+            Assert.assertEquals("Адрес сети не совпадает с ожидаемым", address, network1.getAddressAsString());
             Assert.assertEquals("Маска сети не совпадает с ожидаемой", mask, network1.getMask());
-            Assert.assertEquals("Gateway не совпадает с ожидаемым", governorOfNetwork.ipAddressInStringToInteger(gatewayAddress), network1.getGatewayAddress());
+            Assert.assertEquals("Gateway не совпадает с ожидаемым", gatewayAddress, network1.getGatewayAddressAsString());
             Assert.assertEquals("Номер VLAN'а не совпадает с ожидаемым", vlanNumber, network1.getVlanNumber());
         } catch (ParameterValidateException e) {
             e.printStackTrace();

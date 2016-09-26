@@ -1,42 +1,38 @@
-import com.google.common.net.InetAddresses;
-import com.google.common.net.MediaType;
+package ru.majordomo.hms.rc.staff.test.api.http;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.Request;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MockMvcBuilder;
-import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
-import config.FongoConfig;
-import config.GovernorOfNetworkConfig;
-import ru.majordomo.hms.rc.staff.api.http.NetworkRestController;
+import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
+import ru.majordomo.hms.rc.staff.test.config.NetworkServicesConfig;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfNetwork;
 import ru.majordomo.hms.rc.staff.repositories.NetworkRepository;
 import ru.majordomo.hms.rc.staff.resources.Network;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {FongoConfig.class, GovernorOfNetworkConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = {RepositoriesConfig.class, NetworkServicesConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class NetworkRestControllerTest {
     @Autowired
     GovernorOfNetwork governorOfNetwork;
@@ -49,9 +45,12 @@ public class NetworkRestControllerTest {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
+    @Value("${spring.application.name}")
+    private String applicationName;
+
     private MockMvc mockMvc;
 
-    private List<String> networkIds = new ArrayList<>();
+    private List<Network> networks = new ArrayList<>();
 
     @Before
     public void generateBatchOfNetworks() {
@@ -69,22 +68,22 @@ public class NetworkRestControllerTest {
         for (int i = 0; i < 10; i++) {
             thirdByte = thirdByte + 1;
             String address = addressPattern + thirdByte + ".0";
-            String gwAddress = addressPattern + thirdByte + ".1";
+            String gwAddress = addressPattern + thirdByte + "." + gwHostId;
             Network network = new Network();
             network.setName(name + " " + i);
             network.setSwitchedOn(switchedOn);
-            network.setAddress(governorOfNetwork.ipAddressInStringToInteger(address));
-            network.setGatewayAddress(governorOfNetwork.ipAddressInStringToInteger(gwAddress));
+            network.setAddress(address);
+            network.setGatewayAddress(gwAddress);
             network.setVlanNumber(vlanNumber);
             network.setMask(mask);
             networkRepository.save(network);
-            networkIds.add(network.getId());
+            networks.add(network);
         }
     }
 
     @Test
     public void readOne() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/rc/network/" + networkIds.get(0)).accept(org.springframework.http.MediaType.APPLICATION_JSON);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName + "/network/" + networks.get(0).getId()).accept(MediaType.APPLICATION_JSON);
         try {
             mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType("application/json;charset=UTF-8"));
         } catch (Exception e) {
@@ -95,11 +94,29 @@ public class NetworkRestControllerTest {
 
     @Test
     public void readAll() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/rc/network").accept(org.springframework.http.MediaType.APPLICATION_JSON);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName + "/network").accept(MediaType.APPLICATION_JSON);
         try {
             mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType("application/json;charset=UTF-8"));
         } catch (Exception e) {
             e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void readOneAndCheckObjectFields() {
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName + "/network/" + networks.get(0).getId()).accept(MediaType.APPLICATION_JSON);
+        try {
+            Network testingNetwork = networks.get(0);
+            mockMvc.perform(request).andExpect(jsonPath("gatewayAddress").value(testingNetwork.getGatewayAddressAsString()))
+                    .andExpect(jsonPath("address").value(testingNetwork.getAddressAsString()))
+                    .andExpect(jsonPath("switchedOn").value(testingNetwork.getSwitchedOn()))
+                    .andExpect(jsonPath("vlanNumber").value(testingNetwork.getVlanNumber()))
+                    .andExpect(jsonPath("mask").value(testingNetwork.getMask()))
+                    .andExpect(jsonPath("name").value(testingNetwork.getName()))
+                    .andExpect(jsonPath("id").value(testingNetwork.getId()));
+        } catch (Exception ex) {
+            ex.printStackTrace();
             Assert.fail();
         }
     }

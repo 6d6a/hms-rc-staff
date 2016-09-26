@@ -14,7 +14,7 @@ import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/rc/service-template")
+@RequestMapping("/${spring.application.name}/service-template")
 public class ServiceTemplateRestController {
     @Autowired
     ServiceTemplateRepository serviceTemplateRepository;
