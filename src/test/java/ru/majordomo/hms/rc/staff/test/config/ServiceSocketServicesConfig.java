@@ -24,11 +24,6 @@ public class ServiceSocketServicesConfig {
     }
 
     @Bean
-    public EmbeddedServletContainerFactory embeddedServletContainerFactory() {
-        return new TomcatEmbeddedServletContainerFactory();
-    }
-
-    @Bean
     public ServiceSocketRestController serviceSocketRestController() {
         return new ServiceSocketRestController();
     }

@@ -24,11 +24,6 @@ public class NetworkServicesConfig {
     }
 
     @Bean
-    public EmbeddedServletContainerFactory embeddedServletContainerFactory() {
-        return new TomcatEmbeddedServletContainerFactory();
-    }
-
-    @Bean
     public NetworkRestController networkRestController() {
         return new NetworkRestController();
     }

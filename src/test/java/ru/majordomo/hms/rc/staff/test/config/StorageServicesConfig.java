@@ -14,11 +14,6 @@ import ru.majordomo.hms.rc.staff.managers.GovernorOfStorage;
 @EnableWebMvc
 public class StorageServicesConfig {
     @Bean
-    public EmbeddedServletContainerFactory embeddedServletContainerFactory() {
-        return new TomcatEmbeddedServletContainerFactory();
-    }
-
-    @Bean
     public Cleaner cleaner() {
         return new Cleaner();
     }

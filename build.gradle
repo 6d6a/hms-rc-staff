@@ -45,7 +45,7 @@ repositories {
 }
 
 dependencies {
-    compile('org.springframework.cloud:spring-cloud-starter-ru.majordomo.hms.rc.staff.test.api.config')
+    compile('org.springframework.cloud:spring-cloud-starter-config')
     compile('org.springframework.cloud:spring-cloud-starter-eureka')
     compile('org.springframework.boot:spring-boot-starter-data-mongodb')
     compile('org.springframework.amqp:spring-rabbit:1.6.2.RELEASE')
@@ -84,6 +84,7 @@ task buildDocker(type: Docker, dependsOn: build) {
         }
     }
 }
+
 task cloneCompose(type: Exec) {
     commandLine 'git', 'clone', 'git@gitlab.intr:hms/docker-compose.git'
 }
