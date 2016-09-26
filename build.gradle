@@ -84,6 +84,7 @@ task buildDocker(type: Docker, dependsOn: build) {
         }
     }
 }
+
 task cloneCompose(type: Exec) {
     commandLine 'git', 'clone', 'git@gitlab.intr:hms/docker-compose.git'
 }

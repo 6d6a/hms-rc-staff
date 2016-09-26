@@ -33,7 +33,7 @@ public class ConfigTemplateAMQPController {
     String applicationName;
 
     @RabbitListener(bindings = @QueueBinding(value = @Queue(value = "service.rc-staff", durable = "true", autoDelete = "true"),
-            exchange = @Exchange(value = "config-template.create", type = "topic"),
+            exchange = @Exchange(value = "ru.majordomo.hms.rc.staff.test.api.config-template.create", type = "topic"),
             key = "service.rc.staff"))
     public void create(@Payload ServiceMessage serviceMessage) {
         ServiceMessage reportServiceMessage = new ServiceMessage();
@@ -43,13 +43,13 @@ public class ConfigTemplateAMQPController {
 
         try {
             ConfigTemplate configTemplate = (ConfigTemplate) governorOfConfigTemplate.createResource(serviceMessage);
-            reportServiceMessage.setObjRef("http://" + applicationName + "/config-template/" + configTemplate.getId());
+            reportServiceMessage.setObjRef("http://" + applicationName + "/ru.majordomo.hms.rc.staff.test.api.config-template/" + configTemplate.getId());
             reportServiceMessage.addParam("success", Boolean.TRUE);
 
         } catch (ParameterValidateException e) {
             reportServiceMessage.addParam("success", Boolean.FALSE);
         } finally {
-            sender.send("config-template.create", "service.pm", reportServiceMessage);
+            sender.send("ru.majordomo.hms.rc.staff.test.api.config-template.create", "service.pm", reportServiceMessage);
             logger.info(loggerPrefix + "Сообщение с отчетом отправлено");
         }
     }

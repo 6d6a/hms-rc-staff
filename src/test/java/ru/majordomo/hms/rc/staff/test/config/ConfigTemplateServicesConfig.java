@@ -1,7 +1,6 @@
-package config;
+package ru.majordomo.hms.rc.staff.test.config;
 
 import org.mockito.Mockito;
-import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -10,7 +9,7 @@ import ru.majordomo.hms.rc.staff.managers.GovernorOfConfigTemplate;
 import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
 
 @Configuration
-public class GovernorOfConfigTemplateConfig {
+public class ConfigTemplateServicesConfig {
     @Bean
     public GovernorOfConfigTemplate governorOfConfigTemplate() {
         GovernorOfConfigTemplate governorOfConfigTemplate = new GovernorOfConfigTemplate();

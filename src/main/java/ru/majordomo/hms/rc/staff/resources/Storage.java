@@ -1,7 +1,10 @@
 package ru.majordomo.hms.rc.staff.resources;
 
-import ru.majordomo.hms.rc.staff.Resource;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+import ru.majordomo.hms.rc.staff.Resource;
+//TODO
+@Document
 public class Storage extends Resource {
 
     private Double capacity;

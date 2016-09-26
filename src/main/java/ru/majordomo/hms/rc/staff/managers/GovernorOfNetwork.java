@@ -60,8 +60,8 @@ public class GovernorOfNetwork extends LordOfResources {
                 throw new ParameterValidateException(gwAddress + " не входит в сеть " + address + "/" + netmask.toString());
             }
 
-            network.setAddress(ipAddressInStringToInteger(address));
-            network.setGatewayAddress(ipAddressInStringToInteger(gwAddress));
+            network.setAddress(address);
+            network.setGatewayAddress(gwAddress);
             network.setVlanNumber(vlanNumber);
             network.setMask(netmask);
         } catch (ClassCastException | IllegalArgumentException e) {
@@ -72,19 +72,4 @@ public class GovernorOfNetwork extends LordOfResources {
         return network;
     }
 
-    public String ipAddressInIntegerToString(Integer inetAddress) {
-        return InetAddresses.fromInteger(inetAddress).toString().replace("/","");
-    }
-
-    public Integer ipAddressInStringToInteger(String address) {
-        InetAddress inetAddress = InetAddresses.forString(address);
-        byte[] octets = inetAddress.getAddress();
-        Integer result = new Integer(0);
-        for (byte octet : octets) {
-            result <<= 8;
-            result |= octet & 0xff;
-        }
-
-        return result;
-    }
 }

@@ -1,4 +1,4 @@
-package config;
+package ru.majordomo.hms.rc.staff.test.config;
 
 import com.github.fakemongo.Fongo;
 import com.mongodb.Mongo;
@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 
 @Configuration
 @EnableMongoRepositories({"ru.majordomo.hms.rc.staff.repositories"})
-public class FongoConfig extends AbstractMongoConfiguration {
+public class RepositoriesConfig extends AbstractMongoConfiguration {
 
     @Override
     protected String getDatabaseName() {

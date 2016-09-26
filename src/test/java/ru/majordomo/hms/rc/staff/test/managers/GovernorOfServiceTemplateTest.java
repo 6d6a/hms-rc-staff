@@ -1,20 +1,18 @@
+package ru.majordomo.hms.rc.staff.test.managers;
+
 import org.bson.types.ObjectId;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import config.FongoConfig;
-import config.GovernorOfConfigTemplateConfig;
-import config.GovernorOfServiceTemplateConfig;
+import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
+import ru.majordomo.hms.rc.staff.test.config.ServiceTemplateServicesConfig;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfServiceTemplate;
@@ -23,7 +21,7 @@ import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
 import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = {GovernorOfServiceTemplateConfig.class, FongoConfig.class})
+@SpringBootTest(classes = {ServiceTemplateServicesConfig.class, RepositoriesConfig.class})
 public class GovernorOfServiceTemplateTest {
 
     @Autowired
@@ -51,7 +49,7 @@ public class GovernorOfServiceTemplateTest {
         try {
             ServiceTemplate serviceTemplate = (ServiceTemplate) governorOfServiceTemplate.createResource(serviceMessage);
             Assert.assertEquals("Имя сервиса установлено неверно", "Тестовый service template", serviceTemplate.getName());
-            Assert.assertEquals("Количество config templat'ов не соответствует заданному", 10, serviceTemplate.getConfigTemplateList().size());
+            Assert.assertEquals("Количество ru.majordomo.hms.rc.staff.test.api.config templat'ов не соответствует заданному", 10, serviceTemplate.getConfigTemplateList().size());
         } catch (ParameterValidateException e) {
             e.printStackTrace();
         }
