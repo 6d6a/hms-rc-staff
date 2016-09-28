@@ -12,7 +12,6 @@ import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.repositories.StorageRepository;
 import ru.majordomo.hms.rc.staff.resources.Storage;
 
-//TODO
 @Service
 public class GovernorOfStorage extends LordOfResources {
 
