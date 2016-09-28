@@ -14,22 +14,20 @@ import org.springframework.stereotype.Component;
 
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
-import ru.majordomo.hms.rc.staff.managers.GovernorOfServiceSocket;
-import ru.majordomo.hms.rc.staff.resources.ServiceSocket;
+import ru.majordomo.hms.rc.staff.managers.GovernorOfService;
+import ru.majordomo.hms.rc.staff.resources.Service;
 
-@EnableRabbit
 @Component
-public class ServiceSocketAMQPController {
-
-    private String applicationName;
-    private Sender sender;
-    private GovernorOfServiceSocket governorOfServiceSocket;
-    private static final Logger logger = LoggerFactory.getLogger(ServiceSocketAMQPController.class);
+@EnableRabbit
+public class ServiceAMQPController {
+    GovernorOfService governor;
+    Sender sender;
+    String applicationName;
+    String serviceName = "service";
 
     @Autowired
-    public ServiceSocketAMQPController(Sender sender, GovernorOfServiceSocket governorOfServiceSocket) {
+    public void setSender(Sender sender) {
         this.sender = sender;
-        this.governorOfServiceSocket = governorOfServiceSocket;
     }
 
     @Value("${spring.application.name}")
@@ -37,22 +35,30 @@ public class ServiceSocketAMQPController {
         this.applicationName = applicationName;
     }
 
+    @Autowired
+    public void setGovernor(GovernorOfService governor) {
+        this.governor = governor;
+    }
+
+    private static final Logger logger = LoggerFactory.getLogger(ServiceAMQPController.class);
     @RabbitListener(bindings = @QueueBinding(value = @Queue(value = "service.${spring.application.name}", durable = "true", autoDelete = "true"),
-            exchange = @Exchange(value = "service-socket.create", type = "topic"),
-            key = "service.rc.staff"))
+            exchange = @Exchange(value = "service.create", type = "topic"),
+            key = "service.${spring.application.name}"))
     public void create(@Payload ServiceMessage serviceMessage) {
         String loggerPrefix = "OPERATION IDENTITY:" + serviceMessage.getOperationIdentity() + "ACTION IDENTITY:" + serviceMessage.getActionIdentity() + " ";
-        ServiceMessage serviceReportMessage = new ServiceMessage();
+        ServiceMessage reportServiceMessage = new ServiceMessage();
+        reportServiceMessage.setActionIdentity(serviceMessage.getActionIdentity());
+        reportServiceMessage.setOperationIdentity(serviceMessage.getOperationIdentity());
         try {
-            ServiceSocket serviceSocket = (ServiceSocket) governorOfServiceSocket.createResource(serviceMessage);
-            logger.info(loggerPrefix + "service socket успешно создан и сохранен");
-            serviceReportMessage.setObjRef("http://" + applicationName + "/service-socket/" + serviceSocket.getId());
-            serviceReportMessage.addParam("success", Boolean.TRUE);
+            Service service = (Service) governor.createResource(serviceMessage);
+            logger.info(loggerPrefix + "service успешно создан");
+            reportServiceMessage.setObjRef("http://" + applicationName + "/" + serviceName + "/" + service.getId());
+            reportServiceMessage.addParam("success", Boolean.TRUE);
         } catch (ParameterValidateException e) {
             logger.error(loggerPrefix + e.toString());
-            serviceMessage.addParam("success", Boolean.FALSE);
+            reportServiceMessage.addParam("success", Boolean.FALSE);
         } finally {
-            sender.send("service-socket.create", "service.pm", serviceReportMessage);
+            sender.send(serviceName + ".create", "service.pm", reportServiceMessage);
             logger.info(loggerPrefix + "отчет в pm отправлен");
         }
     }

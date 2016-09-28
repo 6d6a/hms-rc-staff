@@ -12,7 +12,6 @@ import java.util.Collection;
 import ru.majordomo.hms.rc.staff.repositories.StorageRepository;
 import ru.majordomo.hms.rc.staff.resources.Storage;
 
-//TODO
 @RestController
 @RequestMapping("/${spring.application.name}/storage")
 @CrossOrigin("*")
