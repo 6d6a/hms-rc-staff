@@ -1,5 +1,4 @@
 package ru.majordomo.hms.rc.staff.api.http;
-//TODO
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
