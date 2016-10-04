@@ -35,41 +35,55 @@ public class GovernorOfNetwork extends LordOfResources {
 
             network = (Network) LordOfResources.setResourceParams(network, serviceMessage, cleaner);
             String address = cleaner.cleanString((String) serviceMessage.getParam("address"));
-            if (address.equals("") || !InetAddresses.isInetAddress(address)) {
-                throw new ParameterValidateException("параметр address указан неверно");
-            }
-
             Integer netmask = (Integer) serviceMessage.getParam("mask");
-            if (netmask < 0 || netmask > 30) {
-                throw new ParameterValidateException("значение параметра mask должно находиться в диапазоне от 1 до 30");
-            }
-
             String gwAddress = cleaner.cleanString((String) serviceMessage.getParam("gatewayAddress"));
-            if (gwAddress.equals("") || !InetAddresses.isInetAddress(gwAddress)) {
-                throw new ParameterValidateException("gatewayAddress должен быть указан");
-            }
-
             Integer vlanNumber = (Integer) serviceMessage.getParam("vlanNumber");
-            if (vlanNumber < 0 || vlanNumber > 4096) {
-                throw new ParameterValidateException("значение параметра vlanNumber должно находиться в диапазоне от 0 до 4096");
-            }
-
-            SubnetUtils subnetUtils = new SubnetUtils(address + "/" + netmask);
-            SubnetUtils.SubnetInfo subnetInfo = subnetUtils.getInfo();
-            if (!subnetInfo.isInRange(gwAddress)) {
-                throw new ParameterValidateException(gwAddress + " не входит в сеть " + address + "/" + netmask.toString());
-            }
 
             network.setAddress(address);
             network.setGatewayAddress(gwAddress);
             network.setVlanNumber(vlanNumber);
             network.setMask(netmask);
+            isValid(network);
+
         } catch (ClassCastException | IllegalArgumentException e) {
-            throw new ParameterValidateException("один из параметро указан неверно:" + e.getMessage());
+            throw new ParameterValidateException("один из параметров указан неверно:" + e.getMessage());
         }
+
         networkRepository.save(network);
 
         return network;
+    }
+
+    @Override
+    public void isValid(Resource resource) throws ParameterValidateException {
+        Network network = (Network) resource;
+        String address = network.getAddressAsString();
+        if (address.equals("") || !InetAddresses.isInetAddress(address)) {
+            throw new ParameterValidateException("параметр address указан неверно");
+        }
+
+        Integer netmask = network.getMask();
+        if (netmask < 0 || netmask > 30) {
+            throw new ParameterValidateException("значение параметра mask должно находиться в диапазоне от 1 до 30");
+        }
+
+        String gwAddress = network.getGatewayAddressAsString();
+        if (gwAddress.equals("") || !InetAddresses.isInetAddress(gwAddress)) {
+            throw new ParameterValidateException("gatewayAddress должен быть указан");
+        }
+
+        Integer vlanNumber = network.getVlanNumber();
+        if (vlanNumber < 0 || vlanNumber > 4096) {
+            throw new ParameterValidateException("значение параметра vlanNumber должно находиться в диапазоне от 0 до 4096");
+        }
+
+        SubnetUtils subnetUtils = new SubnetUtils(address + "/" + netmask);
+        SubnetUtils.SubnetInfo subnetInfo = subnetUtils.getInfo();
+        if (!subnetInfo.isInRange(gwAddress)) {
+            throw new ParameterValidateException(gwAddress + " не входит в сеть " + address + "/" + netmask.toString());
+        }
+
+
     }
 
 }

@@ -1,5 +1,7 @@
 package ru.majordomo.hms.rc.staff.managers;
 
+import com.sun.org.apache.regexp.internal.RE;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,5 +53,11 @@ public class GovernorOfServiceTemplate extends LordOfResources{
         }
 
         return serviceTemplate;
+    }
+
+    @Override
+    public void isValid(Resource resource) throws ParameterValidateException {
+        ServiceTemplate template = (ServiceTemplate) resource;
+
     }
 }

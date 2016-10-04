@@ -11,7 +11,6 @@ import java.util.Collection;
 import ru.majordomo.hms.rc.staff.repositories.ServerRoleRepository;
 import ru.majordomo.hms.rc.staff.resources.ServerRole;
 
-//TODO
 @RestController
 @RequestMapping(value = "/${spring.application.name}/server-role")
 public class ServerRoleRestController {

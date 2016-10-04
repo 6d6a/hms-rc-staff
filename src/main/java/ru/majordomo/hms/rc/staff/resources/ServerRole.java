@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.majordomo.hms.rc.staff.Resource;
-//TODO
+
 @Document
 public class ServerRole extends Resource {
 

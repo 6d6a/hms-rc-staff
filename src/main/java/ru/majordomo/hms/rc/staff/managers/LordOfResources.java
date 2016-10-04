@@ -7,6 +7,7 @@ import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 
 public abstract class LordOfResources {
     public abstract Resource createResource(ServiceMessage serviceMessage) throws ParameterValidateException;
+    public abstract void isValid(Resource resource) throws ParameterValidateException;
     public static Resource setResourceParams(Resource resource, ServiceMessage serviceMessage, Cleaner cleaner) throws ClassCastException{
         String name = cleaner.cleanString((String) serviceMessage.getParam("name"));
         resource.setName(name);

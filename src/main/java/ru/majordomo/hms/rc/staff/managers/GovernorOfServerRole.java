@@ -9,8 +9,11 @@ import ru.majordomo.hms.rc.staff.Resource;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
+import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
+import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServerRoleRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceTemplateRepository;
+import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
 import ru.majordomo.hms.rc.staff.resources.ServerRole;
 import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 
@@ -18,6 +21,7 @@ import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 public class GovernorOfServerRole extends LordOfResources{
     private ServerRoleRepository repository;
     private ServiceTemplateRepository templateRepository;
+    private ConfigTemplateRepository configTemplateRepository;
     private Cleaner cleaner;
 
     @Autowired
@@ -28,6 +32,11 @@ public class GovernorOfServerRole extends LordOfResources{
     @Autowired
     public void setTemplateRepository(ServiceTemplateRepository templateRepository) {
         this.templateRepository = templateRepository;
+    }
+
+    @Autowired
+    public void setConfigTemplateRepository(ConfigTemplateRepository configTemplateRepository) {
+        this.configTemplateRepository = configTemplateRepository;
     }
 
     @Autowired
@@ -60,5 +69,16 @@ public class GovernorOfServerRole extends LordOfResources{
             throw new ParameterValidateException("один из параметров указан неверно:" + e.getMessage());
         }
         return serverRole;
+    }
+
+    @Override
+    public void isValid(Resource resource) throws ParameterValidateException {
+        ServerRole serverRole = (ServerRole) resource;
+        for (String configTemplateId: serverRole.getServiceTemplateIdList()) {
+            ConfigTemplate configTemplate = configTemplateRepository.findOne(configTemplateId);
+            if (configTemplate == null) {
+                throw new ParameterValidateException("ConfigTemplate с ID:" + configTemplateId + " не найден");
+            }
+        }
     }
 }

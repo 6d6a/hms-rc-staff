@@ -1,6 +1,10 @@
 package ru.majordomo.hms.rc.staff;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.springframework.data.annotation.Id;
+
+import java.io.IOException;
 
 public abstract class Resource {
     @Id
@@ -36,5 +40,15 @@ public abstract class Resource {
 
     public void setSwitchedOn(Boolean switchedOn) {
         this.switchedOn = switchedOn;
+    }
+    public String toJson() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonData = "";
+        try {
+            jsonData = objectMapper.writeValueAsString(this);
+        } catch (IOException ex) {
+//            logger.error("Невозможно конвертировать в JSON" + ex.toString());
+        }
+        return jsonData;
     }
 }
