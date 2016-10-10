@@ -2,6 +2,7 @@ package ru.majordomo.hms.rc.staff.resources;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSetter;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -9,7 +10,7 @@ import ru.majordomo.hms.rc.staff.Resource;
 @Document
 public class ServiceSocket extends Resource {
 
-    private Integer address;
+    private Long address;
     private Integer port;
 
     @Override
@@ -18,7 +19,7 @@ public class ServiceSocket extends Resource {
     }
 
     @JsonIgnore
-    public Integer getAddress() {
+    public Long getAddress() {
         return address;
     }
 
@@ -28,10 +29,11 @@ public class ServiceSocket extends Resource {
     }
 
     @JsonIgnore
-    public void setAddress(Integer address) {
+    public void setAddress(Long address) {
         this.address = address;
     }
 
+    @JsonSetter(value = "address")
     public void setAddress(String address) {
         this.address = Network.ipAddressInStringToInteger(address);
     }

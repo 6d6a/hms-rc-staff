@@ -5,9 +5,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import ru.majordomo.hms.rc.staff.resources.ServiceSocket;
+import ru.majordomo.hms.rc.staff.resources.Server;
 
 @Repository
-public interface ServiceSocketRepository extends MongoRepository<ServiceSocket,String> {
-    List<ServiceSocket> findAll();
+public interface ServerRepository extends MongoRepository<Server, String>{
+    List<Server> findAll();
 }

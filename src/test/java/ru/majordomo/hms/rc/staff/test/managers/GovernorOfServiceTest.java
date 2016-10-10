@@ -58,7 +58,7 @@ public class GovernorOfServiceTest {
         service.setName(name);
         service.setSwitchedOn(switchedOn);
         service.setServiceTemplate(serviceTemplate);
-        service.setServiceSocketList(serviceSocketList);
+        service.setServiceSockets(serviceSocketList);
 
         return service;
     }
@@ -95,8 +95,8 @@ public class GovernorOfServiceTest {
             Assert.assertEquals("name не совпадает с ожидаемым", testService.getName(), createdService.getName());
             Assert.assertEquals("switchedOn не совпадает с ожидаемым", testService.getSwitchedOn(), createdService.getSwitchedOn());
             Assert.assertEquals("serviceTemplate не совпадает с ожидаемым", testService.getServiceTemplate().getId(), createdService.getServiceTemplate().getId());
-            Assert.assertTrue(testService.getServiceSocketIdList().size() == createdService.getServiceSocketIdList().size());
-            Assert.assertTrue(testService.getServiceSocketIdList().containsAll(createdService.getServiceSocketIdList()));
+            Assert.assertTrue(testService.getServiceSocketIds().size() == createdService.getServiceSocketIds().size());
+            Assert.assertTrue(testService.getServiceSocketIds().containsAll(createdService.getServiceSocketIds()));
         } catch (ParameterValidateException e) {
             e.printStackTrace();
             Assert.fail();

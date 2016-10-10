@@ -1,5 +1,9 @@
 package ru.majordomo.hms.rc.staff.resources;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSetter;
+
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -11,24 +15,39 @@ import ru.majordomo.hms.rc.staff.Resource;
 @Document
 public class ServiceTemplate extends Resource {
 
-    private List<String> configTemplateIdsList = new ArrayList<>();
+    private List<String> configTemplateIds = new ArrayList<>();
     @Transient
-    private List<ConfigTemplate> configTemplateList = new ArrayList<>();
+    private List<ConfigTemplate> configTemplates = new ArrayList<>();
 
     @Override
     public void switchResource() {
         switchedOn = !switchedOn;
     }
 
-    public List<ConfigTemplate> getConfigTemplateList() {
-        return configTemplateList;
+    @JsonIgnore
+    public List<ConfigTemplate> getConfigTemplates() {
+        return configTemplates;
     }
 
-    public void setConfigTemplateList(List<ConfigTemplate> configTemplateList) {
-        this.configTemplateList = configTemplateList;
+    @JsonGetter(value = "configTemplates")
+    public List<String> getConfigTemplateIds() {
+        return configTemplateIds;
+    }
+
+    @JsonSetter(value = "configTemplates")
+    public void setConfigTemplateIds(List<String> configTemplateIds) {
+        this.configTemplateIds = configTemplateIds;
+    }
+
+    public void setConfigTemplates(List<ConfigTemplate> configTemplates) {
+        for (ConfigTemplate configTemplate: configTemplates) {
+            this.configTemplateIds.add(configTemplate.getId());
+        }
+        this.configTemplates = configTemplates;
     }
 
     public void addConfigTemplate(ConfigTemplate configTemplate) {
-        this.configTemplateList.add(configTemplate);
+        this.configTemplates.add(configTemplate);
+        this.configTemplateIds.add(configTemplate.getId());
     }
 }

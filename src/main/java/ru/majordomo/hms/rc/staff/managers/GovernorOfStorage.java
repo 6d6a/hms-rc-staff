@@ -51,4 +51,9 @@ public class GovernorOfStorage extends LordOfResources {
 
         return storage;
     }
+
+    @Override
+    public void isValid(Resource resource) throws ParameterValidateException {
+
+    }
 }

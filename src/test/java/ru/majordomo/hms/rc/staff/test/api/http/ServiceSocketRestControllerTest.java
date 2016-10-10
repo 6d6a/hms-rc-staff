@@ -1,5 +1,6 @@
 package ru.majordomo.hms.rc.staff.test.api.http;
 
+import org.bson.types.ObjectId;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,12 +20,16 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
+import ru.majordomo.hms.rc.staff.repositories.NetworkRepository;
+import ru.majordomo.hms.rc.staff.resources.Network;
 import ru.majordomo.hms.rc.staff.test.config.EmbeddedServltetContainerConfig;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
 import ru.majordomo.hms.rc.staff.test.config.ServiceSocketServicesConfig;
 import ru.majordomo.hms.rc.staff.repositories.ServiceSocketRepository;
 import ru.majordomo.hms.rc.staff.resources.ServiceSocket;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -35,6 +40,8 @@ public class ServiceSocketRestControllerTest {
 
     @Autowired
     private ServiceSocketRepository repository;
+    @Autowired
+    private NetworkRepository networkRepository;
     @Autowired
     private TestRestTemplate restTemplate;
     @Autowired
@@ -47,10 +54,16 @@ public class ServiceSocketRestControllerTest {
     private List<ServiceSocket> serviceSocketList = new ArrayList<>();
 
     private void generateBatchOfSockets() {
+
         String namePattern = "Сокет для сервиса";
         Boolean switchedOn = Boolean.TRUE;
         String addressPattern = "172.16.103.";
         Integer portPattern = 4000;
+
+        Network network = new Network();
+        network.setAddress(addressPattern + "0");
+        network.setMask(24);
+        networkRepository.save(network);
 
         for (int i = 2; i < 10; i++) {
             String name = namePattern + " " + i;
@@ -70,6 +83,8 @@ public class ServiceSocketRestControllerTest {
     @Before
     public void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(ctx).build();
+        repository.deleteAll();
+        networkRepository.deleteAll();
         generateBatchOfSockets();
     }
 
@@ -110,5 +125,93 @@ public class ServiceSocketRestControllerTest {
             ex.printStackTrace();
             Assert.fail();
         }
+    }
+
+    @Test
+    public void create() {
+        try {
+            ServiceSocket testingServiceSocket = serviceSocketList.get(0);
+            testingServiceSocket.setId(null);
+            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + applicationName + "/" + resourceName + "/")
+                    .contentType(MediaType.APPLICATION_JSON_UTF8)
+                    .content(testingServiceSocket.toJson());
+            mockMvc.perform(request).andExpect(status().isCreated());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void createWithUnknownNetwork() {
+        try {
+            ServiceSocket testingServiceSocket = serviceSocketList.get(0);
+            testingServiceSocket.setId(null);
+            testingServiceSocket.setAddress("10.10.10.10");
+            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + applicationName + "/" + resourceName + "/")
+                    .contentType(MediaType.APPLICATION_JSON_UTF8)
+                    .content(testingServiceSocket.toJson());
+            mockMvc.perform(request).andExpect(status().isBadRequest());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void update() {
+        try {
+            ServiceSocket testingServiceSocket = serviceSocketList.get(0);
+            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + applicationName + "/" + resourceName + "/" + testingServiceSocket.getId())
+                    .contentType(MediaType.APPLICATION_JSON_UTF8)
+                    .content(testingServiceSocket.toJson());
+            mockMvc.perform(request).andExpect(status().isOk());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void updateNotExistingResource() {
+        try {
+            ServiceSocket testingServiceSocket = serviceSocketList.get(0);
+            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + applicationName + "/" + resourceName + "/" + ObjectId.get().toString())
+                    .contentType(MediaType.APPLICATION_JSON_UTF8)
+                    .content(testingServiceSocket.toJson());
+            mockMvc.perform(request).andExpect(status().isNotFound());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void delete() {
+        try {
+            ServiceSocket testingServiceSocket = serviceSocketList.get(0);
+            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + applicationName + "/" + resourceName + "/" + testingServiceSocket.getId())
+                    .contentType(MediaType.APPLICATION_JSON_UTF8);
+            mockMvc.perform(request).andExpect(status().isOk());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void deleteNotExisting() {
+        try {
+            ServiceSocket testingServiceSocket = serviceSocketList.get(0);
+            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + applicationName + "/" + resourceName + "/" + ObjectId.get().toString())
+                    .contentType(MediaType.APPLICATION_JSON_UTF8);
+            mockMvc.perform(request).andExpect(status().isNotFound());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+
     }
 }

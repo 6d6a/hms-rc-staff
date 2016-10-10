@@ -15,9 +15,9 @@ import ru.majordomo.hms.rc.staff.Resource;
 @Document
 public class Network extends Resource {
 
-    private Integer address;
+    private Long address;
     private Integer mask;
-    private Integer gatewayAddress;
+    private Long gatewayAddress;
     private Integer vlanNumber;
 
     @Override
@@ -26,7 +26,7 @@ public class Network extends Resource {
     }
 
     @JsonIgnore
-    public Integer getAddress() {
+    public Long getAddress() {
         return address;
     }
 
@@ -35,7 +35,7 @@ public class Network extends Resource {
         return ipAddressInIntegerToString(address);
     }
 
-    public void setAddress(Integer address) {
+    public void setAddress(Long address) {
         this.address = address;
     }
 
@@ -52,7 +52,7 @@ public class Network extends Resource {
     }
 
     @JsonIgnore
-    public Integer getGatewayAddress() {
+    public Long getGatewayAddress() {
         return gatewayAddress;
     }
 
@@ -61,7 +61,7 @@ public class Network extends Resource {
         return ipAddressInIntegerToString(gatewayAddress);
     }
 
-    public void setGatewayAddress(Integer gatewayAddress) {
+    public void setGatewayAddress(Long gatewayAddress) {
         this.gatewayAddress = gatewayAddress;
     }
 
@@ -83,18 +83,21 @@ public class Network extends Resource {
         return subnetInfo.isInRange(address);
     }
 
-    public static String ipAddressInIntegerToString(Integer inetAddress) {
-        return InetAddresses.fromInteger(inetAddress).toString().replace("/", "");
+    public static String ipAddressInIntegerToString(Long ip) {
+        return ((ip >> 24) & 0xFF) + "."
+                + ((ip >> 16) & 0xFF) + "."
+                + ((ip >> 8) & 0xFF) + "."
+                + (ip & 0xFF);
     }
 
-    public static Integer ipAddressInStringToInteger(String address) {
-        InetAddress inetAddress = InetAddresses.forString(address);
-        byte[] octets = inetAddress.getAddress();
-        Integer result = 0;
-        for (byte octet : octets) {
-            result <<= 8;
-            result |= octet & 0xff;
+    public static Long ipAddressInStringToInteger(String address) {
+        long result = 0;
+        String[] ipAddressInArray = address.split("\\.");
+        for (int i = 3; i >= 0; i--) {
+            long ip = Long.parseLong(ipAddressInArray[3-i]);
+            result |= ip << (i * 8);
         }
+
         return result;
     }
 

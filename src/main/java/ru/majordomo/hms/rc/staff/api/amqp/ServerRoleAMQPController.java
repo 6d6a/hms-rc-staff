@@ -29,7 +29,8 @@ public class ServerRoleAMQPController {
     public void setGovernor(GovernorOfServerRole governor) {
         this.governor = governor;
     }
-@Autowired
+
+    @Autowired
     public void setSender(Sender sender) {
         this.sender = sender;
     }
@@ -40,9 +41,10 @@ public class ServerRoleAMQPController {
     }
 
     private static final Logger logger = LoggerFactory.getLogger(ServerRoleAMQPController.class);
+
     @RabbitListener(bindings = @QueueBinding(value = @Queue(value = "service.${spring.application.name}", durable = "true", autoDelete = "true"),
-                exchange = @Exchange(value = "server-role.create", type = "topic"),
-                key = "service.${spring.application.name}"))
+            exchange = @Exchange(value = "server-role.create", type = "topic"),
+            key = "service.${spring.application.name}"))
     public void create(@Payload ServiceMessage serviceMessage) {
         String loggerPrefix = "OPERATION IDENTITY:" + serviceMessage.getOperationIdentity() + "ACTION IDENTITY:" + serviceMessage.getActionIdentity() + " ";
         ServiceMessage reportServiceMessage = new ServiceMessage();
@@ -52,10 +54,10 @@ public class ServerRoleAMQPController {
             ServerRole serverRole = (ServerRole) governor.createResource(serviceMessage);
             logger.info(loggerPrefix + "server role успешно создана");
             reportServiceMessage.setObjRef("http://" + applicationName + "/" + serviceName + "/" + serverRole.getId());
-            reportServiceMessage.addParam("success",Boolean.TRUE);
+            reportServiceMessage.addParam("success", Boolean.TRUE);
         } catch (ParameterValidateException e) {
             logger.error(loggerPrefix + e.toString());
-            reportServiceMessage.addParam("success",Boolean.FALSE);
+            reportServiceMessage.addParam("success", Boolean.FALSE);
         } finally {
             sender.send(serviceName + ".create", "service.pm", reportServiceMessage);
             logger.info(loggerPrefix + "отчет в pm отправлен");

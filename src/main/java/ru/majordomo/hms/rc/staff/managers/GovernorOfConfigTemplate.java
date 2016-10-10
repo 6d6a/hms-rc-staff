@@ -5,10 +5,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import ru.majordomo.hms.rc.staff.Resource;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
+import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
 import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
 
@@ -27,20 +31,28 @@ public class GovernorOfConfigTemplate extends LordOfResources {
         String loggerPrefix = "OPERATION IDENTITY:" + serviceMessage.getOperationIdentity() + " ACTION IDENTITY:" + serviceMessage.getActionIdentity() + " ";
 
         ConfigTemplate configTemplate = new ConfigTemplate();
-        String fileName = cleaner.cleanString((String)serviceMessage.getParam("fileName"));
-        if (!fileName.equals("")) {
-            configTemplate.setName(fileName);
-        } else {
-            throw new ParameterValidateException(loggerPrefix + "параметр fileName не может быть пустым");
-        }
-
+        LordOfResources.setResourceParams(configTemplate, serviceMessage, cleaner);
         String fileLink = cleaner.cleanString((String)serviceMessage.getParam("fileLink"));
-        if (!fileLink.equals("")) {
-            configTemplate.setFileLink(fileLink);
-        } else {
-            throw new ParameterValidateException(loggerPrefix + "fileLink не может быть пустым");
-        }
+        configTemplate.setFileLink(fileLink);
+        isValid(configTemplate);
         configTemplateRepository.save(configTemplate);
         return configTemplate;
     }
+
+    @Override
+    public void isValid(Resource resource) throws ParameterValidateException {
+        ConfigTemplate configTemplate = (ConfigTemplate) resource;
+        String fileLink = configTemplate.getFileLink();
+        if (fileLink.equals("")) {
+            throw new ParameterValidateException("Адрес не может быть пустым");
+        }
+        try {
+            URL url = new URL(fileLink);
+        } catch (MalformedURLException e) {
+            throw new ParameterValidateException("Параметр fileLink содержит некорретный URL:'"
+                                                    + fileLink + "'");
+        }
+    }
+
+
 }

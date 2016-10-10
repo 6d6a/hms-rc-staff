@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -12,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.majordomo.hms.rc.staff.Resource;
-import ru.majordomo.hms.rc.staff.repositories.ServiceRepository;
 
 @Document
 public class Service extends Resource {
@@ -20,10 +18,10 @@ public class Service extends Resource {
     @Transient
     private ServiceTemplate serviceTemplate;
     @Transient
-    private List<ServiceSocket> serviceSocketList = new ArrayList<>();
+    private List<ServiceSocket> serviceSockets = new ArrayList<>();
 
     private String serviceTemplateId;
-    private List<String> serviceSocketIdList = new ArrayList<>();
+    private List<String> serviceSocketIds = new ArrayList<>();
 
     @Override
     public void switchResource() {
@@ -35,17 +33,19 @@ public class Service extends Resource {
         return serviceTemplateId;
     }
 
+    @JsonSetter(value = "serviceTemplate")
     public void setServiceTemplateId(String serviceTemplateId) {
         this.serviceTemplateId = serviceTemplateId;
     }
 
-    @JsonGetter(value = "serviceSocketList")
-    public List<String> getServiceSocketIdList() {
-        return serviceSocketIdList;
+    @JsonGetter(value = "serviceSockets")
+    public List<String> getServiceSocketIds() {
+        return serviceSocketIds;
     }
 
-    public void setServiceSocketIdList(List<String> serviceSocketIdList) {
-        this.serviceSocketIdList = serviceSocketIdList;
+    @JsonSetter(value = "serviceSockets")
+    public void setServiceSocketIds(List<String> serviceSocketIds) {
+        this.serviceSocketIds = serviceSocketIds;
     }
 
     @JsonIgnore
@@ -55,31 +55,33 @@ public class Service extends Resource {
 
     @JsonIgnore
     public void setServiceTemplate(ServiceTemplate serviceTemplate) {
-        this.serviceTemplateId = serviceTemplate.getId();
+        try {
+            this.serviceTemplateId = serviceTemplate.getId();
+        } catch (NullPointerException e){}
         this.serviceTemplate = serviceTemplate;
     }
 
     @JsonIgnore
-    public List<ServiceSocket> getServiceSocketList() {
-        return serviceSocketList;
+    public List<ServiceSocket> getServiceSockets() {
+        return serviceSockets;
     }
 
     @JsonIgnore
-    public void setServiceSocketList(List<ServiceSocket> serviceSocketList) {
+    public void setServiceSockets(List<ServiceSocket> serviceSockets) {
         List<String> ids = new ArrayList<>();
-        for (ServiceSocket serviceSocket: serviceSocketList) {
+        for (ServiceSocket serviceSocket: serviceSockets) {
             ids.add(serviceSocket.getId());
         }
-        this.serviceSocketIdList = ids;
-        this.serviceSocketList = serviceSocketList;
+        this.serviceSocketIds = ids;
+        this.serviceSockets = serviceSockets;
     }
 
     public void addServiceSocket(ServiceSocket serviceSocket) {
-        this.serviceSocketIdList.add(serviceSocket.getId());
-        this.serviceSocketList.add(serviceSocket);
+        this.serviceSocketIds.add(serviceSocket.getId());
+        this.serviceSockets.add(serviceSocket);
     }
 
     public void addServiceSocketId(String serviceSocketId) {
-        this.serviceSocketIdList.add(serviceSocketId);
+        this.serviceSocketIds.add(serviceSocketId);
     }
 }
