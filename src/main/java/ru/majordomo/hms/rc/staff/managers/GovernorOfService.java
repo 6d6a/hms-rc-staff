@@ -50,11 +50,10 @@ public class GovernorOfService extends LordOfResources{
         try {
             LordOfResources.setResourceParams(service, serviceMessage, cleaner);
             String serviceTemplateId = cleaner.cleanString((String) serviceMessage.getParam("serviceTemplate"));
-            service.setServiceTemplate(templateRepository.findOne(serviceTemplateId));
-            List<String> serviceSocketIdList= cleaner.cleanListWithStrings((List<String>) serviceMessage.getParam("serviceSocketList"));
-            for (String serviceSocketId: serviceSocketIdList) {
-                service.addServiceSocket(socketRepository.findOne(serviceSocketId));
-            }
+            setServiceTemplateById(service, serviceTemplateId);
+            List<String> serviceSocketIds= cleaner.cleanListWithStrings((List<String>) serviceMessage.getParam("serviceSocketList"));
+            setServiceSocketsByIds(service, serviceSocketIds);
+
             isValid(service);
             repository.save(service);
         } catch (ClassCastException e) {
@@ -63,27 +62,37 @@ public class GovernorOfService extends LordOfResources{
         return service;
     }
 
+    public void setServiceTemplateById(Service service, String serviceTemplateId) {
+        service.setServiceTemplate(templateRepository.findOne(serviceTemplateId));
+    }
+
+    public void setServiceSocketsByIds(Service service, List<String> serviceSocketIds) {
+        service.setServiceSockets((List<ServiceSocket>)socketRepository.findAll(serviceSocketIds));
+    }
+
     @Override
     public void isValid(Resource resource) throws ParameterValidateException {
         Service service = (Service) resource;
-        String serviceTemplateId = service.getId();
-
-        if (serviceTemplateId.equals("") ) {
+        ServiceTemplate serviceTemplate = service.getServiceTemplate();
+        if (serviceTemplate == null) {
+            throw new ParameterValidateException("Параметр serviceTemplate не может быть null");
+        }
+        if (serviceTemplate.getId().equals("")) {
             throw new ParameterValidateException("Параметр serviceTemplate не может быть пустым");
         }
 
-        ServiceTemplate serviceTemplate = templateRepository.findOne(serviceTemplateId);
-        if (serviceTemplate == null) {
-            throw new ParameterValidateException("ServiceTemplate с ID:" + serviceTemplateId + " не найден");
+        ServiceTemplate storedServiceTemplate = templateRepository.findOne(service.getServiceTemplateId());
+        if (storedServiceTemplate == null) {
+            throw new ParameterValidateException("ServiceTemplate с ID:" + service.getServiceTemplateId() + " не найден");
         }
 
-        List<String> serviceSocketIdList= service.getServiceSocketIdList();
+        List<String> serviceSocketIdList= service.getServiceSocketIds();
         if (serviceSocketIdList.isEmpty()) {
             throw new ParameterValidateException("SocketList не может быть пустым");
         }
         for (String serviceSocketId: serviceSocketIdList) {
             if (serviceSocketId.equals("")) {
-                continue;
+                throw new ParameterValidateException("ServiceSocketId не может быть пустым");
             }
             ServiceSocket socket = socketRepository.findOne(serviceSocketId);
             if (socket == null) {

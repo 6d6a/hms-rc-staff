@@ -1,7 +1,5 @@
 package ru.majordomo.hms.rc.staff.test.api.http;
 
-import net.minidev.json.JSONArray;
-
 import org.bson.types.ObjectId;
 import org.junit.Assert;
 import org.junit.Before;
@@ -22,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.majordomo.hms.rc.staff.repositories.ServiceRepository;
+import ru.majordomo.hms.rc.staff.repositories.ServiceSocketRepository;
+import ru.majordomo.hms.rc.staff.repositories.ServiceTemplateRepository;
 import ru.majordomo.hms.rc.staff.resources.Service;
 import ru.majordomo.hms.rc.staff.resources.ServiceSocket;
 import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
@@ -42,11 +42,15 @@ public class ServiceRestControllerTest {
     WebApplicationContext ctx;
     @Autowired
     private ServiceRepository repository;
+    @Autowired
+    private ServiceSocketRepository socketRepository;
+    @Autowired
+    private ServiceTemplateRepository templateRepository;
 
     @Value("${spring.application.name}")
     private String applicationName;
     private String resourceName = "service";
-    private List<Service> testServiceList = new ArrayList<>();
+    private List<Service> testServices = new ArrayList<>();
     private MockMvc mockMvc;
 
     private void generateBatchOfServices() {
@@ -56,12 +60,12 @@ public class ServiceRestControllerTest {
             serviceSocket.setAddress("10.10.10." + i);
             serviceSocket.setPort(2000 + i);
             serviceSocket.setName(serviceSocket.getAddressAsString() + ":" + serviceSocket.getPort());
-            serviceSocket.setId(ObjectId.get().toString());
+            socketRepository.save(serviceSocket);
 
             // Создать сервис темплейт
             ServiceTemplate serviceTemplate = new ServiceTemplate();
             serviceTemplate.setName("Шаблон сервиса " + i);
-            serviceTemplate.setId(ObjectId.get().toString());
+            templateRepository.save(serviceTemplate);
 
             // Создать сервис и добавить в него сокет и сервис темплейт
             Service service = new Service();
@@ -71,7 +75,7 @@ public class ServiceRestControllerTest {
             service.addServiceSocket(serviceSocket);
 
             repository.save(service);
-            testServiceList.add(service);
+            testServices.add(service);
         }
     }
 
@@ -84,7 +88,7 @@ public class ServiceRestControllerTest {
     @Test
     public void readOne() {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName +
-            "/" + resourceName + "/" + testServiceList.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
+            "/" + resourceName + "/" + testServices.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
         try {
             mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
         } catch (Exception e) {
@@ -109,7 +113,7 @@ public class ServiceRestControllerTest {
 
     @Test
     public void readOneAndCheckObjectFields() {
-        Service testingService = testServiceList.get(0);
+        Service testingService = testServices.get(0);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName +
             "/" + resourceName + "/" + testingService.getId()).accept(MediaType.APPLICATION_JSON_UTF8);
         try {
@@ -118,7 +122,81 @@ public class ServiceRestControllerTest {
                     .andExpect(jsonPath("name").value(testingService.getName()))
                     .andExpect(jsonPath("switchedOn").value(testingService.getSwitchedOn()))
                     .andExpect(jsonPath("serviceTemplate").value(testingService.getServiceTemplateId()))
-                    .andExpect(jsonPath("serviceSocketList.[0]").value(testingService.getServiceSocketIdList().get(0)));
+                    .andExpect(jsonPath("serviceSockets.[0]").value(testingService.getServiceSocketIds().get(0)));
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void create() {
+        Service service = testServices.get(0);
+        service.setId(null);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + applicationName +
+                                                "/" + resourceName)
+                                                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                                                .content(service.toJson());
+        try {
+            mockMvc.perform(request).andExpect(status().isCreated());
+         } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void update() {
+        Service service = testServices.get(0);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + applicationName
+                                                + "/" + resourceName + "/" + service.getId())
+                                                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                                                .content(service.toJson());
+        try {
+            mockMvc.perform(request).andExpect(status().isOk());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void updateNotExistingResource() {
+        Service service = testServices.get(0);
+        String unknownServiceId = ObjectId.get().toString();
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + applicationName
+                                                + "/" + resourceName + "/" + unknownServiceId)
+                                                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                                                .content(service.toJson());
+        try {
+            mockMvc.perform(request).andExpect(status().isNotFound());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void delete() {
+        String serviceIdToDelete = testServices.get(0).getId();
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + applicationName
+                                                + "/" + resourceName + "/" + serviceIdToDelete)
+                                                .accept(MediaType.APPLICATION_JSON_UTF8);
+        try {
+            mockMvc.perform(request).andExpect(status().isOk());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void deleteNotExisting() {
+        String unknownServiceId = ObjectId.get().toString();
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + applicationName
+                                                + "/" + resourceName + "/" + unknownServiceId);
+        try {
+            mockMvc.perform(request).andExpect(status().isNotFound());
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
