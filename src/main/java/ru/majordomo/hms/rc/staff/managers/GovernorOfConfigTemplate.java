@@ -31,9 +31,9 @@ public class GovernorOfConfigTemplate extends LordOfResources {
         String loggerPrefix = "OPERATION IDENTITY:" + serviceMessage.getOperationIdentity() + " ACTION IDENTITY:" + serviceMessage.getActionIdentity() + " ";
 
         ConfigTemplate configTemplate = new ConfigTemplate();
-        String fileName = cleaner.cleanString((String)serviceMessage.getParam("fileName"));
+        LordOfResources.setResourceParams(configTemplate, serviceMessage, cleaner);
         String fileLink = cleaner.cleanString((String)serviceMessage.getParam("fileLink"));
-
+        configTemplate.setFileLink(fileLink);
         isValid(configTemplate);
         configTemplateRepository.save(configTemplate);
         return configTemplate;
@@ -49,7 +49,8 @@ public class GovernorOfConfigTemplate extends LordOfResources {
         try {
             URL url = new URL(fileLink);
         } catch (MalformedURLException e) {
-            throw new ParameterValidateException("Параметр fileLink содержит некорретный URL");
+            throw new ParameterValidateException("Параметр fileLink содержит некорретный URL:'"
+                                                    + fileLink + "'");
         }
     }
 
