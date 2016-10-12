@@ -49,16 +49,7 @@ public class GovernorOfServerRole extends LordOfResources{
         try {
             LordOfResources.setResourceParams(serverRole, serviceMessage, cleaner);
             List<String> serviceTemplateIdList = cleaner.cleanListWithStrings((List<String>) serviceMessage.getParam("serviceTemplateList"));
-            for (String serviceTemplateId: serviceTemplateIdList) {
-                if (serviceTemplateId.equals("")) {
-                    continue;
-                }
-                ServiceTemplate serviceTemplate = templateRepository.findOne(serviceTemplateId);
-                if (serviceTemplate == null) {
-                    continue;
-                }
-                serverRole.addServiceTemplate(serviceTemplate);
-            }
+            setServiceTemplatesByIds(serverRole, serviceTemplateIdList);
             if (serverRole.getServiceTemplates().isEmpty()) {
                 throw new ParameterValidateException("Должен быть задан хотя бы один service template");
             }
