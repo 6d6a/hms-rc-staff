@@ -9,7 +9,6 @@ import ru.majordomo.hms.rc.staff.Resource;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
-import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServerRoleRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceTemplateRepository;
@@ -50,34 +49,32 @@ public class GovernorOfServerRole extends LordOfResources{
         try {
             LordOfResources.setResourceParams(serverRole, serviceMessage, cleaner);
             List<String> serviceTemplateIdList = cleaner.cleanListWithStrings((List<String>) serviceMessage.getParam("serviceTemplateList"));
-            for (String serviceTemplateId: serviceTemplateIdList) {
-                if (serviceTemplateId.equals("")) {
-                    continue;
-                }
-                ServiceTemplate serviceTemplate = templateRepository.findOne(serviceTemplateId);
-                if (serviceTemplate == null) {
-                    continue;
-                }
-                serverRole.addServiceTemplate(serviceTemplate);
-            }
-            if (serverRole.getServiceTemplateList().isEmpty()) {
+            setServiceTemplatesByIds(serverRole, serviceTemplateIdList);
+            if (serverRole.getServiceTemplates().isEmpty()) {
                 throw new ParameterValidateException("Должен быть задан хотя бы один service template");
             }
             repository.save(serverRole);
 
         } catch (ClassCastException e) {
-            throw new ParameterValidateException("один из параметров указан неверно:" + e.getMessage());
+            throw new ParameterValidateException("Один из параметров указан неверно:" + e.getMessage());
         }
         return serverRole;
+    }
+
+    public void setServiceTemplatesByIds(ServerRole serverRole, List<String> serviceTemplateIds) throws ParameterValidateException {
+        serverRole.setServiceTemplates((List<ServiceTemplate>) templateRepository.findAll(serviceTemplateIds));
     }
 
     @Override
     public void isValid(Resource resource) throws ParameterValidateException {
         ServerRole serverRole = (ServerRole) resource;
-        for (String configTemplateId: serverRole.getServiceTemplateIdList()) {
-            ConfigTemplate configTemplate = configTemplateRepository.findOne(configTemplateId);
-            if (configTemplate == null) {
-                throw new ParameterValidateException("ConfigTemplate с ID:" + configTemplateId + " не найден");
+        if (serverRole.getServiceTemplates().isEmpty()) {
+            throw new ParameterValidateException("Не найден ни один ServiceTemplate");
+        }
+        for (String serviceTemplateId: serverRole.getServiceTemplateIds()) {
+            ServiceTemplate serviceTemplate = templateRepository.findOne(serviceTemplateId);
+            if (serviceTemplate == null) {
+                throw new ParameterValidateException("ServiceTemplate с ID:" + serviceTemplateId + " не найден");
             }
         }
     }

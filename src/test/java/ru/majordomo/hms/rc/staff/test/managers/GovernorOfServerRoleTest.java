@@ -39,21 +39,21 @@ public class GovernorOfServerRoleTest {
     private ServerRole testServerRole;
 
     private ServiceMessage generateServiceMessage(String name, Boolean switchedOn,
-                                                  List<String> serviceTemplateIdList) {
+                                                  List<String> serviceTemplateIds) {
         ServiceMessage serviceMessage = new ServiceMessage();
         serviceMessage.addParam("name", name);
         serviceMessage.addParam("switchedOn", switchedOn);
-        serviceMessage.addParam("serviceTemplateList", serviceTemplateIdList);
+        serviceMessage.addParam("serviceTemplateList", serviceTemplateIds);
 
         return serviceMessage;
     }
 
     private ServerRole generateServerRole(String name, Boolean switchedOn,
-                                          List<ServiceTemplate> serviceTemplateList) {
+                                          List<ServiceTemplate> serviceTemplates) {
         ServerRole serverRole = new ServerRole();
         serverRole.setName(name);
         serverRole.setSwitchedOn(switchedOn);
-        serverRole.setServiceTemplateList(serviceTemplateList);
+        serverRole.setServiceTemplates(serviceTemplates);
 
         return serverRole;
     }
@@ -67,12 +67,12 @@ public class GovernorOfServerRoleTest {
         // Создать сервер роль и сервисное сообщение
         String name = "Серверная роль 1";
         Boolean switchedOn = Boolean.TRUE;
-        List<ServiceTemplate> serviceTemplateList = new ArrayList<>();
-        List<String> serviceTemplateIdList = new ArrayList<>();
-        serviceTemplateList.add(serviceTemplate);
-        serviceTemplateIdList.add(serviceTemplate.getId());
-        this.testServerRole = generateServerRole(name,switchedOn,serviceTemplateList);
-        this.testServiceMessage = generateServiceMessage(name,switchedOn,serviceTemplateIdList);
+        List<ServiceTemplate> serviceTemplates = new ArrayList<>();
+        List<String> serviceTemplateIds = new ArrayList<>();
+        serviceTemplates.add(serviceTemplate);
+        serviceTemplateIds.add(serviceTemplate.getId());
+        this.testServerRole = generateServerRole(name,switchedOn,serviceTemplates);
+        this.testServiceMessage = generateServiceMessage(name,switchedOn,serviceTemplateIds);
     }
 
     @Test
@@ -81,8 +81,8 @@ public class GovernorOfServerRoleTest {
             ServerRole createdRole = (ServerRole) governor.createResource(testServiceMessage);
             Assert.assertEquals("Имя не совпадает с ожидаемым", testServerRole.getName(), createdRole.getName());
             Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testServerRole.getSwitchedOn(), createdRole.getSwitchedOn());
-            Assert.assertTrue(testServerRole.getServiceTemplateList().size() == createdRole.getServiceTemplateList().size());
-            Assert.assertTrue(testServerRole.getServiceTemplateIdList().containsAll(createdRole.getServiceTemplateIdList()));
+            Assert.assertTrue(testServerRole.getServiceTemplates().size() == createdRole.getServiceTemplates().size());
+            Assert.assertTrue(testServerRole.getServiceTemplateIds().containsAll(createdRole.getServiceTemplateIds()));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -91,9 +91,16 @@ public class GovernorOfServerRoleTest {
 
     @Test(expected = ParameterValidateException.class)
     public void createWithUnknownServiceTemplate() throws ParameterValidateException {
-        List<String> unknownServiceTemplateList = new ArrayList<>();
-        unknownServiceTemplateList.add(ObjectId.get().toString());
-        testServiceMessage.addParam("serviceTemplateList", unknownServiceTemplateList);
+        List<String> unknownServiceTemplates = new ArrayList<>();
+        unknownServiceTemplates.add(ObjectId.get().toString());
+        testServiceMessage.addParam("serviceTemplateList", unknownServiceTemplates);
         governor.createResource(testServiceMessage);
+    }
+
+    @Test(expected = ParameterValidateException.class)
+    public void validateWithEmptyServiceTemplate() throws ParameterValidateException {
+        List<ServiceTemplate> emptyServiceTemplates = new ArrayList<>();
+        testServerRole.setServiceTemplates(emptyServiceTemplates);
+        governor.isValid(testServerRole);
     }
 }

@@ -3,6 +3,7 @@ package ru.majordomo.hms.rc.staff.resources;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -15,8 +16,8 @@ import ru.majordomo.hms.rc.staff.Resource;
 public class ServerRole extends Resource {
 
     @Transient
-    private List<ServiceTemplate> serviceTemplateList = new ArrayList<>();
-    private List<String> serviceTemplateIdList = new ArrayList<>();
+    private List<ServiceTemplate> serviceTemplates = new ArrayList<>();
+    private List<String> serviceTemplateIds = new ArrayList<>();
 
     @Override
     public void switchResource() {
@@ -24,31 +25,32 @@ public class ServerRole extends Resource {
     }
 
     @JsonIgnore
-    public List<ServiceTemplate> getServiceTemplateList() {
-        return serviceTemplateList;
+    public List<ServiceTemplate> getServiceTemplates() {
+        return serviceTemplates;
     }
 
     @JsonIgnore
-    public void setServiceTemplateList(List<ServiceTemplate> serviceTemplateList) {
+    public void setServiceTemplates(List<ServiceTemplate> serviceTemplates) {
         List<String> serviceTemplateIdList = new ArrayList<>();
-        for (ServiceTemplate serviceTemplate: serviceTemplateList) {
+        for (ServiceTemplate serviceTemplate: serviceTemplates) {
             serviceTemplateIdList.add(serviceTemplate.getId());
         }
-        this.serviceTemplateIdList = serviceTemplateIdList;
-        this.serviceTemplateList = serviceTemplateList;
+        this.serviceTemplateIds = serviceTemplateIdList;
+        this.serviceTemplates = serviceTemplates;
     }
 
-    @JsonGetter(value = "serviceTemplateList")
-    public List<String> getServiceTemplateIdList() {
-        return serviceTemplateIdList;
+    @JsonGetter(value = "serviceTemplates")
+    public List<String> getServiceTemplateIds() {
+        return serviceTemplateIds;
     }
 
-    public void setServiceTemplateIdList(List<String> serviceTemplateIdList) {
-        this.serviceTemplateIdList = serviceTemplateIdList;
+    @JsonSetter(value = "serviceTemplates")
+    public void setServiceTemplateIds(List<String> serviceTemplateIds) {
+        this.serviceTemplateIds = serviceTemplateIds;
     }
 
     public void addServiceTemplate(ServiceTemplate serviceTemplate) {
-        this.serviceTemplateList.add(serviceTemplate);
-        this.serviceTemplateIdList.add(serviceTemplate.getId());
+        this.serviceTemplates.add(serviceTemplate);
+        this.serviceTemplateIds.add(serviceTemplate.getId());
     }
 }
