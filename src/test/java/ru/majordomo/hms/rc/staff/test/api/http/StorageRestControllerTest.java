@@ -72,7 +72,7 @@ public class StorageRestControllerTest {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName +
                 "/" + resourceName + "/" + storages.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
         try {
-            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType("application/json;charset=UTF8"));
+            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -83,7 +83,7 @@ public class StorageRestControllerTest {
     public void readAll() {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName + "/" + resourceName + "/").accept(MediaType.APPLICATION_JSON_UTF8);
         try {
-            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType("application/json;charset=UTF8"));
+            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
