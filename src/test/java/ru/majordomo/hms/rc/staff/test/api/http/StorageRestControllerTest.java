@@ -1,5 +1,6 @@
 package ru.majordomo.hms.rc.staff.test.api.http;
 
+import org.bson.types.ObjectId;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,7 +43,7 @@ public class StorageRestControllerTest {
     @Value("${spring.application.name}")
     private String applicationName;
     private String resourceName = "storage";
-    private List<Storage> storageList = new ArrayList<>();
+    private List<Storage> storages = new ArrayList<>();
 
     private void generateBatchOfStorages() {
         String namePattern = "Хранилище ";
@@ -56,7 +57,7 @@ public class StorageRestControllerTest {
             storage.setCapacity(capacity);
             storage.setCapacityUsed(used);
             repository.save(storage);
-            storageList.add(storage);
+            storages.add(storage);
         }
     }
 
@@ -69,7 +70,7 @@ public class StorageRestControllerTest {
     @Test
     public void readOne() {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName +
-                "/" + resourceName + "/" + storageList.get(0).getId()).accept(MediaType.APPLICATION_JSON);
+                "/" + resourceName + "/" + storages.get(0).getId()).accept(MediaType.APPLICATION_JSON);
         try {
             mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType("application/json;charset=UTF8"));
         } catch (Exception e) {
@@ -91,7 +92,7 @@ public class StorageRestControllerTest {
 
     @Test
     public void readOneAndCheckObjectFields() {
-        Storage testingStorage = storageList.get(0);
+        Storage testingStorage = storages.get(0);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName + "/" + resourceName + "/" + testingStorage.getId()).accept(MediaType.APPLICATION_JSON);
         try {
             mockMvc.perform(request).andExpect(jsonPath("name").value(testingStorage.getName()))
@@ -100,6 +101,79 @@ public class StorageRestControllerTest {
                     .andExpect(jsonPath("capacity").value(testingStorage.getCapacity()))
                     .andExpect(jsonPath("capacityUsed").value(testingStorage.getCapacityUsed()));
         } catch (Exception e){
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void create() {
+        Storage testingStorage = storages.get(0);
+        testingStorage.setId(null);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + applicationName
+                + "/" + resourceName)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(testingStorage.toJson());
+        try {
+            mockMvc.perform(request).andExpect(status().isCreated());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void update() {
+        Storage storage = storages.get(0);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + applicationName
+                + "/" + resourceName + "/" + storage.getId())
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(storage.toJson());
+        try {
+            mockMvc.perform(request).andExpect(status().isOk());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void updateNotExistingResource() {
+        Storage storage = storages.get(0);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + applicationName
+                + "/" + resourceName + "/" + ObjectId.get().toString())
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(storage.toJson());
+        try {
+            mockMvc.perform(request).andExpect(status().isNotFound());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void delete() {
+        Storage storage = storages.get(0);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + applicationName
+                + "/" + resourceName + "/" + storage.getId())
+                .accept(MediaType.APPLICATION_JSON_UTF8);
+        try {
+            mockMvc.perform(request).andExpect(status().isOk());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void deleteNotExisting() {
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + applicationName
+                + "/" + resourceName + "/" + ObjectId.get().toString())
+                .accept(MediaType.APPLICATION_JSON_UTF8);
+        try {
+            mockMvc.perform(request).andExpect(status().isNotFound());
+        } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
         }

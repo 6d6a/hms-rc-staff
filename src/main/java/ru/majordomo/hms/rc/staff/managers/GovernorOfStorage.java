@@ -41,8 +41,8 @@ public class GovernorOfStorage extends LordOfResources {
             if (capacityUsed > capacity) {
                 throw new ParameterValidateException("capacityUsed не может быть больше capacity");
             }
-            storage.setCapacity(capacity);
-            storage.setCapacityUsed(capacityUsed);
+            storage.setCapacity((Double) serviceMessage.getParam("capacity"));
+            storage.setCapacityUsed((Double) serviceMessage.getParam("capacityUsed"));
 
             repository.save(storage);
         } catch (ClassCastException e){
@@ -54,6 +54,21 @@ public class GovernorOfStorage extends LordOfResources {
 
     @Override
     public void isValid(Resource resource) throws ParameterValidateException {
+        Storage storage = (Storage) resource;
 
+        Double capacity = storage.getCapacity();
+        Double capacityUsed = storage.getCapacityUsed();
+
+        if (capacity <= 0) {
+            throw new ParameterValidateException("capacity не может быть меньше или равен нулю");
+        }
+
+        if (capacityUsed < 0) {
+            throw new ParameterValidateException("capacityUsed не может быть меньше нуля");
+        }
+
+        if (capacityUsed > capacity) {
+            throw new ParameterValidateException("capacityUsed не может быть больше capacity");
+        }
     }
 }
