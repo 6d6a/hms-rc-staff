@@ -70,7 +70,7 @@ public class StorageRestControllerTest {
     @Test
     public void readOne() {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName +
-                "/" + resourceName + "/" + storages.get(0).getId()).accept(MediaType.APPLICATION_JSON);
+                "/" + resourceName + "/" + storages.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
         try {
             mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType("application/json;charset=UTF8"));
         } catch (Exception e) {
@@ -81,7 +81,7 @@ public class StorageRestControllerTest {
 
     @Test
     public void readAll() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName + "/" + resourceName + "/").accept(MediaType.APPLICATION_JSON);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName + "/" + resourceName + "/").accept(MediaType.APPLICATION_JSON_UTF8);
         try {
             mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType("application/json;charset=UTF8"));
         } catch (Exception e) {
@@ -93,7 +93,7 @@ public class StorageRestControllerTest {
     @Test
     public void readOneAndCheckObjectFields() {
         Storage testingStorage = storages.get(0);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName + "/" + resourceName + "/" + testingStorage.getId()).accept(MediaType.APPLICATION_JSON);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName + "/" + resourceName + "/" + testingStorage.getId()).accept(MediaType.APPLICATION_JSON_UTF8);
         try {
             mockMvc.perform(request).andExpect(jsonPath("name").value(testingStorage.getName()))
                     .andExpect(jsonPath("id").value(testingStorage.getId()))

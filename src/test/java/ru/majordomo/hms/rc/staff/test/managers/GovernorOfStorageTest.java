@@ -25,9 +25,6 @@ public class GovernorOfStorageTest {
     ServiceMessage testServiceMessage;
     Storage testStorage;
 
-    private String name = "Хранилище 1";
-    private Boolean switchedOn = Boolean.TRUE;
-
     private ServiceMessage generateServiceMessage(String name, Boolean switchedOn,
                                                   Double capacity, Double capacityUsed) {
         ServiceMessage serviceMessage = new ServiceMessage();
@@ -50,6 +47,8 @@ public class GovernorOfStorageTest {
 
     @Before
     public void setUp() {
+        String name = "Хранилище 1";
+        Boolean switchedOn = Boolean.TRUE;
         Double capacity = 5 * Math.pow(10, 12);
         Double capacityUsed = 3 * Math.pow(10, 12);
         testServiceMessage = generateServiceMessage(name, switchedOn, capacity, capacityUsed);
@@ -71,20 +70,20 @@ public class GovernorOfStorageTest {
     }
 
     @Test(expected = ParameterValidateException.class)
-    public void createWithInvalidCapacity() throws ParameterValidateException {
-        testServiceMessage = generateServiceMessage(name, switchedOn, 0.0, 3 * Math.pow(10, 12));
+    public void createResourceWithInvalidCapacity() throws ParameterValidateException {
+        testServiceMessage = generateServiceMessage("Хранилище 2", Boolean.TRUE, 0.0, 3 * Math.pow(10, 12));
         governor.createResource(testServiceMessage);
     }
 
     @Test(expected = ParameterValidateException.class)
-    public void createWithInvalidCapacityUsed() throws ParameterValidateException {
-        testServiceMessage = generateServiceMessage(name, switchedOn, 5 * Math.pow(10, 12), -10.0);
+    public void createResourceWithInvalidCapacityUsed() throws ParameterValidateException {
+        testServiceMessage = generateServiceMessage("Хранилище 3", Boolean.TRUE, 5 * Math.pow(10, 12), -10.0);
         governor.createResource(testServiceMessage);
     }
 
     @Test(expected = ParameterValidateException.class)
-    public void createWithInvalidParams() throws ParameterValidateException {
-        testServiceMessage = generateServiceMessage(name, switchedOn, 3 * Math.pow(10, 12), 5 * Math.pow(10, 12));
+    public void createResourceWithCapacityUsedBiggerThenCapacity() throws ParameterValidateException {
+        testServiceMessage = generateServiceMessage("Хранилище 4", Boolean.TRUE, 3 * Math.pow(10, 12), 5 * Math.pow(10, 12));
         governor.createResource(testServiceMessage);
     }
 
@@ -101,7 +100,7 @@ public class GovernorOfStorageTest {
     }
 
     @Test(expected = ParameterValidateException.class)
-    public void validateWithInvalidParams() throws ParameterValidateException {
+    public void validateWithInvalidCapacityUsedBiggerThenCapacity() throws ParameterValidateException {
         testStorage.setCapacity(3 * Math.pow(10, 12));
         testStorage.setCapacityUsed(5 * Math.pow(10, 12));
         governor.isValid(testStorage);

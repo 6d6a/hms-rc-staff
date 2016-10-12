@@ -15,11 +15,18 @@ import ru.majordomo.hms.rc.staff.resources.Storage;
 @Service
 public class GovernorOfStorage extends LordOfResources {
 
-    @Autowired
     StorageRepository repository;
+    Cleaner cleaner;
 
     @Autowired
-    Cleaner cleaner;
+    public void setCleaner(Cleaner cleaner) {
+        this.cleaner = cleaner;
+    }
+
+    @Autowired
+    public void setRepository(StorageRepository repository) {
+        this.repository = repository;
+    }
 
     private static final Logger logger = LoggerFactory.getLogger(GovernorOfStorage.class);
 
