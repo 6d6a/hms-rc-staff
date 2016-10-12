@@ -41,8 +41,8 @@ public class GovernorOfStorage extends LordOfResources {
             if (capacityUsed > capacity) {
                 throw new ParameterValidateException("capacityUsed не может быть больше capacity");
             }
-            storage.setCapacity((Double) serviceMessage.getParam("capacity"));
-            storage.setCapacityUsed((Double) serviceMessage.getParam("capacityUsed"));
+            storage.setCapacity(capacity);
+            storage.setCapacityUsed(capacityUsed);
 
             repository.save(storage);
         } catch (ClassCastException e){

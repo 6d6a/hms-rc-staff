@@ -16,9 +16,6 @@ import ru.majordomo.hms.rc.staff.resources.Storage;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
 import ru.majordomo.hms.rc.staff.test.config.StorageServicesConfig;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {StorageServicesConfig.class, RepositoriesConfig.class})
 public class GovernorOfStorageTest {
