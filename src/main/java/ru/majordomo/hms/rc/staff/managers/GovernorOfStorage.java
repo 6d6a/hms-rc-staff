@@ -15,11 +15,18 @@ import ru.majordomo.hms.rc.staff.resources.Storage;
 @Service
 public class GovernorOfStorage extends LordOfResources {
 
-    @Autowired
     StorageRepository repository;
+    Cleaner cleaner;
 
     @Autowired
-    Cleaner cleaner;
+    public void setCleaner(Cleaner cleaner) {
+        this.cleaner = cleaner;
+    }
+
+    @Autowired
+    public void setRepository(StorageRepository repository) {
+        this.repository = repository;
+    }
 
     private static final Logger logger = LoggerFactory.getLogger(GovernorOfStorage.class);
 
@@ -54,6 +61,21 @@ public class GovernorOfStorage extends LordOfResources {
 
     @Override
     public void isValid(Resource resource) throws ParameterValidateException {
+        Storage storage = (Storage) resource;
 
+        Double capacity = storage.getCapacity();
+        Double capacityUsed = storage.getCapacityUsed();
+
+        if (capacity <= 0) {
+            throw new ParameterValidateException("capacity не может быть меньше или равен нулю");
+        }
+
+        if (capacityUsed < 0) {
+            throw new ParameterValidateException("capacityUsed не может быть меньше нуля");
+        }
+
+        if (capacityUsed > capacity) {
+            throw new ParameterValidateException("capacityUsed не может быть больше capacity");
+        }
     }
 }

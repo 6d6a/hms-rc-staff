@@ -68,4 +68,42 @@ public class GovernorOfStorageTest {
             Assert.fail();
         }
     }
+
+    @Test(expected = ParameterValidateException.class)
+    public void createResourceWithInvalidCapacity() throws ParameterValidateException {
+        testServiceMessage = generateServiceMessage("Хранилище 2", Boolean.TRUE, 0.0, 3 * Math.pow(10, 12));
+        governor.createResource(testServiceMessage);
+    }
+
+    @Test(expected = ParameterValidateException.class)
+    public void createResourceWithInvalidCapacityUsed() throws ParameterValidateException {
+        testServiceMessage = generateServiceMessage("Хранилище 3", Boolean.TRUE, 5 * Math.pow(10, 12), -10.0);
+        governor.createResource(testServiceMessage);
+    }
+
+    @Test(expected = ParameterValidateException.class)
+    public void createResourceWithCapacityUsedBiggerThenCapacity() throws ParameterValidateException {
+        testServiceMessage = generateServiceMessage("Хранилище 4", Boolean.TRUE, 3 * Math.pow(10, 12), 5 * Math.pow(10, 12));
+        governor.createResource(testServiceMessage);
+    }
+
+    @Test(expected = ParameterValidateException.class)
+    public void validateWithInvalidCapacity() throws ParameterValidateException {
+        testStorage.setCapacity(0.0);
+        governor.isValid(testStorage);
+    }
+
+    @Test(expected = ParameterValidateException.class)
+    public void validateWithInvalidCapacityUsed() throws ParameterValidateException {
+        testStorage.setCapacityUsed(-10.0);
+        governor.isValid(testStorage);
+    }
+
+    @Test(expected = ParameterValidateException.class)
+    public void validateWithInvalidCapacityUsedBiggerThenCapacity() throws ParameterValidateException {
+        testStorage.setCapacity(3 * Math.pow(10, 12));
+        testStorage.setCapacityUsed(5 * Math.pow(10, 12));
+        governor.isValid(testStorage);
+    }
+
 }
