@@ -100,7 +100,7 @@ public class NetworkRestControllerTest {
     @Test
     public void readAll() {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName
-                + "/" + resourceName).accept(MediaType.APPLICATION_JSON);
+                + "/" + resourceName).accept(MediaType.APPLICATION_JSON_UTF8);
         try {
             mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
         } catch (Exception e) {
