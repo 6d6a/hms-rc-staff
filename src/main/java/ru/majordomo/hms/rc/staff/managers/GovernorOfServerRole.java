@@ -5,14 +5,13 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-import ru.majordomo.hms.rc.staff.Resource;
+import ru.majordomo.hms.rc.staff.resources.Resource;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServerRoleRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceTemplateRepository;
-import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
 import ru.majordomo.hms.rc.staff.resources.ServerRole;
 import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 

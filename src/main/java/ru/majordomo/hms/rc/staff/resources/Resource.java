@@ -1,4 +1,4 @@
-package ru.majordomo.hms.rc.staff;
+package ru.majordomo.hms.rc.staff.resources;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

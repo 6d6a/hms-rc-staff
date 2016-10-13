@@ -10,8 +10,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.majordomo.hms.rc.staff.Resource;
-
 @Document
 public class ServerRole extends Resource {
 

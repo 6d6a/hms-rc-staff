@@ -3,15 +3,12 @@ package ru.majordomo.hms.rc.staff.managers;
 import com.google.common.net.InetAddresses;
 
 import org.apache.commons.net.util.SubnetUtils;
-import org.apache.http.conn.util.InetAddressUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.net.Inet4Address;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 
-import ru.majordomo.hms.rc.staff.Resource;
+import ru.majordomo.hms.rc.staff.resources.Resource;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
