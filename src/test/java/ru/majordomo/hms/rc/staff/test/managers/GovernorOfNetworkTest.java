@@ -21,10 +21,10 @@ import ru.majordomo.hms.rc.staff.resources.Network;
 public class GovernorOfNetworkTest {
 
     @Autowired
-    GovernorOfNetwork governorOfNetwork;
+    private GovernorOfNetwork governorOfNetwork;
 
     @Autowired
-    NetworkRepository networkRepository;
+    private NetworkRepository networkRepository;
 
     private String name = "Тестовая сеть";
     private Boolean switchedOn = Boolean.TRUE;
@@ -32,7 +32,7 @@ public class GovernorOfNetworkTest {
     private Integer mask = 24;
     private String gatewayAddress = "172.16.103.1";
     private Integer vlanNumber = 103;
-    ServiceMessage serviceMessage;
+    private ServiceMessage serviceMessage;
 
     private ServiceMessage createServiceMessage(String name, Boolean switchedOn, String address, Integer mask, String gatewayAddress, Integer vlanNumber) {
         ServiceMessage serviceMessage = new ServiceMessage();

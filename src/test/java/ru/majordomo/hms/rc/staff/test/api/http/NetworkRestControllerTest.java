@@ -37,12 +37,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = {RepositoriesConfig.class, NetworkServicesConfig.class, EmbeddedServltetContainerConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class NetworkRestControllerTest {
     @Autowired
-    GovernorOfNetwork governorOfNetwork;
+    private GovernorOfNetwork governorOfNetwork;
     @Autowired
     private NetworkRepository networkRepository;
 
     @Autowired
-    TestRestTemplate restTemplate;
+    private TestRestTemplate restTemplate;
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -88,9 +88,9 @@ public class NetworkRestControllerTest {
     @Test
     public void readOne() {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName
-                + "/" + resourceName + "/" + networks.get(0).getId()).accept(MediaType.APPLICATION_JSON);
+                + "/" + resourceName + "/" + networks.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
         try {
-            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType("application/json;charset=UTF-8"));
+            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -102,7 +102,7 @@ public class NetworkRestControllerTest {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName
                 + "/" + resourceName).accept(MediaType.APPLICATION_JSON);
         try {
-            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType("application/json;charset=UTF-8"));
+            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -112,7 +112,7 @@ public class NetworkRestControllerTest {
     @Test
     public void readOneAndCheckObjectFields() {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName
-                + "/" + resourceName + "/" + networks.get(0).getId()).accept(MediaType.APPLICATION_JSON);
+                + "/" + resourceName + "/" + networks.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
         try {
             Network testingNetwork = networks.get(0);
             mockMvc.perform(request).andExpect(jsonPath("gatewayAddress").value(testingNetwork.getGatewayAddressAsString()))
