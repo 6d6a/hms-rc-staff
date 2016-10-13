@@ -17,19 +17,23 @@ import ru.majordomo.hms.rc.staff.resources.Network;
 
 @Component
 public class GovernorOfNetwork extends LordOfResources {
-    @Autowired
-    NetworkRepository networkRepository;
+    private NetworkRepository networkRepository;
+    private Cleaner cleaner;
 
     @Autowired
-    Cleaner cleaner;
+    public void setRepository(NetworkRepository repository) {
+        this.networkRepository = repository;
+    }
+
+    @Autowired
+    public void setCleaner(Cleaner cleaner) {
+        this.cleaner = cleaner;
+    }
 
     @Override
     public Resource createResource(ServiceMessage serviceMessage) throws ParameterValidateException {
         Network network = new Network();
         try {
-            InetAddress inetAddress = null;
-            InetAddress gwInetAddress = null;
-
             network = (Network) LordOfResources.setResourceParams(network, serviceMessage, cleaner);
             String address = cleaner.cleanString((String) serviceMessage.getParam("address"));
             Integer netmask = (Integer) serviceMessage.getParam("mask");
@@ -54,6 +58,12 @@ public class GovernorOfNetwork extends LordOfResources {
     @Override
     public void isValid(Resource resource) throws ParameterValidateException {
         Network network = (Network) resource;
+
+        Long addressAsLong = network.getAddress();
+        if (addressAsLong < 0L || addressAsLong > 4294967295L) {
+            throw new ParameterValidateException("параметр address указан неверно");
+        }
+
         String address = network.getAddressAsString();
         if (address.equals("") || !InetAddresses.isInetAddress(address)) {
             throw new ParameterValidateException("параметр address указан неверно");

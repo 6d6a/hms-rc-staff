@@ -3,6 +3,7 @@ package ru.majordomo.hms.rc.staff.resources;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
 import org.apache.commons.net.util.SubnetUtils;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -33,6 +34,7 @@ public class Network extends Resource {
         this.address = address;
     }
 
+    @JsonSetter
     public void setAddress(String address) {
         this.address = ipAddressInStringToInteger(address);
     }
@@ -59,6 +61,7 @@ public class Network extends Resource {
         this.gatewayAddress = gatewayAddress;
     }
 
+    @JsonSetter
     public void setGatewayAddress(String gatewayAddress) {
         this.gatewayAddress = ipAddressInStringToInteger(gatewayAddress);
     }
@@ -103,7 +106,7 @@ public class Network extends Resource {
                 ", switchedOn=" + this.getSwitchedOn() +
                 ", address=" + this.getAddressAsString() +
                 ", mask=" + mask +
-                ", gatewayAddress=" + this.getAddressAsString() +
+                ", gatewayAddress=" + this.getGatewayAddressAsString() +
                 ", vlanNumber=" + vlanNumber +
                 '}';
     }

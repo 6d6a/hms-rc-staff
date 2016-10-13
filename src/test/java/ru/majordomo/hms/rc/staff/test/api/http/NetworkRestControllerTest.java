@@ -1,5 +1,6 @@
 package ru.majordomo.hms.rc.staff.test.api.http;
 
+import org.bson.types.ObjectId;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -36,12 +37,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = {RepositoriesConfig.class, NetworkServicesConfig.class, EmbeddedServltetContainerConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class NetworkRestControllerTest {
     @Autowired
-    GovernorOfNetwork governorOfNetwork;
+    private GovernorOfNetwork governorOfNetwork;
     @Autowired
-    NetworkRepository networkRepository;
+    private NetworkRepository networkRepository;
 
     @Autowired
-    TestRestTemplate restTemplate;
+    private TestRestTemplate restTemplate;
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -52,6 +53,8 @@ public class NetworkRestControllerTest {
     private MockMvc mockMvc;
 
     private List<Network> networks = new ArrayList<>();
+
+    private String resourceName = "network";
 
     @Before
     public void generateBatchOfNetworks() {
@@ -84,9 +87,10 @@ public class NetworkRestControllerTest {
 
     @Test
     public void readOne() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName + "/network/" + networks.get(0).getId()).accept(MediaType.APPLICATION_JSON);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName
+                + "/" + resourceName + "/" + networks.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
         try {
-            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType("application/json;charset=UTF-8"));
+            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -95,9 +99,10 @@ public class NetworkRestControllerTest {
 
     @Test
     public void readAll() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName + "/network").accept(MediaType.APPLICATION_JSON);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName
+                + "/" + resourceName).accept(MediaType.APPLICATION_JSON_UTF8);
         try {
-            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType("application/json;charset=UTF-8"));
+            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -106,7 +111,8 @@ public class NetworkRestControllerTest {
 
     @Test
     public void readOneAndCheckObjectFields() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName + "/network/" + networks.get(0).getId()).accept(MediaType.APPLICATION_JSON);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName
+                + "/" + resourceName + "/" + networks.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
         try {
             Network testingNetwork = networks.get(0);
             mockMvc.perform(request).andExpect(jsonPath("gatewayAddress").value(testingNetwork.getGatewayAddressAsString()))
@@ -118,6 +124,79 @@ public class NetworkRestControllerTest {
                     .andExpect(jsonPath("id").value(testingNetwork.getId()));
         } catch (Exception ex) {
             ex.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void create() {
+        Network testingNetwork = networks.get(0);
+        testingNetwork.setId(null);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + applicationName
+                + "/" + resourceName)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(testingNetwork.toJson());
+        try {
+            mockMvc.perform(request).andExpect(status().isCreated());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void update() {
+        Network network = networks.get(0);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + applicationName
+                + "/" + resourceName + "/" + network.getId())
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(network.toJson());
+        try {
+            mockMvc.perform(request).andExpect(status().isOk());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void updateNotExistingResource() {
+        Network network = networks.get(0);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + applicationName
+                + "/" + resourceName + "/" + ObjectId.get().toString())
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(network.toJson());
+        try {
+            mockMvc.perform(request).andExpect(status().isNotFound());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void delete() {
+        Network network = networks.get(0);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + applicationName
+                + "/" + resourceName + "/" + network.getId())
+                .accept(MediaType.APPLICATION_JSON_UTF8);
+        try {
+            mockMvc.perform(request).andExpect(status().isOk());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void deleteNotExisting() {
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + applicationName
+                + "/" + resourceName + "/" + ObjectId.get().toString())
+                .accept(MediaType.APPLICATION_JSON_UTF8);
+        try {
+            mockMvc.perform(request).andExpect(status().isNotFound());
+        } catch (Exception e) {
+            e.printStackTrace();
             Assert.fail();
         }
     }

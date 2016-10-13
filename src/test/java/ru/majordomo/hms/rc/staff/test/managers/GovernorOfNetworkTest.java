@@ -21,10 +21,10 @@ import ru.majordomo.hms.rc.staff.resources.Network;
 public class GovernorOfNetworkTest {
 
     @Autowired
-    GovernorOfNetwork governorOfNetwork;
+    private GovernorOfNetwork governorOfNetwork;
 
     @Autowired
-    NetworkRepository networkRepository;
+    private NetworkRepository networkRepository;
 
     private String name = "Тестовая сеть";
     private Boolean switchedOn = Boolean.TRUE;
@@ -32,7 +32,7 @@ public class GovernorOfNetworkTest {
     private Integer mask = 24;
     private String gatewayAddress = "172.16.103.1";
     private Integer vlanNumber = 103;
-    ServiceMessage serviceMessage;
+    private ServiceMessage serviceMessage;
 
     private ServiceMessage createServiceMessage(String name, Boolean switchedOn, String address, Integer mask, String gatewayAddress, Integer vlanNumber) {
         ServiceMessage serviceMessage = new ServiceMessage();
@@ -77,32 +77,64 @@ public class GovernorOfNetworkTest {
     }
 
     @Test(expected = ParameterValidateException.class)
-    public void createWithBadAddress() throws ParameterValidateException {
-        serviceMessage = createServiceMessage(name,switchedOn,"<? yabidabido?>", mask, gatewayAddress, vlanNumber);
+    public void createResourceWithInvalidAddress() throws ParameterValidateException {
+        serviceMessage = createServiceMessage(name, switchedOn, "<? yabidabido?>", mask, gatewayAddress, vlanNumber);
         governorOfNetwork.createResource(serviceMessage);
     }
 
     @Test(expected = ParameterValidateException.class)
-    public void createWithBadGatewayAddress() throws ParameterValidateException {
-        serviceMessage = createServiceMessage(name,switchedOn,address,mask,"<? SELECT *",vlanNumber);
+    public void createResourceWithInvalidGatewayAddress() throws ParameterValidateException {
+        serviceMessage = createServiceMessage(name, switchedOn, address, mask, "<? SELECT *", vlanNumber);
         governorOfNetwork.createResource(serviceMessage);
     }
 
     @Test(expected = ParameterValidateException.class)
-    public void gatewayNotInNetwork() throws ParameterValidateException {
-        serviceMessage = createServiceMessage(name,switchedOn,address,mask,"10.10.10.1",vlanNumber);
+    public void createResourceWithGatewayNotInNetwork() throws ParameterValidateException {
+        serviceMessage = createServiceMessage(name, switchedOn, address, mask, "10.10.10.1", vlanNumber);
         governorOfNetwork.createResource(serviceMessage);
     }
 
     @Test(expected = ParameterValidateException.class)
-    public void maskOutOfRange() throws ParameterValidateException {
-        serviceMessage = createServiceMessage(name,switchedOn,address,101,gatewayAddress,vlanNumber);
+    public void createResourceWithMaskOutOfRange() throws ParameterValidateException {
+        serviceMessage = createServiceMessage(name, switchedOn, address, 101, gatewayAddress, vlanNumber);
         governorOfNetwork.createResource(serviceMessage);
     }
 
     @Test(expected = ParameterValidateException.class)
-    public void vlanOutOfRange() throws ParameterValidateException {
-        serviceMessage = createServiceMessage(name,switchedOn,address,mask,gatewayAddress,-1);
+    public void createResourceWithVlanOutOfRange() throws ParameterValidateException {
+        serviceMessage = createServiceMessage(name, switchedOn, address, mask, gatewayAddress, -1);
         governorOfNetwork.createResource(serviceMessage);
+    }
+
+    @Test(expected = ParameterValidateException.class)
+    public void validateWithInvalidAddress() throws ParameterValidateException {
+        serviceMessage = createServiceMessage(name, switchedOn, address, mask, gatewayAddress, vlanNumber);
+        Network network = (Network) governorOfNetwork.createResource(serviceMessage);
+        network.setAddress(-1L);
+        governorOfNetwork.isValid(network);
+    }
+
+    @Test(expected = ParameterValidateException.class)
+    public void validateWithInvalidGatewayNotInNetwork() throws ParameterValidateException {
+        serviceMessage = createServiceMessage(name, switchedOn, address, mask, gatewayAddress, 103);
+        Network network = (Network) governorOfNetwork.createResource(serviceMessage);
+        network.setGatewayAddress("10.10.10.1");
+        governorOfNetwork.isValid(network);
+    }
+
+    @Test(expected = ParameterValidateException.class)
+    public void validateWithMaskOutOfRange() throws ParameterValidateException {
+        serviceMessage = createServiceMessage(name, switchedOn, address, mask, gatewayAddress, vlanNumber);
+        Network network = (Network) governorOfNetwork.createResource(serviceMessage);
+        network.setMask(101);
+        governorOfNetwork.isValid(network);
+    }
+
+    @Test(expected = ParameterValidateException.class)
+    public void validateWithVlanOutOfRange() throws ParameterValidateException {
+        serviceMessage = createServiceMessage(name, switchedOn, address, mask, gatewayAddress, vlanNumber);
+        Network network = (Network) governorOfNetwork.createResource(serviceMessage);
+        network.setVlanNumber(-1);
+        governorOfNetwork.isValid(network);
     }
 }
