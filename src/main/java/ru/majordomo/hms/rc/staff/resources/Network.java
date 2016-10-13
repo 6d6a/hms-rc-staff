@@ -1,16 +1,10 @@
 package ru.majordomo.hms.rc.staff.resources;
 
-import com.google.common.net.InetAddresses;
-
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import org.apache.commons.net.util.SubnetUtils;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.net.InetAddress;
-
-import ru.majordomo.hms.rc.staff.Resource;
 
 @Document
 public class Network extends Resource {

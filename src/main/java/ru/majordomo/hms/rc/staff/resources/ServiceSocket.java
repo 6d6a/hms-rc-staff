@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import ru.majordomo.hms.rc.staff.Resource;
 @Document
 public class ServiceSocket extends Resource {
 

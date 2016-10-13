@@ -1,6 +1,6 @@
 package ru.majordomo.hms.rc.staff.managers;
 
-import ru.majordomo.hms.rc.staff.Resource;
+import ru.majordomo.hms.rc.staff.resources.Resource;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;

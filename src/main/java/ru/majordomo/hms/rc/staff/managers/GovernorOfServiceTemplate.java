@@ -1,17 +1,13 @@
 package ru.majordomo.hms.rc.staff.managers;
 
-import com.sun.org.apache.regexp.internal.RE;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
 import java.util.List;
 
-import jdk.nashorn.internal.runtime.regexp.joni.Config;
-import ru.majordomo.hms.rc.staff.Resource;
+import ru.majordomo.hms.rc.staff.resources.Resource;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
