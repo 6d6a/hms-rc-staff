@@ -20,6 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.majordomo.hms.rc.staff.repositories.ServerRepository;
+import ru.majordomo.hms.rc.staff.repositories.ServerRoleRepository;
+import ru.majordomo.hms.rc.staff.repositories.ServiceRepository;
+import ru.majordomo.hms.rc.staff.repositories.StorageRepository;
 import ru.majordomo.hms.rc.staff.resources.Server;
 import ru.majordomo.hms.rc.staff.resources.ServerRole;
 import ru.majordomo.hms.rc.staff.resources.Service;
@@ -38,40 +41,51 @@ public class ServerRestControllerTest {
     @Autowired
     private WebApplicationContext ctx;
     @Autowired
-    private ServerRepository repository;
+    private ServerRepository serverRepository;
+    @Autowired
+    private ServerRoleRepository serverRoleRepository;
+    @Autowired
+    private ServiceRepository serviceRepository;
+    @Autowired
+    private StorageRepository storageRepository;
 
     @Value("${spring.application.name}")
     private String applicationName;
     private String resourceName = "server";
-    private List<Server> testServerList = new ArrayList<>();
+    private List<Server> testServers = new ArrayList<>();
     private MockMvc mockMvc;
 
     private void generateBatchOfServers() {
         for (int i = 1; i < 6; i++) {
-            // создать сервер роль
-            List<ServerRole> serverRoleList = new ArrayList<>();
+
             ServerRole serverRole = new ServerRole();
             serverRole.setId(ObjectId.get().toString());
-            serverRoleList.add(serverRole);
-            // создать сервис
-            List<Service> serviceList = new ArrayList<>();
+            serverRoleRepository.save(serverRole);
+
+            List<Service> services = new ArrayList<>();
             Service service = new Service();
             service.setId(ObjectId.get().toString());
-            serviceList.add(service);
-            // создать сторейдж
-            List<Storage> storageList = new ArrayList<>();
+            services.add(service);
+            serviceRepository.save(services);
+
+            List<Storage> storages = new ArrayList<>();
             Storage storage = new Storage();
             storage.setId(ObjectId.get().toString());
-            storageList.add(storage);
+            storages.add(storage);
+            storageRepository.save(storages);
 
-            // создать сервер
+            String name = "Сервер " + i;
+            Boolean switchedOn = Boolean.TRUE;
+
             Server server = new Server();
+            server.setName(name);
+            server.setSwitchedOn(switchedOn);
             server.setServerRole(serverRole);
-            server.setServiceList(serviceList);
-            server.setStorageList(storageList);
+            server.setServices(services);
+            server.setStorages(storages);
 
-            repository.save(server);
-            testServerList.add(server);
+            serverRepository.save(server);
+            testServers.add(server);
         }
     }
 
@@ -84,7 +98,7 @@ public class ServerRestControllerTest {
     @Test
     public void readOne() {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName +
-            "/" + resourceName + "/" + testServerList.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
+            "/" + resourceName + "/" + testServers.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
         try {
             mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
         } catch (Exception e) {
@@ -109,7 +123,7 @@ public class ServerRestControllerTest {
 
     @Test
     public void readOneAndCheckObjectFields() {
-        Server testingServer = testServerList.get(0);
+        Server testingServer = testServers.get(0);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName +
             "/" + resourceName + "/" + testingServer.getId()).accept(MediaType.APPLICATION_JSON_UTF8);
         try {
@@ -117,8 +131,83 @@ public class ServerRestControllerTest {
                     .andExpect(jsonPath("name").value(testingServer.getName()))
                     .andExpect(jsonPath("switchedOn").value(testingServer.getSwitchedOn()))
                     .andExpect(jsonPath("serverRole").value(testingServer.getServerRoleId()))
-                    .andExpect(jsonPath("serviceList.[0]").value(testingServer.getServiceList().get(0)))
-                    .andExpect(jsonPath("storageList.[0]").value(testingServer.getStorageList().get(0)));
+                    .andExpect(jsonPath("services").isArray())
+                    .andExpect(jsonPath("services.[0]").value(testingServer.getServices().get(0).getId()))
+                    .andExpect(jsonPath("storages").isArray())
+                    .andExpect(jsonPath("storages.[0]").value(testingServer.getStorages().get(0).getId()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void create() {
+        Server server = testServers.get(0);
+        server.setId(null);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + applicationName
+                + "/" + resourceName)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(server.toJson());
+        try {
+            mockMvc.perform(request).andExpect(status().isCreated());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void update() {
+        Server server = testServers.get(0);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + applicationName
+                + "/" + resourceName + "/" + server.getId())
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(server.toJson());
+        try {
+            mockMvc.perform(request).andExpect(status().isOk());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void updateNotExistingResource() {
+        Server server = testServers.get(0);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + applicationName
+                + "/" + resourceName + "/" + ObjectId.get().toString())
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(server.toJson());
+        try {
+            mockMvc.perform(request).andExpect(status().isNotFound());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void delete() {
+        Server server = testServers.get(0);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + applicationName
+                + "/" + resourceName + "/" + server.getId())
+                .accept(MediaType.APPLICATION_JSON_UTF8);
+        try {
+            mockMvc.perform(request).andExpect(status().isOk());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void deleteNotExisting() {
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + applicationName
+                + "/" + resourceName + "/" + ObjectId.get().toString())
+                .accept(MediaType.APPLICATION_JSON_UTF8);
+        try {
+            mockMvc.perform(request).andExpect(status().isNotFound());
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
