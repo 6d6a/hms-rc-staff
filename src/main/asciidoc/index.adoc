@@ -23,7 +23,7 @@ Majordomo LTD;
 | Используется для создания ресурса
 
 | `PATCH`
-| Используется для обновления ресурса, может применяться к фрагменту ресурса
+| Используется для обновления ресурса
 
 | `PUT`
 | Используется для обновления ресурса
@@ -52,6 +52,9 @@ Majordomo LTD;
 
 | `404 Not Found`
 | Сервер принял запрос, но не нашёл соответствующего ресурса.
+
+| `405 Method Not Allowed`
+| Указанный метод нельзя применить к ресурсу.
 |===
 
 [[resources]]
@@ -99,7 +102,7 @@ include::{snippets}/server-role/create/curl-request.adoc[]
 include::{snippets}/server-role/create/http-response.adoc[]
 
 === Update
-`PATCH` запрос для изменения Server Role.
+`PATCH` запрос для изменения Server Role. Идентичен `PUT` запросу.
 
 ==== Пример запроса
 
