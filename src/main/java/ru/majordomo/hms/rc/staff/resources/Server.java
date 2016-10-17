@@ -9,19 +9,18 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.ArrayList;
 import java.util.List;
 
-//TODO
 @Document
 public class Server extends Resource {
 
     @Transient
-    private List<Service> serviceList = new ArrayList<>();
-    private List<String> serviceIdList = new ArrayList<>();
+    private List<Service> services = new ArrayList<>();
+    private List<String> serviceIds = new ArrayList<>();
     @Transient
     private ServerRole serverRole;
     private String serverRoleId;
     @Transient
-    private List<Storage> storageList;
-    private List<String> storageIdList = new ArrayList<>();
+    private List<Storage> storages = new ArrayList<>();
+    private List<String> storageIds = new ArrayList<>();
 
     @Override
     public void switchResource() {
@@ -29,17 +28,17 @@ public class Server extends Resource {
     }
 
     @JsonIgnore
-    public List<Service> getServiceList() {
-        return serviceList;
+    public List<Service> getServices() {
+        return services;
     }
 
-    public void setServiceList(List<Service> serviceList) {
+    public void setServices(List<Service> services) {
         List<String> serviceIdList = new ArrayList<>();
-        for (Service service: serviceList) {
+        for (Service service: services) {
             serviceIdList.add(service.getId());
         }
-        setServiceIdList(serviceIdList);
-        this.serviceList = serviceList;
+        setServiceIds(serviceIdList);
+        this.services = services;
     }
 
     @JsonIgnore
@@ -48,28 +47,33 @@ public class Server extends Resource {
     }
 
     public void setServerRole(ServerRole serverRole) {
-        setServerRoleId(serverRole.getId());
+        try {
+            setServerRoleId(serverRole.getId());
+        } catch (NullPointerException e) {}
         this.serverRole = serverRole;
     }
 
     @JsonIgnore
-    public List<Storage> getStorageList() {
-        return storageList;
+    public List<Storage> getStorages() {
+        return storages;
     }
 
-    public void setStorageList(List<Storage> storageList) {
+    public void setStorages(List<Storage> storages) {
         List<String> storageIdList = new ArrayList<>();
-        setStorageIdList(storageIdList);
-        this.storageList = storageList;
+        for (Storage storage: storages) {
+            storageIdList.add(storage.getId());
+        }
+        setStorageIds(storageIdList);
+        this.storages = storages;
     }
 
-    @JsonGetter(value = "serviceList")
-    public List<String> getServiceIdList() {
-        return serviceIdList;
+    @JsonGetter(value = "services")
+    public List<String> getServiceIds() {
+        return serviceIds;
     }
 
-    public void setServiceIdList(List<String> serviceIdList) {
-        this.serviceIdList = serviceIdList;
+    public void setServiceIds(List<String> serviceIds) {
+        this.serviceIds = serviceIds;
     }
 
     @JsonGetter(value = "serverRole")
@@ -81,12 +85,12 @@ public class Server extends Resource {
         this.serverRoleId = serverRoleId;
     }
 
-    @JsonGetter(value = "storageList")
-    public List<String> getStorageIdList() {
-        return storageIdList;
+    @JsonGetter(value = "storages")
+    public List<String> getStorageIds() {
+        return storageIds;
     }
 
-    public void setStorageIdList(List<String> storageIdList) {
-        this.storageIdList = storageIdList;
+    public void setStorageIds(List<String> storageIds) {
+        this.storageIds = storageIds;
     }
 }
