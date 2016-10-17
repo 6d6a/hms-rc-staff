@@ -101,10 +101,10 @@ public class ServerRoleRestControllerTest {
 
         this.document.snippets(
                 responseFields(
-                        fieldWithPath("id").description("The ServerRole ID"),
-                        fieldWithPath("name").description("The ServerRole name"),
-                        fieldWithPath("switchedOn").description("The ServerRole status"),
-                        fieldWithPath("serviceTemplates").description("The ServerRole ServiceTemplates ID's")
+                        fieldWithPath("id").description("ServerRole ID"),
+                        fieldWithPath("name").description("Имя ServerRole"),
+                        fieldWithPath("switchedOn").description("Статус ServerRole"),
+                        fieldWithPath("serviceTemplates").description("ServerRole ServiceTemplates ID's")
                 )
         );
 
@@ -124,10 +124,10 @@ public class ServerRoleRestControllerTest {
 
         this.document.snippets(
                 responseFields(
-                        fieldWithPath("[].id").description("The ServerRole ID"),
-                        fieldWithPath("[].name").description("The ServerRole name"),
-                        fieldWithPath("[].switchedOn").description("The ServerRole status"),
-                        fieldWithPath("[].serviceTemplates").description("The ServerRole ServiceTemplates ID's")
+                        fieldWithPath("[].id").description("ServerRole ID"),
+                        fieldWithPath("[].name").description("Имя ServerRole"),
+                        fieldWithPath("[].switchedOn").description("Статус ServerRole"),
+                        fieldWithPath("[].serviceTemplates").description("ServerRole ServiceTemplates ID's")
                 )
         );
 
@@ -149,10 +149,10 @@ public class ServerRoleRestControllerTest {
 
         this.document.snippets(
                 responseFields(
-                        fieldWithPath("id").description("The ServerRole ID"),
-                        fieldWithPath("name").description("The ServerRole name"),
-                        fieldWithPath("switchedOn").description("The ServerRole status"),
-                        fieldWithPath("serviceTemplates").description("The ServerRole ServiceTemplates ID's")
+                        fieldWithPath("id").description("ServerRole ID"),
+                        fieldWithPath("name").description("Имя ServerRole"),
+                        fieldWithPath("switchedOn").description("Статус ServerRole"),
+                        fieldWithPath("serviceTemplates").description("ServerRole ServiceTemplates ID's")
                 )
         );
 

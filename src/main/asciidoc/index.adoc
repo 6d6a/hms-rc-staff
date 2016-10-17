@@ -1,4 +1,4 @@
-= RC-staff API documentation
+= RC-staff Документация API
 Majordomo LTD;
 :doctype: book
 :icons: font
@@ -8,120 +8,114 @@ Majordomo LTD;
 :sectlinks:
 
 [[overview]]
-= Overview
+= Сводная информация
 
 [[overview-http-verbs]]
-== HTTP verbs
-Person-service tries to adhere as closely as possible to standard HTTP and REST conventions in its
-use of HTTP verbs.
+== HTTP методы
+
 |===
-| Verb | Usage
+| Метод | Описание
 
 | `GET`
-| Used to retrieve a resource
+| Используется для получения информации о ресурсе
 
 | `POST`
-| Used to create a new resource
+| Используется для создания ресурса
 
 | `PATCH`
-| Used to update an existing resource, including partial updates
+| Используется для обновления ресурса, может применяться к фрагменту ресурса
 
 | `PUT`
-| Used to update an existing resource, full updates only
+| Используется для обновления ресурса
 
 | `DELETE`
-| Used to delete an existing resource
+| Используется для удаления существующего ресурса
 |===
 
 [[overview-http-status-codes]]
-== HTTP status codes
-Person-service tries to adhere as closely as possible to standard HTTP and REST conventions in its
-use of HTTP status codes.
+== Коды состояния HTTP
 
 |===
-| Status code | Usage
+| Код | Описание
 
 | `200 OK`
-| Standard response for successful HTTP requests.
-| The actual response will depend on the request method used.
-| In a GET request, the response will contain an entity corresponding to the requested resource.
-| In a POST request, the response will contain an entity describing or containing the result of the action.
+| Успешный запрос. Если были запрошены какие-либо данные, то они находятся в заголовке и/или теле сообщения.
 
 | `201 Created`
-| The request has been fulfilled and resulted in a new resource being created.
+| В результате успешного выполнения запроса был создан новый ресурс.
 
 | `204 No Content`
-| The server successfully processed the request, but is not returning any content.
+| Сервер успешно обработал запрос, но в ответе были переданы только заголовки без тела сообщения.
 
 | `400 Bad Request`
-| The server cannot or will not process the request due to something that is perceived to be a client error (e.g., malformed request syntax, invalid request message framing, or deceptive request routing).
+| Сервер не может выполнить запрос, так так в запросе были обнаружены ошибки.
 
 | `404 Not Found`
-| The requested resource could not be found but may be available again in the future. Subsequent requests by the client are permissible.
+| Сервер принял запрос, но не нашёл соответствующего ресурса.
 |===
 
 [[resources]]
-= Resources
+= Ресурсы
 
 
 [[resource-server-role]]
 == Server Role
 
 === Read One
-A `GET` request to lists one Server Role.
+`GET` запрос для получения Server Role по ID.
 
 include::{snippets}/server-role/read-one/response-fields.adoc[]
 
-==== Example request
+==== Пример запроса
 
 include::{snippets}/server-role/read-one/curl-request.adoc[]
 
-==== Example response
+==== Пример ответа
 
 include::{snippets}/server-role/read-one/http-response.adoc[]
 
 === Read All
-A `GET` request lists all Server Roles.
+`GET` запрос для получения всех Server Role.
 
 include::{snippets}/server-role/read-all/response-fields.adoc[]
 
-==== Example request
+==== Пример запроса
 
 include::{snippets}/server-role/read-all/curl-request.adoc[]
 
-==== Example response
+==== Пример ответа
 
 include::{snippets}/server-role/read-all/http-response.adoc[]
 
 === Create
-A `POST` request to create Server Role.
+`POST` запрос для создания Server Role.
 
-==== Example request
+==== Пример запроса
 
 include::{snippets}/server-role/create/curl-request.adoc[]
 
-==== Example response
+==== Пример ответа
 
 include::{snippets}/server-role/create/http-response.adoc[]
 
 === Update
-A `POST` request to update Server Role.
+`PATCH` запрос для изменения Server Role.
 
-==== Example request
+==== Пример запроса
 
 include::{snippets}/server-role/update/curl-request.adoc[]
 
-==== Example response
+==== Пример ответа
 
 include::{snippets}/server-role/update/http-response.adoc[]
 
 === Delete
-A `POST` request to delete Server Role.
+`DELETE` запрос для удаления Server Role.
 
-==== Example request
+==== Пример запроса
 
 include::{snippets}/server-role/delete/curl-request.adoc[]
 
-==== Example response
+==== Пример ответа
 
 include::{snippets}/server-role/delete/http-response.adoc[]
