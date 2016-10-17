@@ -3,6 +3,7 @@ package ru.majordomo.hms.rc.staff.test.api.http;
 import org.bson.types.ObjectId;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -11,12 +12,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.JUnitRestDocumentation;
+import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.restdocs.RestDocumentation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +33,13 @@ import ru.majordomo.hms.rc.staff.test.config.EmbeddedServltetContainerConfig;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
 import ru.majordomo.hms.rc.staff.test.config.ServerRoleServicesConfig;
 
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -37,12 +48,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {RepositoriesConfig.class, EmbeddedServltetContainerConfig.class, ServerRoleServicesConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ServerRoleRestControllerTest {
+    @Rule
+    public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("build/generated-snippets");
+
     @Autowired
     WebApplicationContext ctx;
     @Autowired
     private ServerRoleRepository repository;
     @Autowired
     private ServiceTemplateRepository templateRepository;
+
+    private RestDocumentationResultHandler document;
 
     @Value("${spring.application.name}")
     private String applicationName;
@@ -71,7 +87,10 @@ public class ServerRoleRestControllerTest {
 
     @Before
     public void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(ctx).build();
+        this.document = document("server-role/{method-name}", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()));
+        mockMvc = MockMvcBuilders.webAppContextSetup(ctx)
+                .apply(documentationConfiguration(this.restDocumentation))
+                .build();
         generateBatchOfServerRoles();
     }
 
@@ -79,8 +98,19 @@ public class ServerRoleRestControllerTest {
     public void readOne() {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName +
             "/" + resourceName + "/" + testServerRoles.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
+
+        this.document.snippets(
+                responseFields(
+                        fieldWithPath("id").description("ServerRole ID"),
+                        fieldWithPath("name").description("Имя ServerRole"),
+                        fieldWithPath("switchedOn").description("Статус ServerRole"),
+                        fieldWithPath("serviceTemplates").description("ServerRole ServiceTemplates ID's")
+                )
+        );
+
         try {
-            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
+            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                    .andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -91,10 +121,20 @@ public class ServerRoleRestControllerTest {
     public void readAll() {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName +
                 "/" + resourceName).accept(MediaType.APPLICATION_JSON_UTF8);
+
+        this.document.snippets(
+                responseFields(
+                        fieldWithPath("[].id").description("ServerRole ID"),
+                        fieldWithPath("[].name").description("Имя ServerRole"),
+                        fieldWithPath("[].switchedOn").description("Статус ServerRole"),
+                        fieldWithPath("[].serviceTemplates").description("ServerRole ServiceTemplates ID's")
+                )
+        );
+
         try {
             mockMvc.perform(request).andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                    .andExpect(jsonPath("$").isArray());
+                    .andExpect(jsonPath("$").isArray()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -106,13 +146,23 @@ public class ServerRoleRestControllerTest {
         ServerRole testingServerRole = testServerRoles.get(0);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName +
                 "/" + resourceName + "/" + testingServerRole.getId()).accept(MediaType.APPLICATION_JSON_UTF8);
+
+        this.document.snippets(
+                responseFields(
+                        fieldWithPath("id").description("ServerRole ID"),
+                        fieldWithPath("name").description("Имя ServerRole"),
+                        fieldWithPath("switchedOn").description("Статус ServerRole"),
+                        fieldWithPath("serviceTemplates").description("ServerRole ServiceTemplates ID's")
+                )
+        );
+
         try {
             mockMvc.perform(request).andExpect(jsonPath("id").value(testingServerRole.getId()))
                     .andExpect(jsonPath("name").value(testingServerRole.getName()))
                     .andExpect(jsonPath("switchedOn").value(testingServerRole.getSwitchedOn()))
                     .andExpect(jsonPath("serviceTemplates").isArray())
                     .andExpect(jsonPath("serviceTemplates.[0]").value(testingServerRole.getServiceTemplates().get(0).getId()))
-                    .andDo(print());
+                    .andDo(print()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -128,7 +178,7 @@ public class ServerRoleRestControllerTest {
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(serverRole.toJson());
         try {
-            mockMvc.perform(request).andExpect(status().isCreated());
+            mockMvc.perform(request).andExpect(status().isCreated()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -143,7 +193,7 @@ public class ServerRoleRestControllerTest {
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(serverRole.toJson());
         try {
-            mockMvc.perform(request).andExpect(status().isOk());
+            mockMvc.perform(request).andExpect(status().isOk()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -158,7 +208,7 @@ public class ServerRoleRestControllerTest {
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(serverRole.toJson());
         try {
-            mockMvc.perform(request).andExpect(status().isNotFound());
+            mockMvc.perform(request).andExpect(status().isNotFound()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -172,7 +222,7 @@ public class ServerRoleRestControllerTest {
                 + "/" + resourceName + "/" + serverRole.getId())
                 .accept(MediaType.APPLICATION_JSON_UTF8);
         try {
-            mockMvc.perform(request).andExpect(status().isOk());
+            mockMvc.perform(request).andExpect(status().isOk()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -185,7 +235,7 @@ public class ServerRoleRestControllerTest {
                 + "/" + resourceName + "/" + ObjectId.get().toString())
                 .accept(MediaType.APPLICATION_JSON_UTF8);
         try {
-            mockMvc.perform(request).andExpect(status().isNotFound());
+            mockMvc.perform(request).andExpect(status().isNotFound()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();

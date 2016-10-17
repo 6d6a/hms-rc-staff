@@ -1,0 +1,124 @@
+= RC-staff Документация API
+Majordomo LTD;
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+
+[[overview]]
+= Сводная информация
+
+[[overview-http-verbs]]
+== HTTP методы
+
+|===
+| Метод | Описание
+
+| `GET`
+| Используется для получения информации о ресурсе
+
+| `POST`
+| Используется для создания ресурса
+
+| `PATCH`
+| Используется для обновления ресурса
+
+| `PUT`
+| Используется для обновления ресурса
+
+| `DELETE`
+| Используется для удаления существующего ресурса
+|===
+
+[[overview-http-status-codes]]
+== Коды состояния HTTP
+
+|===
+| Код | Описание
+
+| `200 OK`
+| Успешный запрос. Если были запрошены какие-либо данные, то они находятся в заголовке и/или теле сообщения.
+
+| `201 Created`
+| В результате успешного выполнения запроса был создан новый ресурс.
+
+| `204 No Content`
+| Сервер успешно обработал запрос, но в ответе были переданы только заголовки без тела сообщения.
+
+| `400 Bad Request`
+| Сервер не может выполнить запрос, так так в запросе были обнаружены ошибки.
+
+| `404 Not Found`
+| Сервер принял запрос, но не нашёл соответствующего ресурса.
+
+| `405 Method Not Allowed`
+| Указанный метод нельзя применить к ресурсу.
+|===
+
+[[resources]]
+= Ресурсы
+
+
+[[resource-server-role]]
+== Server Role
+
+=== Read One
+`GET` запрос для получения Server Role по ID.
+
+include::{snippets}/server-role/read-one/response-fields.adoc[]
+
+==== Пример запроса
+
+include::{snippets}/server-role/read-one/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/server-role/read-one/http-response.adoc[]
+
+=== Read All
+`GET` запрос для получения всех Server Role.
+
+include::{snippets}/server-role/read-all/response-fields.adoc[]
+
+==== Пример запроса
+
+include::{snippets}/server-role/read-all/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/server-role/read-all/http-response.adoc[]
+
+=== Create
+`POST` запрос для создания Server Role.
+
+==== Пример запроса
+
+include::{snippets}/server-role/create/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/server-role/create/http-response.adoc[]
+
+=== Update
+`PATCH` запрос для изменения Server Role. Идентичен `PUT` запросу.
+
+==== Пример запроса
+
+include::{snippets}/server-role/update/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/server-role/update/http-response.adoc[]
+
+=== Delete
+`DELETE` запрос для удаления Server Role.
+
+==== Пример запроса
+
+include::{snippets}/server-role/delete/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/server-role/delete/http-response.adoc[]

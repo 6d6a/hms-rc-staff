@@ -55,7 +55,7 @@ public class ServerRoleRestController {
         return new ResponseEntity<>(null, httpHeaders, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/{serverRoleId}", method = RequestMethod.PATCH)
+    @RequestMapping(value = "/{serverRoleId}", method = {RequestMethod.PATCH, RequestMethod.PUT})
     public ResponseEntity<?> update(@PathVariable String serverRoleId, @RequestBody ServerRole serverRole) throws ParameterValidateException {
         governor.setServiceTemplatesByIds(serverRole, serverRole.getServiceTemplateIds());
         governor.isValid(serverRole);
