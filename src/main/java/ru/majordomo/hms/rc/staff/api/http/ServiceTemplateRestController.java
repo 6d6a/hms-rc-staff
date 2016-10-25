@@ -39,7 +39,8 @@ public class ServiceTemplateRestController {
 
     @RequestMapping(value = "{serviceTemplateId}", method = RequestMethod.GET)
     public ServiceTemplate readOne(@PathVariable String serviceTemplateId) {
-        return repository.findOne(serviceTemplateId);
+        ServiceTemplate serviceTemplate = (ServiceTemplate) governor.build(serviceTemplateId);
+        return serviceTemplate;
     }
 
     @RequestMapping(value = {"/",""}, method = RequestMethod.GET)

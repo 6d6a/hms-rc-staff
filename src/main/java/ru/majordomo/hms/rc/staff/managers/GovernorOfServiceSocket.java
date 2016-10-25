@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.resources.Resource;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
@@ -73,5 +74,10 @@ public class GovernorOfServiceSocket extends LordOfResources {
             throw new ParameterValidateException("Значение параметра port может находиться в пределах диапазоне 1-65535");
         }
 
+    }
+
+    @Override
+    public Resource build(String resourceId) throws ResourceNotFoundException {
+        return null;
     }
 }

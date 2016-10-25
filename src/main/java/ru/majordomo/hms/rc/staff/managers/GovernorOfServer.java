@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
+import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.repositories.ServerRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServerRoleRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceRepository;
@@ -119,5 +120,10 @@ public class GovernorOfServer extends LordOfResources{
         if (serverRole == null) {
             throw new ParameterValidateException("ServerRole с ID: " + serverRoleId + " не найден");
         }
+    }
+
+    @Override
+    public Resource build(String resourceId) throws ResourceNotFoundException {
+        return null;
     }
 }

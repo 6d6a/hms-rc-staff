@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.resources.Resource;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
@@ -52,5 +53,21 @@ public class GovernorOfServiceTemplate extends LordOfResources {
         if (configTemplateIds.size() != configTemplates.size()) {
             throw new ParameterValidateException("Передан некорретный список config templat'ов");
         }
+    }
+
+    @Override
+    public Resource build(String resourceId) throws ResourceNotFoundException {
+        ServiceTemplate serviceTemplate = serviceTemplateRepository.findOne(resourceId);
+        if (serviceTemplate == null) {
+            throw new ResourceNotFoundException("ServiceTemplate с ID:" + resourceId + " не найден");
+        }
+        for (String configTemplateId: serviceTemplate.getConfigTemplateIds()) {
+            ConfigTemplate configTemplate = configTemplateRepository.findOne(configTemplateId);
+            if (configTemplateId == null) {
+                throw new ResourceNotFoundException("ConfigTemplate с ID:" + configTemplateId + "не найден");
+            }
+            serviceTemplate.addConfigTemplate(configTemplate);
+        }
+        return serviceTemplate;
     }
 }

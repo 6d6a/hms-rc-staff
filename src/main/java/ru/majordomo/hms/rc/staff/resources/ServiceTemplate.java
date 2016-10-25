@@ -22,17 +22,16 @@ public class ServiceTemplate extends Resource {
         switchedOn = !switchedOn;
     }
 
-    @JsonIgnore
     public List<ConfigTemplate> getConfigTemplates() {
         return configTemplates;
     }
 
-    @JsonGetter(value = "configTemplates")
+    @JsonIgnore
     public List<String> getConfigTemplateIds() {
         return configTemplateIds;
     }
 
-    @JsonSetter(value = "configTemplates")
+    @JsonIgnore
     public void setConfigTemplateIds(List<String> configTemplateIds) {
         this.configTemplateIds = configTemplateIds;
     }
@@ -45,7 +44,10 @@ public class ServiceTemplate extends Resource {
     }
 
     public void addConfigTemplate(ConfigTemplate configTemplate) {
+        String configTemplateId = configTemplate.getId();
         this.configTemplates.add(configTemplate);
-        this.configTemplateIds.add(configTemplate.getId());
+        if (configTemplateIds.contains(configTemplateId) == false) {
+            this.configTemplateIds.add(configTemplate.getId());
+        }
     }
 }

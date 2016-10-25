@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.net.InetAddress;
 
+import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.resources.Resource;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
@@ -91,6 +92,11 @@ public class GovernorOfNetwork extends LordOfResources {
         }
 
 
+    }
+
+    @Override
+    public Resource build(String resourceId) throws ResourceNotFoundException {
+        return null;
     }
 
 }
