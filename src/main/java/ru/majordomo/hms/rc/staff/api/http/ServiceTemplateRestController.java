@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfServiceTemplate;
@@ -39,13 +41,16 @@ public class ServiceTemplateRestController {
 
     @RequestMapping(value = "{serviceTemplateId}", method = RequestMethod.GET)
     public ServiceTemplate readOne(@PathVariable String serviceTemplateId) {
-        ServiceTemplate serviceTemplate = (ServiceTemplate) governor.build(serviceTemplateId);
-        return serviceTemplate;
+        return (ServiceTemplate) governor.build(serviceTemplateId);
     }
 
     @RequestMapping(value = {"/",""}, method = RequestMethod.GET)
     public Collection<ServiceTemplate> readAll() {
-        return repository.findAll();
+        List<ServiceTemplate> serviceTemplates = new ArrayList<>();
+        for (ServiceTemplate serviceTemplate : repository.findAll()) {
+            serviceTemplates.add((ServiceTemplate) governor.build(serviceTemplate.getId()));
+        }
+        return serviceTemplates;
     }
 
     @RequestMapping(value = {"", ""}, method = RequestMethod.POST)

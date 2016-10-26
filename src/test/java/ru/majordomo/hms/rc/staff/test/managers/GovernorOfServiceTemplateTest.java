@@ -32,25 +32,25 @@ public class GovernorOfServiceTemplateTest {
 
     @Test
     public void create() {
-        List<String> configTemplateIds = new ArrayList<>();
+        List<ConfigTemplate> configTemplates = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             String configTemplateId = ObjectId.get().toString();
             ConfigTemplate configTemplate = new ConfigTemplate();
             configTemplate.setId(configTemplateId);
             configTemplateRepository.save(configTemplate);
-            configTemplateIds.add(configTemplateId);
+            configTemplates.add(configTemplate);
         }
         ServiceMessage serviceMessage = new ServiceMessage();
         serviceMessage.setActionIdentity(ObjectId.get().toString());
         serviceMessage.setOperationIdentity(ObjectId.get().toString());
-        serviceMessage.addParam("configTemplateList", configTemplateIds);
+        serviceMessage.addParam("configTemplates", configTemplates);
         serviceMessage.addParam("name", "Тестовый service template");
         serviceMessage.addParam("switchedOn", Boolean.TRUE);
 
         try {
             ServiceTemplate serviceTemplate = (ServiceTemplate) governorOfServiceTemplate.createResource(serviceMessage);
             Assert.assertEquals("Имя сервиса установлено неверно", "Тестовый service template", serviceTemplate.getName());
-            Assert.assertEquals("Количество config templat'ов не соответствует заданному", 10, serviceTemplate.getConfigTemplates().size());
+            Assert.assertEquals("configTemplates указаны неверно", configTemplates.size(), serviceTemplate.getConfigTemplates().size());
             Assert.assertEquals("Статус включен/выключен установлен неверно", Boolean.TRUE, serviceTemplate.getSwitchedOn());
         } catch (ParameterValidateException e) {
             e.printStackTrace();

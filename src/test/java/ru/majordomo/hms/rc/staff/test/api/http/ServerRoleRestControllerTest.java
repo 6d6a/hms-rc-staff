@@ -20,13 +20,14 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.restdocs.RestDocumentation;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServerRoleRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceTemplateRepository;
+import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
 import ru.majordomo.hms.rc.staff.resources.ServerRole;
 import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 import ru.majordomo.hms.rc.staff.test.config.EmbeddedServltetContainerConfig;
@@ -54,9 +55,11 @@ public class ServerRoleRestControllerTest {
     @Autowired
     WebApplicationContext ctx;
     @Autowired
-    private ServerRoleRepository repository;
+    private ServerRoleRepository serverRoleRepository;
     @Autowired
-    private ServiceTemplateRepository templateRepository;
+    private ServiceTemplateRepository serviceTemplateRepository;
+    @Autowired
+    private ConfigTemplateRepository configTemplateRepository;
 
     private RestDocumentationResultHandler document;
 
@@ -70,9 +73,12 @@ public class ServerRoleRestControllerTest {
 
     private void generateBatchOfServerRoles() {
         for (int i = 1; i < 6; i++) {
+            ConfigTemplate configTemplate = new ConfigTemplate();
+            configTemplateRepository.save(configTemplate);
             //создать сервис темплейт и сохранить его
             ServiceTemplate template = new ServiceTemplate();
-            templateRepository.save(template);
+            template.addConfigTemplate(configTemplate);
+            serviceTemplateRepository.save(template);
             // создать сервер роль без сохранения
             String name = "Серверная роль " + i;
             Boolean switchedOn = Boolean.TRUE;
@@ -80,7 +86,7 @@ public class ServerRoleRestControllerTest {
             serverRole.setName(name);
             serverRole.setSwitchedOn(switchedOn);
             serverRole.addServiceTemplate(template);
-            repository.save(serverRole);
+            serverRoleRepository.save(serverRole);
             testServerRoles.add(serverRole);
         }
     }
@@ -104,7 +110,7 @@ public class ServerRoleRestControllerTest {
                         fieldWithPath("id").description("ServerRole ID"),
                         fieldWithPath("name").description("Имя ServerRole"),
                         fieldWithPath("switchedOn").description("Статус ServerRole"),
-                        fieldWithPath("serviceTemplates").description("ServerRole ServiceTemplates ID's")
+                        fieldWithPath("serviceTemplates").description("Список ServiceTemplates для ServerRole")
                 )
         );
 
@@ -127,7 +133,7 @@ public class ServerRoleRestControllerTest {
                         fieldWithPath("[].id").description("ServerRole ID"),
                         fieldWithPath("[].name").description("Имя ServerRole"),
                         fieldWithPath("[].switchedOn").description("Статус ServerRole"),
-                        fieldWithPath("[].serviceTemplates").description("ServerRole ServiceTemplates ID's")
+                        fieldWithPath("[].serviceTemplates").description("Список ServiceTemplates для ServerRole")
                 )
         );
 
@@ -152,7 +158,7 @@ public class ServerRoleRestControllerTest {
                         fieldWithPath("id").description("ServerRole ID"),
                         fieldWithPath("name").description("Имя ServerRole"),
                         fieldWithPath("switchedOn").description("Статус ServerRole"),
-                        fieldWithPath("serviceTemplates").description("ServerRole ServiceTemplates ID's")
+                        fieldWithPath("serviceTemplates").description("Список ServiceTemplates для ServerRole")
                 )
         );
 
@@ -161,8 +167,8 @@ public class ServerRoleRestControllerTest {
                     .andExpect(jsonPath("name").value(testingServerRole.getName()))
                     .andExpect(jsonPath("switchedOn").value(testingServerRole.getSwitchedOn()))
                     .andExpect(jsonPath("serviceTemplates").isArray())
-                    .andExpect(jsonPath("serviceTemplates.[0]").value(testingServerRole.getServiceTemplates().get(0).getId()))
-                    .andDo(print()).andDo(this.document);
+                    .andExpect(jsonPath("serviceTemplates.[0].id").value(testingServerRole.getServiceTemplates().get(0).getId()))
+                    .andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();

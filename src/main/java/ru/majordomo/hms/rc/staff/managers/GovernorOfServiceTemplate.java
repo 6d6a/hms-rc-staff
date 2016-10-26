@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
@@ -37,8 +38,8 @@ public class GovernorOfServiceTemplate extends LordOfResources {
 
         LordOfResources.setResourceParams(serviceTemplate, serviceMessage, cleaner);
 
-        List<String> configTemplateIds = cleaner.cleanListWithStrings((List<String>) serviceMessage.getParam("configTemplateList"));
-        serviceTemplate.setConfigTemplates((List<ConfigTemplate>) configTemplateRepository.findAll(configTemplateIds));
+        List<ConfigTemplate> configTemplates = (List<ConfigTemplate>)serviceMessage.getParam("configTemplates");
+        serviceTemplate.setConfigTemplates(configTemplates);
         isValid(serviceTemplate);
         serviceTemplateRepository.save(serviceTemplate);
 
@@ -51,7 +52,7 @@ public class GovernorOfServiceTemplate extends LordOfResources {
         List<String> configTemplateIds = template.getConfigTemplateIds();
         List<ConfigTemplate> configTemplates = (List<ConfigTemplate>) configTemplateRepository.findAll(configTemplateIds);
         if (configTemplateIds.size() != configTemplates.size()) {
-            throw new ParameterValidateException("Передан некорретный список config templat'ов");
+            throw new ParameterValidateException("Передан некорретный список configTemplates");
         }
     }
 
@@ -63,7 +64,7 @@ public class GovernorOfServiceTemplate extends LordOfResources {
         }
         for (String configTemplateId: serviceTemplate.getConfigTemplateIds()) {
             ConfigTemplate configTemplate = configTemplateRepository.findOne(configTemplateId);
-            if (configTemplateId == null) {
+            if (configTemplate == null) {
                 throw new ResourceNotFoundException("ConfigTemplate с ID:" + configTemplateId + "не найден");
             }
             serviceTemplate.addConfigTemplate(configTemplate);

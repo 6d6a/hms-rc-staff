@@ -3,13 +3,15 @@ package ru.majordomo.hms.rc.staff.test.api.http;
 import org.bson.types.ObjectId;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.JUnitRestDocumentation;
+import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -26,6 +28,14 @@ import ru.majordomo.hms.rc.staff.test.config.ConfigTemplateServicesConfig;
 import ru.majordomo.hms.rc.staff.test.config.EmbeddedServltetContainerConfig;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
 
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -33,11 +43,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {RepositoriesConfig.class, ConfigTemplateServicesConfig.class, EmbeddedServltetContainerConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ConfigTemplateRestControllerTest {
+    @Rule
+    public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("build/generated-snippets");
 
     @Autowired
-    private ConfigTemplateRepository repository;
-    @Autowired
-    private TestRestTemplate restTemplate;
+    private ConfigTemplateRepository configTemplateRepository;
     @Autowired
     private WebApplicationContext ctx;
     @Value("${spring.application.name}")
@@ -46,6 +56,8 @@ public class ConfigTemplateRestControllerTest {
 
     private MockMvc mockMvc;
     private List<ConfigTemplate> configTemplates = new ArrayList<>();
+
+    private RestDocumentationResultHandler document;
 
     private void generateBatchOfConfigTemplates() {
         String namePattern = "Шаблон ";
@@ -56,15 +68,18 @@ public class ConfigTemplateRestControllerTest {
             configTemplate.setName(namePattern + i);
             configTemplate.setSwitchedOn(switchedOn);
             configTemplate.setFileLink(fileLinkPattern + ObjectId.get().toString());
-            repository.save(configTemplate);
+            configTemplateRepository.save(configTemplate);
             configTemplates.add(configTemplate);
         }
     }
 
     @Before
     public void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(ctx).build();
-        repository.deleteAll();
+        this.document = document("config-template/{method-name}", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()));
+        mockMvc = MockMvcBuilders.webAppContextSetup(ctx)
+                .apply(documentationConfiguration(this.restDocumentation))
+                .build();
+        configTemplateRepository.deleteAll();
         generateBatchOfConfigTemplates();
     }
 
@@ -73,9 +88,20 @@ public class ConfigTemplateRestControllerTest {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName
                 + "/" + resourceName + "/" + configTemplates.get(0).getId())
                 .accept(MediaType.APPLICATION_JSON_UTF8);
+
+        this.document.snippets(
+                responseFields(
+                        fieldWithPath("id").description("ConfigTemplate ID"),
+                        fieldWithPath("name").description("Имя ConfigTemplate"),
+                        fieldWithPath("switchedOn").description("Статус ConfigTemplate"),
+                        fieldWithPath("fileLink").description("Ссылка на файл")
+                )
+        );
+
         try {
             mockMvc.perform(request).andExpect(status().isOk())
-                    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                    .andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -86,9 +112,20 @@ public class ConfigTemplateRestControllerTest {
     public void readAll() {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName
                 + "/" + resourceName + "/").accept(MediaType.APPLICATION_JSON_UTF8);
+
+        this.document.snippets(
+                responseFields(
+                        fieldWithPath("[].id").description("ConfigTemplate ID"),
+                        fieldWithPath("[].name").description("Имя ConfigTemplate"),
+                        fieldWithPath("[].switchedOn").description("Статус ConfigTemplate"),
+                        fieldWithPath("[].fileLink").description("Ссылка на файл")
+                )
+        );
+
         try {
             mockMvc.perform(request).andExpect(status().isOk())
-                    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                    .andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -100,10 +137,21 @@ public class ConfigTemplateRestControllerTest {
         ConfigTemplate configTemplate = configTemplates.get(0);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName
             + "/" + resourceName + "/" + configTemplate.getId()).accept(MediaType.APPLICATION_JSON_UTF8);
+
+        this.document.snippets(
+                responseFields(
+                        fieldWithPath("id").description("ConfigTemplate ID"),
+                        fieldWithPath("name").description("Имя ConfigTemplate"),
+                        fieldWithPath("switchedOn").description("Статус ConfigTemplate"),
+                        fieldWithPath("fileLink").description("Ссылка на файл")
+                )
+        );
+
         try {
             mockMvc.perform(request).andExpect(jsonPath("name").value(configTemplate.getName()))
                     .andExpect(jsonPath("switchedOn").value(configTemplate.getSwitchedOn()))
-                    .andExpect(jsonPath("fileLink").value(configTemplate.getFileLink()));
+                    .andExpect(jsonPath("fileLink").value(configTemplate.getFileLink()))
+                    .andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -119,7 +167,7 @@ public class ConfigTemplateRestControllerTest {
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(configTemplate.toJson());
         try {
-            mockMvc.perform(request).andExpect(status().isCreated());
+            mockMvc.perform(request).andExpect(status().isCreated()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -134,7 +182,7 @@ public class ConfigTemplateRestControllerTest {
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(configTemplate.toJson());
         try {
-            mockMvc.perform(request).andExpect(status().isOk());
+            mockMvc.perform(request).andExpect(status().isOk()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -149,7 +197,7 @@ public class ConfigTemplateRestControllerTest {
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(configTemplate.toJson());
         try {
-            mockMvc.perform(request).andExpect(status().isNotFound());
+            mockMvc.perform(request).andExpect(status().isNotFound()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -163,7 +211,7 @@ public class ConfigTemplateRestControllerTest {
                 + "/" + resourceName + "/" + configTemplate.getId())
                 .accept(MediaType.APPLICATION_JSON_UTF8);
         try {
-            mockMvc.perform(request).andExpect(status().isOk());
+            mockMvc.perform(request).andExpect(status().isOk()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -176,7 +224,7 @@ public class ConfigTemplateRestControllerTest {
                 + "/" + resourceName + "/" + ObjectId.get().toString())
                 .accept(MediaType.APPLICATION_JSON_UTF8);
         try {
-            mockMvc.perform(request).andExpect(status().isNotFound());
+            mockMvc.perform(request).andExpect(status().isNotFound()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();

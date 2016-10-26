@@ -15,8 +15,10 @@ import java.util.List;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfServerRole;
+import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServerRoleRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceTemplateRepository;
+import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
 import ru.majordomo.hms.rc.staff.resources.ServerRole;
 import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 import ru.majordomo.hms.rc.staff.test.config.EmbeddedServltetContainerConfig;
@@ -31,19 +33,21 @@ public class GovernorOfServerRoleTest {
     @Autowired
     private GovernorOfServerRole governor;
     @Autowired
-    private ServiceTemplateRepository templateRepository;
+    private ServiceTemplateRepository serviceTemplateRepository;
     @Autowired
-    private ServerRoleRepository repository;
+    private ServerRoleRepository serverRoleRepository;
+    @Autowired
+    private ConfigTemplateRepository configTemplateRepository;
 
     private ServiceMessage testServiceMessage;
     private ServerRole testServerRole;
 
     private ServiceMessage generateServiceMessage(String name, Boolean switchedOn,
-                                                  List<String> serviceTemplateIds) {
+                                                  List<ServiceTemplate> serviceTemplates) {
         ServiceMessage serviceMessage = new ServiceMessage();
         serviceMessage.addParam("name", name);
         serviceMessage.addParam("switchedOn", switchedOn);
-        serviceMessage.addParam("serviceTemplateList", serviceTemplateIds);
+        serviceMessage.addParam("serviceTemplates", serviceTemplates);
 
         return serviceMessage;
     }
@@ -61,18 +65,20 @@ public class GovernorOfServerRoleTest {
     @Before
     public void setUp() {
         // Создать и сохранить сервис темплейт
+        ConfigTemplate configTemplate = new ConfigTemplate();
+        configTemplateRepository.save(configTemplate);
+
         ServiceTemplate serviceTemplate = new ServiceTemplate();
-        templateRepository.save(serviceTemplate);
+        serviceTemplate.addConfigTemplate(configTemplate);
+        serviceTemplateRepository.save(serviceTemplate);
 
         // Создать сервер роль и сервисное сообщение
         String name = "Серверная роль 1";
         Boolean switchedOn = Boolean.TRUE;
         List<ServiceTemplate> serviceTemplates = new ArrayList<>();
-        List<String> serviceTemplateIds = new ArrayList<>();
         serviceTemplates.add(serviceTemplate);
-        serviceTemplateIds.add(serviceTemplate.getId());
         this.testServerRole = generateServerRole(name,switchedOn,serviceTemplates);
-        this.testServiceMessage = generateServiceMessage(name,switchedOn,serviceTemplateIds);
+        this.testServiceMessage = generateServiceMessage(name,switchedOn,serviceTemplates);
     }
 
     @Test
@@ -93,7 +99,7 @@ public class GovernorOfServerRoleTest {
     public void createWithUnknownServiceTemplate() throws ParameterValidateException {
         List<String> unknownServiceTemplates = new ArrayList<>();
         unknownServiceTemplates.add(ObjectId.get().toString());
-        testServiceMessage.addParam("serviceTemplateList", unknownServiceTemplates);
+        testServiceMessage.addParam("serviceTemplates", unknownServiceTemplates);
         governor.createResource(testServiceMessage);
     }
 

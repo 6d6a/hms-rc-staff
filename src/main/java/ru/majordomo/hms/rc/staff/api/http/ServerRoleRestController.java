@@ -8,7 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
@@ -35,17 +37,20 @@ public class ServerRoleRestController {
 
     @RequestMapping(value = "/{serverRoleId}", method = RequestMethod.GET)
     public ServerRole readOne(@PathVariable String serverRoleId) {
-        return repository.findOne(serverRoleId);
+        return (ServerRole) governor.build(serverRoleId);
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
     public Collection<ServerRole> readAll() {
-        return repository.findAll();
+        List<ServerRole> serverRoles = new ArrayList<>();
+        for (ServerRole serverRole : repository.findAll()) {
+            serverRoles.add((ServerRole) governor.build(serverRole.getId()));
+        }
+        return serverRoles;
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
     public ResponseEntity<?> create (@RequestBody ServerRole serverRole) throws ParameterValidateException {
-        governor.setServiceTemplatesByIds(serverRole, serverRole.getServiceTemplateIds());
         governor.isValid(serverRole);
         ServerRole createdServerRole = repository.save(serverRole);
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -57,7 +62,6 @@ public class ServerRoleRestController {
 
     @RequestMapping(value = "/{serverRoleId}", method = {RequestMethod.PATCH, RequestMethod.PUT})
     public ResponseEntity<?> update(@PathVariable String serverRoleId, @RequestBody ServerRole serverRole) throws ParameterValidateException {
-        governor.setServiceTemplatesByIds(serverRole, serverRole.getServiceTemplateIds());
         governor.isValid(serverRole);
         ServerRole storedServerRole = repository.findOne(serverRoleId);
         if (storedServerRole == null) {

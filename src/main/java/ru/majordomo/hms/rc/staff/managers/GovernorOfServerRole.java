@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
+import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
 import ru.majordomo.hms.rc.staff.resources.Resource;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
@@ -18,19 +19,19 @@ import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 
 @Component
 public class GovernorOfServerRole extends LordOfResources{
-    private ServerRoleRepository repository;
-    private ServiceTemplateRepository templateRepository;
+    private ServerRoleRepository serverRoleRepository;
+    private ServiceTemplateRepository serviceTemplateRepository;
     private ConfigTemplateRepository configTemplateRepository;
     private Cleaner cleaner;
 
     @Autowired
-    public void setRepository(ServerRoleRepository repository) {
-        this.repository = repository;
+    public void setServerRoleRepository(ServerRoleRepository serverRoleRepository) {
+        this.serverRoleRepository = serverRoleRepository;
     }
 
     @Autowired
-    public void setTemplateRepository(ServiceTemplateRepository templateRepository) {
-        this.templateRepository = templateRepository;
+    public void setServiceTemplateRepository(ServiceTemplateRepository serviceTemplateRepository) {
+        this.serviceTemplateRepository = serviceTemplateRepository;
     }
 
     @Autowired
@@ -48,21 +49,20 @@ public class GovernorOfServerRole extends LordOfResources{
         ServerRole serverRole = new ServerRole();
         try {
             LordOfResources.setResourceParams(serverRole, serviceMessage, cleaner);
-            List<String> serviceTemplateIdList = cleaner.cleanListWithStrings((List<String>) serviceMessage.getParam("serviceTemplateList"));
-            setServiceTemplatesByIds(serverRole, serviceTemplateIdList);
+
+            List<ServiceTemplate> serviceTemplates = (List<ServiceTemplate>)serviceMessage.getParam("serviceTemplates");
+            serverRole.setServiceTemplates(serviceTemplates);
+            isValid(serverRole);
+
             if (serverRole.getServiceTemplates().isEmpty()) {
                 throw new ParameterValidateException("Должен быть задан хотя бы один service template");
             }
-            repository.save(serverRole);
+            serverRoleRepository.save(serverRole);
 
         } catch (ClassCastException e) {
             throw new ParameterValidateException("Один из параметров указан неверно:" + e.getMessage());
         }
         return serverRole;
-    }
-
-    public void setServiceTemplatesByIds(ServerRole serverRole, List<String> serviceTemplateIds) throws ParameterValidateException {
-        serverRole.setServiceTemplates((List<ServiceTemplate>) templateRepository.findAll(serviceTemplateIds));
     }
 
     @Override
@@ -71,16 +71,50 @@ public class GovernorOfServerRole extends LordOfResources{
         if (serverRole.getServiceTemplates().isEmpty()) {
             throw new ParameterValidateException("Не найден ни один ServiceTemplate");
         }
-        for (String serviceTemplateId: serverRole.getServiceTemplateIds()) {
-            ServiceTemplate serviceTemplate = templateRepository.findOne(serviceTemplateId);
-            if (serviceTemplate == null) {
-                throw new ParameterValidateException("ServiceTemplate с ID:" + serviceTemplateId + " не найден");
+        if (serverRole.getServiceTemplateIds().isEmpty()) {
+            throw new ParameterValidateException("Не найден ни один ServiceTemplateId");
+        }
+        for (ServiceTemplate serviceTemplate : serverRole.getServiceTemplates()) {
+            if (serviceTemplateRepository.findOne(serviceTemplate.getId()) == null) {
+                throw new ParameterValidateException("ServiceTemplate с ID:" + serviceTemplate.getId() + " не найден");
+            }
+            if (serviceTemplate.getConfigTemplates().isEmpty()) {
+                throw new ParameterValidateException("Не найден ни один ConfigTemplate");
+            }
+            if (serviceTemplate.getConfigTemplateIds().isEmpty()) {
+                throw new ParameterValidateException("Не найден ни один ConfigTemplateId");
+            }
+            for (String configTemplateId: serviceTemplate.getConfigTemplateIds()) {
+                ConfigTemplate configTemplate = configTemplateRepository.findOne(configTemplateId);
+                if (configTemplate == null) {
+                    throw new ParameterValidateException("ConfigTemplate с ID:" + configTemplateId + " не найден");
+                }
             }
         }
     }
 
     @Override
     public Resource build(String resourceId) throws ResourceNotFoundException {
-        return null;
+        ServerRole serverRole = serverRoleRepository.findOne(resourceId);
+        if (serverRole == null) {
+            throw new ResourceNotFoundException("ServerRole с ID:" + resourceId + " не найден");
+        }
+        for (String serviceTemplateId: serverRole.getServiceTemplateIds()) {
+            ServiceTemplate serviceTemplate = serviceTemplateRepository.findOne(serviceTemplateId);
+            if (serviceTemplate == null) {
+                throw new ResourceNotFoundException("ServiceTemplate с ID:" + serviceTemplateId + "не найден");
+            }
+
+            for (String configTemplateId: serviceTemplate.getConfigTemplateIds()) {
+                ConfigTemplate configTemplate = configTemplateRepository.findOne(configTemplateId);
+                if (configTemplate == null) {
+                    throw new ResourceNotFoundException("ConfigTemplate с ID:" + configTemplateId + "не найден");
+                }
+                serviceTemplate.addConfigTemplate(configTemplate);
+            }
+
+            serverRole.addServiceTemplate(serviceTemplate);
+        }
+        return serverRole;
     }
 }
