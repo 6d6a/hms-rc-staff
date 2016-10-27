@@ -18,20 +18,13 @@ import java.util.List;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfNetwork;
-import ru.majordomo.hms.rc.staff.repositories.NetworkRepository;
 import ru.majordomo.hms.rc.staff.resources.Network;
 
 @RestController
 @CrossOrigin("*")
 @RequestMapping("/${spring.application.name}/network")
 public class NetworkRestController {
-    private NetworkRepository networkRepository;
     private GovernorOfNetwork governor;
-
-    @Autowired
-    public void setRepository(NetworkRepository repository) {
-        this.networkRepository = repository;
-    }
 
     @Autowired
     public void setGovernor(GovernorOfNetwork governor) {
@@ -46,7 +39,7 @@ public class NetworkRestController {
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
     public Collection<Network> readAll() {
         List<Network> networks = new ArrayList<>();
-        for (Network network : networkRepository.findAll()) {
+        for (Network network : governor.findAll()) {
             networks.add((Network) governor.build(network.getId()));
         }
         return networks;
@@ -55,7 +48,7 @@ public class NetworkRestController {
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
     public ResponseEntity<?> create (@RequestBody Network network) throws ParameterValidateException {
         governor.isValid(network);
-        Network createdNetwork = networkRepository.save(network);
+        Network createdNetwork = (Network) governor.save(network);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{id}")
@@ -66,22 +59,22 @@ public class NetworkRestController {
     @RequestMapping(value = "/{networkId}", method = RequestMethod.PATCH)
     public ResponseEntity<?> update(@PathVariable String networkId, @RequestBody Network network) throws ParameterValidateException {
         governor.isValid(network);
-        Network storedNetwork = networkRepository.findOne(networkId);
+        Network storedNetwork = (Network) governor.findOne(networkId);
         if (storedNetwork == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         network.setId(storedNetwork.getId());
-        networkRepository.save(network);
+        governor.save(network);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{networkId}", method = RequestMethod.DELETE)
     public ResponseEntity<?> delete(@PathVariable String networkId) {
-        Network storedNetwork = networkRepository.findOne(networkId);
+        Network storedNetwork = (Network) governor.findOne(networkId);
         if (storedNetwork == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        networkRepository.delete(networkId);
+        governor.delete(networkId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

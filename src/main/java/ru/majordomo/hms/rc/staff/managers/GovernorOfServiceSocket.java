@@ -84,4 +84,24 @@ public class GovernorOfServiceSocket extends LordOfResources {
         }
         return serviceSocket;
     }
+
+    @Override
+    public Resource save(Resource resource) {
+        return null;
+    }
+
+    @Override
+    public Resource findOne(String resourceId) {
+        return null;
+    }
+
+    @Override
+    public void delete(String resourceId) {
+
+    }
+
+    @Override
+    public List<? extends Resource> findAll() {
+        return null;
+    }
 }
