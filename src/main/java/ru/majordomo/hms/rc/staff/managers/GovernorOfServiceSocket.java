@@ -78,6 +78,10 @@ public class GovernorOfServiceSocket extends LordOfResources {
 
     @Override
     public Resource build(String resourceId) throws ResourceNotFoundException {
-        return null;
+        ServiceSocket serviceSocket = serviceSocketRepository.findOne(resourceId);
+        if (serviceSocket == null) {
+            throw new ResourceNotFoundException("ServiceSocket с ID:" + resourceId + " не найден");
+        }
+        return serviceSocket;
     }
 }

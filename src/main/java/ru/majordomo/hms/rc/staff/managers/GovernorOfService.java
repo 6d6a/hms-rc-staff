@@ -22,6 +22,8 @@ public class GovernorOfService extends LordOfResources{
     private ServiceSocketRepository socketRepository;
     private ServiceTemplateRepository templateRepository;
     private ConfigTemplateRepository configTemplateRepository;
+    private GovernorOfServiceTemplate governorOfServiceTemplate;
+    private GovernorOfServiceSocket governorOfServiceSocket;
     private Cleaner cleaner;
 
     @Autowired
@@ -42,6 +44,16 @@ public class GovernorOfService extends LordOfResources{
     @Autowired
     public void setConfigTemplateRepository(ConfigTemplateRepository configTemplateRepository) {
         this.configTemplateRepository = configTemplateRepository;
+    }
+
+    @Autowired
+    public void setGovernorOfServiceTemplate(GovernorOfServiceTemplate governorOfServiceTemplate) {
+        this.governorOfServiceTemplate = governorOfServiceTemplate;
+    }
+
+    @Autowired
+    public void setGovernorOfServiceSocket(GovernorOfServiceSocket governorOfServiceSocket) {
+        this.governorOfServiceSocket = governorOfServiceSocket;
     }
 
     @Autowired
@@ -116,26 +128,11 @@ public class GovernorOfService extends LordOfResources{
         }
 
         for (String serviceSocketId: service.getServiceSocketIds()) {
-            ServiceSocket serviceSocket = socketRepository.findOne(serviceSocketId);
-            if (serviceSocket == null) {
-                throw new ResourceNotFoundException("ServiceSocket с ID:" + serviceSocketId + "не найден");
-            }
+            ServiceSocket serviceSocket = (ServiceSocket) governorOfServiceSocket.build(serviceSocketId);
             service.addServiceSocket(serviceSocket);
         }
 
-        ServiceTemplate serviceTemplate = templateRepository.findOne(service.getServiceTemplateId());
-        if (serviceTemplate == null) {
-            throw new ResourceNotFoundException("ServiceTemplate с ID:" + service.getServiceTemplateId() + "не найден");
-        }
-
-        for (String configTemplateId: serviceTemplate.getConfigTemplateIds()) {
-            ConfigTemplate configTemplate = configTemplateRepository.findOne(configTemplateId);
-            if (configTemplate == null) {
-                throw new ResourceNotFoundException("ConfigTemplate с ID:" + configTemplateId + "не найден");
-            }
-            serviceTemplate.addConfigTemplate(configTemplate);
-        }
-
+        ServiceTemplate serviceTemplate = (ServiceTemplate) governorOfServiceTemplate.build(service.getServiceTemplateId());
         service.setServiceTemplate(serviceTemplate);
 
         return service;

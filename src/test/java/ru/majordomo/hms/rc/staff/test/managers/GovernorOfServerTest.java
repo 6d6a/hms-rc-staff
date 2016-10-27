@@ -125,6 +125,24 @@ public class GovernorOfServerTest {
         }
     }
 
+    @Test
+    public void build() {
+        serverRepository.save(testServer);
+        try {
+            Server buildedServer = (Server) governor.build(testServer.getId());
+            Assert.assertEquals("Имя не совпадает с ожидаемым", testServer.getName(), buildedServer.getName());
+            Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testServer.getSwitchedOn(), buildedServer.getSwitchedOn());
+            Assert.assertTrue(testServer.getServices().size() == buildedServer.getServices().size());
+            Assert.assertTrue(testServer.getServiceIds().containsAll(buildedServer.getServiceIds()));
+            Assert.assertTrue(testServer.getStorages().size() == buildedServer.getStorages().size());
+            Assert.assertTrue(testServer.getStorageIds().containsAll(buildedServer.getStorageIds()));
+            Assert.assertTrue(testServer.getServerRoleId().equals(buildedServer.getServerRoleId()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
     @Test(expected = ParameterValidateException.class)
     public void createWithUnknownService() throws ParameterValidateException {
         List<String> unknownService = new ArrayList<>();

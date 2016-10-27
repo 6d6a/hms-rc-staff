@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.resources.Resource;
@@ -56,7 +57,11 @@ public class GovernorOfConfigTemplate extends LordOfResources {
 
     @Override
     public Resource build(String resourceId) throws ResourceNotFoundException {
-        return null;
+        ConfigTemplate configTemplate = configTemplateRepository.findOne(resourceId);
+        if (configTemplate == null) {
+            throw new ResourceNotFoundException("ConfigTemplate с ID:" + resourceId + " не найден");
+        }
+        return configTemplate;
     }
 
 

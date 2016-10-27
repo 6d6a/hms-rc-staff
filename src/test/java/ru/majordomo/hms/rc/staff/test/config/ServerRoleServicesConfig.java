@@ -6,7 +6,9 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import ru.majordomo.hms.rc.staff.api.http.ServerRoleRestController;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
+import ru.majordomo.hms.rc.staff.managers.GovernorOfConfigTemplate;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfServerRole;
+import ru.majordomo.hms.rc.staff.managers.GovernorOfServiceTemplate;
 
 @Configuration
 @EnableWebMvc
@@ -24,5 +26,15 @@ public class ServerRoleServicesConfig {
     @Bean
     public ServerRoleRestController serverRoleRestController() {
         return new ServerRoleRestController();
+    }
+
+    @Bean
+    public GovernorOfServiceTemplate governorOfServiceTemplate() {
+        return new GovernorOfServiceTemplate();
+    }
+
+    @Bean
+    public GovernorOfConfigTemplate governorOfConfigTemplate() {
+        return new GovernorOfConfigTemplate();
     }
 }

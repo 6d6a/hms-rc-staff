@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
@@ -39,12 +41,16 @@ public class StorageRestController {
 
     @RequestMapping(value = "/{storageId}", method = RequestMethod.GET)
     public Storage readOne(@PathVariable String storageId) {
-        return repository.findOne(storageId);
+        return (Storage) governor.build(storageId);
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
     public Collection<Storage> readAll() {
-        return repository.findAll();
+        List<Storage> storages = new ArrayList<>();
+        for (Storage storage : repository.findAll()) {
+            storages.add((Storage) governor.build(storage.getId()));
+        }
+        return storages;
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)

@@ -6,6 +6,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import ru.majordomo.hms.rc.staff.api.http.ServiceTemplateRestController;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
+import ru.majordomo.hms.rc.staff.managers.GovernorOfConfigTemplate;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfServiceTemplate;
 
 @Configuration
@@ -24,5 +25,10 @@ public class ServiceTemplateServicesConfig {
     @Bean
     public ServiceTemplateRestController serviceTemplateRestController() {
         return new ServiceTemplateRestController();
+    }
+
+    @Bean
+    public GovernorOfConfigTemplate governorOfConfigTemplate() {
+        return new GovernorOfConfigTemplate();
     }
 }

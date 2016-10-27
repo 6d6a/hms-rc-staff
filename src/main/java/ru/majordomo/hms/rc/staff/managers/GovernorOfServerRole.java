@@ -22,6 +22,7 @@ public class GovernorOfServerRole extends LordOfResources{
     private ServerRoleRepository serverRoleRepository;
     private ServiceTemplateRepository serviceTemplateRepository;
     private ConfigTemplateRepository configTemplateRepository;
+    private GovernorOfServiceTemplate governorOfServiceTemplate;
     private Cleaner cleaner;
 
     @Autowired
@@ -37,6 +38,11 @@ public class GovernorOfServerRole extends LordOfResources{
     @Autowired
     public void setConfigTemplateRepository(ConfigTemplateRepository configTemplateRepository) {
         this.configTemplateRepository = configTemplateRepository;
+    }
+
+    @Autowired
+    public void setGovernor(GovernorOfServiceTemplate governorOfServiceTemplate) {
+        this.governorOfServiceTemplate = governorOfServiceTemplate;
     }
 
     @Autowired
@@ -99,19 +105,9 @@ public class GovernorOfServerRole extends LordOfResources{
         if (serverRole == null) {
             throw new ResourceNotFoundException("ServerRole с ID:" + resourceId + " не найден");
         }
-        for (String serviceTemplateId: serverRole.getServiceTemplateIds()) {
-            ServiceTemplate serviceTemplate = serviceTemplateRepository.findOne(serviceTemplateId);
-            if (serviceTemplate == null) {
-                throw new ResourceNotFoundException("ServiceTemplate с ID:" + serviceTemplateId + "не найден");
-            }
 
-            for (String configTemplateId: serviceTemplate.getConfigTemplateIds()) {
-                ConfigTemplate configTemplate = configTemplateRepository.findOne(configTemplateId);
-                if (configTemplate == null) {
-                    throw new ResourceNotFoundException("ConfigTemplate с ID:" + configTemplateId + "не найден");
-                }
-                serviceTemplate.addConfigTemplate(configTemplate);
-            }
+        for (String serviceTemplateId: serverRole.getServiceTemplateIds()) {
+            ServiceTemplate serviceTemplate = (ServiceTemplate) governorOfServiceTemplate.build(serviceTemplateId);
 
             serverRole.addServiceTemplate(serviceTemplate);
         }

@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.List;
 
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.resources.Resource;
@@ -96,7 +98,11 @@ public class GovernorOfNetwork extends LordOfResources {
 
     @Override
     public Resource build(String resourceId) throws ResourceNotFoundException {
-        return null;
+        Network network = networkRepository.findOne(resourceId);
+        if (network == null) {
+            throw new ResourceNotFoundException("Network с ID:" + resourceId + " не найден");
+        }
+        return network;
     }
 
 }

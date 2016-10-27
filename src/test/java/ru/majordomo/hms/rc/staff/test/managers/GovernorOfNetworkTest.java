@@ -76,6 +76,31 @@ public class GovernorOfNetworkTest {
         }
     }
 
+    @Test
+    public void build() {
+        Network network = new Network();
+        network.setName(name);
+        network.setSwitchedOn(switchedOn);
+        network.setAddress(address);
+        network.setMask(mask);
+        network.setGatewayAddress(gatewayAddress);
+        network.setVlanNumber(vlanNumber);
+        networkRepository.save(network);
+
+        try {
+            Network buildedNetwork = (Network)governorOfNetwork.build(network.getId());
+            Assert.assertEquals("Имя сети, полученное из базы не совпадает с ожидаемым", name, buildedNetwork.getName());
+            Assert.assertEquals("Флаг switchedOn не совпадает с ожидаемым", switchedOn, buildedNetwork.getSwitchedOn());
+            Assert.assertEquals("Адрес сети не совпадает с ожидаемым", address, buildedNetwork.getAddressAsString());
+            Assert.assertEquals("Маска сети не совпадает с ожидаемой", mask, buildedNetwork.getMask());
+            Assert.assertEquals("Gateway не совпадает с ожидаемым", gatewayAddress, buildedNetwork.getGatewayAddressAsString());
+            Assert.assertEquals("Номер VLAN'а не совпадает с ожидаемым", vlanNumber, buildedNetwork.getVlanNumber());
+        } catch (ParameterValidateException | NullPointerException e ) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
     @Test(expected = ParameterValidateException.class)
     public void createResourceWithInvalidAddress() throws ParameterValidateException {
         serviceMessage = createServiceMessage(name, switchedOn, "<? yabidabido?>", mask, gatewayAddress, vlanNumber);

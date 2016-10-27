@@ -6,6 +6,8 @@ import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 
+import java.util.List;
+
 public abstract class LordOfResources {
     public abstract Resource createResource(ServiceMessage serviceMessage) throws ParameterValidateException;
     public abstract void isValid(Resource resource) throws ParameterValidateException;

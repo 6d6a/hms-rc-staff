@@ -13,6 +13,8 @@ import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.repositories.StorageRepository;
 import ru.majordomo.hms.rc.staff.resources.Storage;
 
+import java.util.List;
+
 @Service
 public class GovernorOfStorage extends LordOfResources {
 
@@ -82,6 +84,10 @@ public class GovernorOfStorage extends LordOfResources {
 
     @Override
     public Resource build(String resourceId) throws ResourceNotFoundException {
-        return null;
+        Storage storage = repository.findOne(resourceId);
+        if (storage == null) {
+            throw new ResourceNotFoundException("Storage с ID:" + resourceId + " не найден");
+        }
+        return storage;
     }
 }

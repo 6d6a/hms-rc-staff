@@ -16,6 +16,7 @@ import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfService;
 import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
+import ru.majordomo.hms.rc.staff.repositories.ServiceRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceSocketRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceTemplateRepository;
 import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
@@ -39,6 +40,8 @@ public class GovernorOfServiceTest {
     private ServiceTemplateRepository serviceTemplateRepository;
     @Autowired
     private ConfigTemplateRepository configTemplateRepository;
+    @Autowired
+    private ServiceRepository serviceRepository;
 
     ServiceMessage testServiceMessage;
     Service testService;
@@ -98,6 +101,22 @@ public class GovernorOfServiceTest {
             Assert.assertEquals("serviceTemplate не совпадает с ожидаемым", testService.getServiceTemplate().getId(), createdService.getServiceTemplate().getId());
             Assert.assertTrue(testService.getServiceSocketIds().size() == createdService.getServiceSocketIds().size());
             Assert.assertTrue(testService.getServiceSocketIds().containsAll(createdService.getServiceSocketIds()));
+        } catch (ParameterValidateException e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void build() {
+        serviceRepository.save(testService);
+        try {
+            Service buildedService = (Service) governor.build(testService.getId());
+            Assert.assertEquals("name не совпадает с ожидаемым", testService.getName(), buildedService.getName());
+            Assert.assertEquals("switchedOn не совпадает с ожидаемым", testService.getSwitchedOn(), buildedService.getSwitchedOn());
+            Assert.assertEquals("serviceTemplate не совпадает с ожидаемым", testService.getServiceTemplate().getId(), buildedService.getServiceTemplate().getId());
+            Assert.assertTrue(testService.getServiceSocketIds().size() == buildedService.getServiceSocketIds().size());
+            Assert.assertTrue(testService.getServiceSocketIds().containsAll(buildedService.getServiceSocketIds()));
         } catch (ParameterValidateException e) {
             e.printStackTrace();
             Assert.fail();

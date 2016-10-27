@@ -12,6 +12,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfStorage;
+import ru.majordomo.hms.rc.staff.repositories.StorageRepository;
 import ru.majordomo.hms.rc.staff.resources.Storage;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
 import ru.majordomo.hms.rc.staff.test.config.StorageServicesConfig;
@@ -24,6 +25,9 @@ public class GovernorOfStorageTest {
 
     ServiceMessage testServiceMessage;
     Storage testStorage;
+
+    @Autowired
+    private StorageRepository storageRepository;
 
     private ServiceMessage generateServiceMessage(String name, Boolean switchedOn,
                                                   Double capacity, Double capacityUsed) {
@@ -64,6 +68,21 @@ public class GovernorOfStorageTest {
             Assert.assertEquals("Capacity не совпадает с ожидаемым", testStorage.getCapacity(), createdStorage.getCapacity());
             Assert.assertEquals("CapacityUsed не совпадает с ожидаемым", testStorage.getCapacityUsed(), createdStorage.getCapacityUsed());
         } catch (ParameterValidateException e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void build() {
+        storageRepository.save(testStorage);
+        try {
+            Storage buildedStorage = (Storage)governor.build(testStorage.getId());
+            Assert.assertEquals("Имя не совпадает с ожидаемым", testStorage.getName(), buildedStorage.getName());
+            Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testStorage.getSwitchedOn(), buildedStorage.getSwitchedOn());
+            Assert.assertEquals("Capacity не совпадает с ожидаемым", testStorage.getCapacity(), buildedStorage.getCapacity());
+            Assert.assertEquals("CapacityUsed не совпадает с ожидаемым", testStorage.getCapacityUsed(), buildedStorage.getCapacityUsed());
+        } catch (ParameterValidateException | NullPointerException e ) {
             e.printStackTrace();
             Assert.fail();
         }

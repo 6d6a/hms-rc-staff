@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -39,13 +40,15 @@ public class NetworkRestController {
 
     @RequestMapping(value = "/{networkId}", method = RequestMethod.GET)
     public Network readOne(@PathVariable String networkId) {
-        Network network = networkRepository.findOne(networkId);
-        return network;
+        return (Network) governor.build(networkId);
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
     public Collection<Network> readAll() {
-        List<Network> networks = networkRepository.findAll();
+        List<Network> networks = new ArrayList<>();
+        for (Network network : networkRepository.findAll()) {
+            networks.add((Network) governor.build(network.getId()));
+        }
         return networks;
     }
 

@@ -95,6 +95,21 @@ public class GovernorOfServerRoleTest {
         }
     }
 
+    @Test
+    public void build() {
+        serverRoleRepository.save(testServerRole);
+        try {
+            ServerRole buildedServerRole = (ServerRole) governor.build(testServerRole.getId());
+            Assert.assertEquals("Имя не совпадает с ожидаемым", testServerRole.getName(), buildedServerRole.getName());
+            Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testServerRole.getSwitchedOn(), buildedServerRole.getSwitchedOn());
+            Assert.assertTrue(testServerRole.getServiceTemplates().size() == buildedServerRole.getServiceTemplates().size());
+            Assert.assertTrue(testServerRole.getServiceTemplateIds().containsAll(buildedServerRole.getServiceTemplateIds()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
     @Test(expected = ParameterValidateException.class)
     public void createWithUnknownServiceTemplate() throws ParameterValidateException {
         List<String> unknownServiceTemplates = new ArrayList<>();

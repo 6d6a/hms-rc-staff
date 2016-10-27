@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfConfigTemplate;
@@ -48,12 +50,16 @@ public class ConfigTemplateRestController {
 
     @RequestMapping(value = "/{configTemplateId}", method = RequestMethod.GET)
     public ConfigTemplate readOne(@PathVariable String configTemplateId) {
-        return repository.findOne(configTemplateId);
+        return (ConfigTemplate) governor.build(configTemplateId);
     }
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public Collection<ConfigTemplate> readAll() {
-        return repository.findAll();
+        List<ConfigTemplate> configTemplates = new ArrayList<>();
+        for (ConfigTemplate configTemplate : repository.findAll()) {
+            configTemplates.add((ConfigTemplate) governor.build(configTemplate.getId()));
+        }
+        return configTemplates;
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)

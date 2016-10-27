@@ -29,6 +29,9 @@ public class GovernorOfServiceTemplate extends LordOfResources {
     @Autowired
     ConfigTemplateRepository configTemplateRepository;
 
+    @Autowired
+    GovernorOfConfigTemplate governorOfConfigTemplate;
+
     private static final Logger logger = LoggerFactory.getLogger(GovernorOfServiceTemplate.class);
 
     @Override
@@ -63,10 +66,7 @@ public class GovernorOfServiceTemplate extends LordOfResources {
             throw new ResourceNotFoundException("ServiceTemplate с ID:" + resourceId + " не найден");
         }
         for (String configTemplateId: serviceTemplate.getConfigTemplateIds()) {
-            ConfigTemplate configTemplate = configTemplateRepository.findOne(configTemplateId);
-            if (configTemplate == null) {
-                throw new ResourceNotFoundException("ConfigTemplate с ID:" + configTemplateId + "не найден");
-            }
+            ConfigTemplate configTemplate = (ConfigTemplate) governorOfConfigTemplate.build(configTemplateId);
             serviceTemplate.addConfigTemplate(configTemplate);
         }
         return serviceTemplate;

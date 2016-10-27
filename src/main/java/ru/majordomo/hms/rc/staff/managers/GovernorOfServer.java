@@ -22,6 +22,9 @@ public class GovernorOfServer extends LordOfResources{
     private ServiceTemplateRepository serviceTemplateRepository;
     private ConfigTemplateRepository configTemplateRepository;
     private ServiceSocketRepository serviceSocketRepository;
+    private GovernorOfServerRole governorOfServerRole;
+    private GovernorOfService governorOfService;
+    private GovernorOfStorage governorOfStorage;
     private Cleaner cleaner;
 
     @Autowired
@@ -57,6 +60,21 @@ public class GovernorOfServer extends LordOfResources{
     @Autowired
     public void setServiceSocketRepository(ServiceSocketRepository serviceSocketRepository) {
         this.serviceSocketRepository = serviceSocketRepository;
+    }
+
+    @Autowired
+    public void setGovernorOfServerRole(GovernorOfServerRole governorOfServerRole) {
+        this.governorOfServerRole = governorOfServerRole;
+    }
+
+    @Autowired
+    public void setGovernorOfService(GovernorOfService governorOfService) {
+        this.governorOfService = governorOfService;
+    }
+
+    @Autowired
+    public void setGovernorOfStorage(GovernorOfStorage governorOfStorage) {
+        this.governorOfStorage = governorOfStorage;
     }
 
     @Autowired
@@ -126,63 +144,17 @@ public class GovernorOfServer extends LordOfResources{
             throw new ResourceNotFoundException("Server с ID:" + resourceId + " не найден");
         }
 
-        ServerRole serverRole = serverRoleRepository.findOne(server.getServerRoleId());
-        if (serverRole == null) {
-            throw new ResourceNotFoundException("ServerRole с ID:" + server.getServerRoleId() + " не найден");
-        }
-        for (String serviceTemplateId: serverRole.getServiceTemplateIds()) {
-            ServiceTemplate serviceTemplate = serviceTemplateRepository.findOne(serviceTemplateId);
-            if (serviceTemplate == null) {
-                throw new ResourceNotFoundException("ServiceTemplate с ID:" + serviceTemplateId + "не найден");
-            }
-
-            for (String configTemplateId: serviceTemplate.getConfigTemplateIds()) {
-                ConfigTemplate configTemplate = configTemplateRepository.findOne(configTemplateId);
-                if (configTemplate == null) {
-                    throw new ResourceNotFoundException("ConfigTemplate с ID:" + configTemplateId + "не найден");
-                }
-                serviceTemplate.addConfigTemplate(configTemplate);
-            }
-
-            serverRole.addServiceTemplate(serviceTemplate);
-        }
+        ServerRole serverRole = (ServerRole) governorOfServerRole.build(server.getServerRoleId());
         server.setServerRole(serverRole);
 
         for (String serviceId : server.getServiceIds()) {
-            Service service = serviceRepository.findOne(serviceId);
-            if (service == null) {
-                throw new ResourceNotFoundException("Service с ID:" + serviceId + " не найден");
-            }
-            for (String serviceSocketId: service.getServiceSocketIds()) {
-                ServiceSocket serviceSocket = serviceSocketRepository.findOne(serviceSocketId);
-                if (serviceSocket == null) {
-                    throw new ResourceNotFoundException("ServiceSocket с ID:" + serviceSocketId + "не найден");
-                }
-                service.addServiceSocket(serviceSocket);
-            }
-
-            ServiceTemplate serviceTemplate = serviceTemplateRepository.findOne(service.getServiceTemplateId());
-            if (serviceTemplate == null) {
-                throw new ResourceNotFoundException("ServiceTemplate с ID:" + service.getServiceTemplateId() + "не найден");
-            }
-
-            for (String configTemplateId: serviceTemplate.getConfigTemplateIds()) {
-                ConfigTemplate configTemplate = configTemplateRepository.findOne(configTemplateId);
-                if (configTemplate == null) {
-                    throw new ResourceNotFoundException("ConfigTemplate с ID:" + configTemplateId + "не найден");
-                }
-                serviceTemplate.addConfigTemplate(configTemplate);
-            }
-
-            service.setServiceTemplate(serviceTemplate);
+            Service service = (Service) governorOfService.build(serviceId);
             server.addService(service);
         }
 
         for (String storageId : server.getStorageIds()) {
-            if (storageRepository.findOne(storageId) == null) {
-                throw new ResourceNotFoundException("Storage с ID:" + storageId + "не найден");
-            }
-            server.addStorage(storageRepository.findOne(storageId));
+            Storage storage = (Storage) governorOfStorage.build(storageId);
+            server.addStorage(storage);
         }
 
         return server;

@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfServiceSocket;
@@ -47,12 +49,16 @@ public class ServiceSocketRestController {
 
     @RequestMapping(value = "/{serviceSocketId}", method = RequestMethod.GET)
     public ServiceSocket readOne(@PathVariable String serviceSocketId) {
-        return serviceSocketRepository.findOne(serviceSocketId);
+        return (ServiceSocket) governor.build(serviceSocketId);
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
     public Collection<ServiceSocket> findAll() {
-        return serviceSocketRepository.findAll();
+        List<ServiceSocket> serviceSockets = new ArrayList<>();
+        for (ServiceSocket serviceSocket : serviceSocketRepository.findAll()) {
+            serviceSockets.add((ServiceSocket) governor.build(serviceSocket.getId()));
+        }
+        return serviceSockets;
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)

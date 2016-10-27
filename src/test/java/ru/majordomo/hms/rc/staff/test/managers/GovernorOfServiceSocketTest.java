@@ -85,6 +85,21 @@ public class GovernorOfServiceSocketTest {
         }
     }
 
+    @Test
+    public void build() {
+        repository.save(testServiceSocket);
+        try {
+            ServiceSocket buildedServiceSocket = (ServiceSocket) governor.build(testServiceSocket.getId());
+            Assert.assertEquals("Имя не совпадает с ожидаемым", testServiceSocket.getName(), buildedServiceSocket.getName());
+            Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testServiceSocket.getName(), buildedServiceSocket.getName());
+            Assert.assertEquals("Адрес не совпадает с ожидаемым", testServiceSocket.getAddress(), buildedServiceSocket.getAddress());
+            Assert.assertEquals("Порт не совпадает с ожидаемым", testServiceSocket.getPort(), buildedServiceSocket.getPort());
+        } catch (ParameterValidateException e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
     @Test(expected = ParameterValidateException.class)
     public void createWithBadAddress() throws ParameterValidateException {
         ServiceMessage badAddressServiceMessage = testServiceMessage;
