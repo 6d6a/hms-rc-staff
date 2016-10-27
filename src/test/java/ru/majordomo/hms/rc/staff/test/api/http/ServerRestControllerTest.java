@@ -3,12 +3,15 @@ package ru.majordomo.hms.rc.staff.test.api.http;
 import org.bson.types.ObjectId;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.JUnitRestDocumentation;
+import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -19,18 +22,20 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.majordomo.hms.rc.staff.repositories.ServerRepository;
-import ru.majordomo.hms.rc.staff.repositories.ServerRoleRepository;
-import ru.majordomo.hms.rc.staff.repositories.ServiceRepository;
-import ru.majordomo.hms.rc.staff.repositories.StorageRepository;
-import ru.majordomo.hms.rc.staff.resources.Server;
-import ru.majordomo.hms.rc.staff.resources.ServerRole;
-import ru.majordomo.hms.rc.staff.resources.Service;
-import ru.majordomo.hms.rc.staff.resources.Storage;
+import ru.majordomo.hms.rc.staff.repositories.*;
+import ru.majordomo.hms.rc.staff.resources.*;
 import ru.majordomo.hms.rc.staff.test.config.EmbeddedServltetContainerConfig;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
 import ru.majordomo.hms.rc.staff.test.config.ServerServicesConfig;
 
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -38,6 +43,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {RepositoriesConfig.class, EmbeddedServltetContainerConfig.class, ServerServicesConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ServerRestControllerTest {
+    @Rule
+    public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("build/generated-snippets");
+
     @Autowired
     private WebApplicationContext ctx;
     @Autowired
@@ -48,6 +56,14 @@ public class ServerRestControllerTest {
     private ServiceRepository serviceRepository;
     @Autowired
     private StorageRepository storageRepository;
+    @Autowired
+    private ServiceTemplateRepository serviceTemplateRepository;
+    @Autowired
+    private ConfigTemplateRepository configTemplateRepository;
+    @Autowired
+    private ServiceSocketRepository serviceSocketRepository;
+
+    private RestDocumentationResultHandler document;
 
     @Value("${spring.application.name}")
     private String applicationName;
@@ -58,19 +74,29 @@ public class ServerRestControllerTest {
     private void generateBatchOfServers() {
         for (int i = 1; i < 6; i++) {
 
+            ConfigTemplate configTemplate = new ConfigTemplate();
+            configTemplateRepository.save(configTemplate);
+
+            ServiceTemplate serviceTemplate = new ServiceTemplate();
+            serviceTemplate.addConfigTemplate(configTemplate);
+            serviceTemplateRepository.save(serviceTemplate);
+
             ServerRole serverRole = new ServerRole();
-            serverRole.setId(ObjectId.get().toString());
+            serverRole.addServiceTemplate(serviceTemplate);
             serverRoleRepository.save(serverRole);
 
             List<Service> services = new ArrayList<>();
             Service service = new Service();
-            service.setId(ObjectId.get().toString());
+            ServiceSocket serviceSocket = new ServiceSocket();
+
+            serviceSocketRepository.save(serviceSocket);
+            service.setServiceTemplate(serviceTemplate);
+            service.addServiceSocket(serviceSocket);
             services.add(service);
             serviceRepository.save(services);
 
             List<Storage> storages = new ArrayList<>();
             Storage storage = new Storage();
-            storage.setId(ObjectId.get().toString());
             storages.add(storage);
             storageRepository.save(storages);
 
@@ -91,7 +117,10 @@ public class ServerRestControllerTest {
 
     @Before
     public void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(ctx).build();
+        this.document = document("server/{method-name}", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()));
+        mockMvc = MockMvcBuilders.webAppContextSetup(ctx)
+                .apply(documentationConfiguration(this.restDocumentation))
+                .build();
         generateBatchOfServers();
     }
 
@@ -99,8 +128,20 @@ public class ServerRestControllerTest {
     public void readOne() {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName +
             "/" + resourceName + "/" + testServers.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
+
+        this.document.snippets(
+                responseFields(
+                        fieldWithPath("id").description("Server ID"),
+                        fieldWithPath("name").description("Имя Server"),
+                        fieldWithPath("switchedOn").description("Статус Server"),
+                        fieldWithPath("services").description("Список Service для Server"),
+                        fieldWithPath("serverRole").description("ServerRole для Server"),
+                        fieldWithPath("storages").description("Список Storages для Server")
+                )
+        );
+
         try {
-            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
+            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8)).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -111,10 +152,23 @@ public class ServerRestControllerTest {
     public void readAll() {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName +
                 "/" + resourceName ).accept(MediaType.APPLICATION_JSON_UTF8);
+
+        this.document.snippets(
+                responseFields(
+                        fieldWithPath("[].id").description("Server ID"),
+                        fieldWithPath("[].name").description("Имя Server"),
+                        fieldWithPath("[].switchedOn").description("Статус Server"),
+                        fieldWithPath("[].services").description("Список Service для Server"),
+                        fieldWithPath("[].serverRole").description("ServerRole для Server"),
+                        fieldWithPath("[].storages").description("Список Storages для Server")
+                )
+        );
+
         try {
             mockMvc.perform(request).andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                    .andExpect(jsonPath("$").isArray());
+                    .andExpect(jsonPath("$").isArray())
+                    .andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -126,15 +180,28 @@ public class ServerRestControllerTest {
         Server testingServer = testServers.get(0);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName +
             "/" + resourceName + "/" + testingServer.getId()).accept(MediaType.APPLICATION_JSON_UTF8);
+
+        this.document.snippets(
+                responseFields(
+                        fieldWithPath("id").description("Server ID"),
+                        fieldWithPath("name").description("Имя Server"),
+                        fieldWithPath("switchedOn").description("Статус Server"),
+                        fieldWithPath("services").description("Список Service для Server"),
+                        fieldWithPath("serverRole").description("ServerRole для Server"),
+                        fieldWithPath("storages").description("Список Storages для Server")
+                )
+        );
+
         try {
             mockMvc.perform(request).andExpect(jsonPath("id").value(testingServer.getId()))
                     .andExpect(jsonPath("name").value(testingServer.getName()))
                     .andExpect(jsonPath("switchedOn").value(testingServer.getSwitchedOn()))
-                    .andExpect(jsonPath("serverRole").value(testingServer.getServerRoleId()))
+                    .andExpect(jsonPath("serverRole.id").value(testingServer.getServerRoleId()))
                     .andExpect(jsonPath("services").isArray())
-                    .andExpect(jsonPath("services.[0]").value(testingServer.getServices().get(0).getId()))
+                    .andExpect(jsonPath("services.[0].id").value(testingServer.getServices().get(0).getId()))
                     .andExpect(jsonPath("storages").isArray())
-                    .andExpect(jsonPath("storages.[0]").value(testingServer.getStorages().get(0).getId()));
+                    .andExpect(jsonPath("storages.[0].id").value(testingServer.getStorages().get(0).getId()))
+                    .andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -150,7 +217,7 @@ public class ServerRestControllerTest {
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(server.toJson());
         try {
-            mockMvc.perform(request).andExpect(status().isCreated());
+            mockMvc.perform(request).andExpect(status().isCreated()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -165,7 +232,7 @@ public class ServerRestControllerTest {
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(server.toJson());
         try {
-            mockMvc.perform(request).andExpect(status().isOk());
+            mockMvc.perform(request).andExpect(status().isOk()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -180,7 +247,7 @@ public class ServerRestControllerTest {
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(server.toJson());
         try {
-            mockMvc.perform(request).andExpect(status().isNotFound());
+            mockMvc.perform(request).andExpect(status().isNotFound()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -194,7 +261,7 @@ public class ServerRestControllerTest {
                 + "/" + resourceName + "/" + server.getId())
                 .accept(MediaType.APPLICATION_JSON_UTF8);
         try {
-            mockMvc.perform(request).andExpect(status().isOk());
+            mockMvc.perform(request).andExpect(status().isOk()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -207,7 +274,7 @@ public class ServerRestControllerTest {
                 + "/" + resourceName + "/" + ObjectId.get().toString())
                 .accept(MediaType.APPLICATION_JSON_UTF8);
         try {
-            mockMvc.perform(request).andExpect(status().isNotFound());
+            mockMvc.perform(request).andExpect(status().isNotFound()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();

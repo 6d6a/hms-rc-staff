@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -54,18 +55,20 @@ public class ServiceRestController {
 
     @RequestMapping(value = "/{serviceId}", method = RequestMethod.GET)
     public Service readOne(@PathVariable String serviceId) {
-        return repository.findOne(serviceId);
+        return (Service) governor.build(serviceId);
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
     public Collection<Service> readAll() {
-        return repository.findAll();
+        List<Service> services = new ArrayList<>();
+        for (Service service : repository.findAll()) {
+            services.add((Service) governor.build(service.getId()));
+        }
+        return services;
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
     public ResponseEntity<?> create(@RequestBody Service service) throws ParameterValidateException {
-        governor.setServiceTemplateById(service, service.getServiceTemplateId());
-        governor.setServiceSocketsByIds(service, service.getServiceSocketIds());
         governor.isValid(service);
         Service createdService = repository.save(service);
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -78,8 +81,6 @@ public class ServiceRestController {
     @RequestMapping(value = "/{serviceId}", method = RequestMethod.PATCH)
     public ResponseEntity<?> update(@PathVariable String serviceId,
                                     @RequestBody Service service) throws ParameterValidateException {
-        governor.setServiceTemplateById(service, service.getServiceTemplateId());
-        governor.setServiceSocketsByIds(service, service.getServiceSocketIds());
         governor.isValid(service);
         Service storedService = repository.findOne(serviceId);
         if (storedService == null) {

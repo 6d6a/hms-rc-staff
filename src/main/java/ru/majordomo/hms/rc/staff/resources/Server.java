@@ -27,7 +27,6 @@ public class Server extends Resource {
         switchedOn = !switchedOn;
     }
 
-    @JsonIgnore
     public List<Service> getServices() {
         return services;
     }
@@ -41,7 +40,6 @@ public class Server extends Resource {
         this.services = services;
     }
 
-    @JsonIgnore
     public ServerRole getServerRole() {
         return serverRole;
     }
@@ -53,7 +51,6 @@ public class Server extends Resource {
         this.serverRole = serverRole;
     }
 
-    @JsonIgnore
     public List<Storage> getStorages() {
         return storages;
     }
@@ -67,30 +64,49 @@ public class Server extends Resource {
         this.storages = storages;
     }
 
-    @JsonGetter(value = "services")
+    @JsonIgnore
     public List<String> getServiceIds() {
         return serviceIds;
     }
 
+    @JsonIgnore
     public void setServiceIds(List<String> serviceIds) {
         this.serviceIds = serviceIds;
     }
 
-    @JsonGetter(value = "serverRole")
+    @JsonIgnore
     public String getServerRoleId() {
         return serverRoleId;
     }
 
+    @JsonIgnore
     public void setServerRoleId(String serverRoleId) {
         this.serverRoleId = serverRoleId;
     }
 
-    @JsonGetter(value = "storages")
+    @JsonIgnore
     public List<String> getStorageIds() {
         return storageIds;
     }
 
+    @JsonIgnore
     public void setStorageIds(List<String> storageIds) {
         this.storageIds = storageIds;
+    }
+
+    public void addStorage(Storage storage) {
+        String storageId = storage.getId();
+        this.storages.add(storage);
+        if (storageIds.contains(storageId) == false) {
+            this.storageIds.add(storageId);
+        }
+    }
+
+    public void addService(Service service) {
+        String serviceId = service.getId();
+        this.services.add(service);
+        if (serviceIds.contains(serviceId) == false) {
+            this.serviceIds.add(serviceId);
+        }
     }
 }

@@ -3,6 +3,7 @@ package ru.majordomo.hms.rc.staff.test.api.http;
 import org.bson.types.ObjectId;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.JUnitRestDocumentation;
+import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -26,6 +29,14 @@ import ru.majordomo.hms.rc.staff.test.config.EmbeddedServltetContainerConfig;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
 import ru.majordomo.hms.rc.staff.test.config.StorageServicesConfig;
 
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -33,6 +44,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {RepositoriesConfig.class, StorageServicesConfig.class, EmbeddedServltetContainerConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class StorageRestControllerTest {
+    @Rule
+    public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("build/generated-snippets");
+
     @Autowired
     private StorageRepository repository;
     @Autowired
@@ -44,6 +58,8 @@ public class StorageRestControllerTest {
     private String applicationName;
     private String resourceName = "storage";
     private List<Storage> storages = new ArrayList<>();
+
+    private RestDocumentationResultHandler document;
 
     private void generateBatchOfStorages() {
         String namePattern = "Хранилище ";
@@ -63,7 +79,10 @@ public class StorageRestControllerTest {
 
     @Before
     public void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(ctx).build();
+        this.document = document("storage/{method-name}", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()));
+        mockMvc = MockMvcBuilders.webAppContextSetup(ctx)
+                .apply(documentationConfiguration(this.restDocumentation))
+                .build();
         generateBatchOfStorages();
     }
 
@@ -71,8 +90,19 @@ public class StorageRestControllerTest {
     public void readOne() {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName +
                 "/" + resourceName + "/" + storages.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
+
+        this.document.snippets(
+                responseFields(
+                        fieldWithPath("id").description("Storage ID"),
+                        fieldWithPath("name").description("Имя Storage"),
+                        fieldWithPath("switchedOn").description("Статус Storage"),
+                        fieldWithPath("capacity").description("Объем хранилища"),
+                        fieldWithPath("capacityUsed").description("Занятый объем хранилища")
+                )
+        );
+
         try {
-            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
+            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8)).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -82,8 +112,19 @@ public class StorageRestControllerTest {
     @Test
     public void readAll() {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName + "/" + resourceName + "/").accept(MediaType.APPLICATION_JSON_UTF8);
+
+        this.document.snippets(
+                responseFields(
+                        fieldWithPath("[].id").description("Storage ID"),
+                        fieldWithPath("[].name").description("Имя Storage"),
+                        fieldWithPath("[].switchedOn").description("Статус Storage"),
+                        fieldWithPath("[].capacity").description("Объем хранилища"),
+                        fieldWithPath("[].capacityUsed").description("Занятый объем хранилища")
+                )
+        );
+
         try {
-            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
+            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8)).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -94,12 +135,24 @@ public class StorageRestControllerTest {
     public void readOneAndCheckObjectFields() {
         Storage testingStorage = storages.get(0);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName + "/" + resourceName + "/" + testingStorage.getId()).accept(MediaType.APPLICATION_JSON_UTF8);
+
+        this.document.snippets(
+                responseFields(
+                        fieldWithPath("id").description("Storage ID"),
+                        fieldWithPath("name").description("Имя Storage"),
+                        fieldWithPath("switchedOn").description("Статус Storage"),
+                        fieldWithPath("capacity").description("Объем хранилища"),
+                        fieldWithPath("capacityUsed").description("Занятый объем хранилища")
+                )
+        );
+
         try {
             mockMvc.perform(request).andExpect(jsonPath("name").value(testingStorage.getName()))
                     .andExpect(jsonPath("id").value(testingStorage.getId()))
                     .andExpect(jsonPath("switchedOn").value(testingStorage.getSwitchedOn()))
                     .andExpect(jsonPath("capacity").value(testingStorage.getCapacity()))
-                    .andExpect(jsonPath("capacityUsed").value(testingStorage.getCapacityUsed()));
+                    .andExpect(jsonPath("capacityUsed").value(testingStorage.getCapacityUsed()))
+                    .andDo(this.document);
         } catch (Exception e){
             e.printStackTrace();
             Assert.fail();
@@ -115,7 +168,7 @@ public class StorageRestControllerTest {
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(testingStorage.toJson());
         try {
-            mockMvc.perform(request).andExpect(status().isCreated());
+            mockMvc.perform(request).andExpect(status().isCreated()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -130,7 +183,7 @@ public class StorageRestControllerTest {
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(storage.toJson());
         try {
-            mockMvc.perform(request).andExpect(status().isOk());
+            mockMvc.perform(request).andExpect(status().isOk()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -145,7 +198,7 @@ public class StorageRestControllerTest {
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(storage.toJson());
         try {
-            mockMvc.perform(request).andExpect(status().isNotFound());
+            mockMvc.perform(request).andExpect(status().isNotFound()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -159,7 +212,7 @@ public class StorageRestControllerTest {
                 + "/" + resourceName + "/" + storage.getId())
                 .accept(MediaType.APPLICATION_JSON_UTF8);
         try {
-            mockMvc.perform(request).andExpect(status().isOk());
+            mockMvc.perform(request).andExpect(status().isOk()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -172,7 +225,7 @@ public class StorageRestControllerTest {
                 + "/" + resourceName + "/" + ObjectId.get().toString())
                 .accept(MediaType.APPLICATION_JSON_UTF8);
         try {
-            mockMvc.perform(request).andExpect(status().isNotFound());
+            mockMvc.perform(request).andExpect(status().isNotFound()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();

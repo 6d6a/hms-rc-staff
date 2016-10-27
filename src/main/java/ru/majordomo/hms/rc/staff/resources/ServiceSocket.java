@@ -24,7 +24,11 @@ public class ServiceSocket extends Resource {
 
     @JsonGetter(value = "address")
     public String getAddressAsString() {
-        return Network.ipAddressInIntegerToString(address);
+        try {
+            return Network.ipAddressInIntegerToString(address);
+        } catch (NullPointerException e) {
+            return null;
+        }
     }
 
     @JsonIgnore
@@ -34,7 +38,10 @@ public class ServiceSocket extends Resource {
 
     @JsonSetter(value = "address")
     public void setAddress(String address) {
-        this.address = Network.ipAddressInStringToInteger(address);
+        try {
+            this.address = Network.ipAddressInStringToInteger(address);
+        } catch (NullPointerException e) {
+        }
     }
 
     public Integer getPort() {

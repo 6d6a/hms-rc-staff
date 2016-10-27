@@ -6,24 +6,23 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
-import ru.majordomo.hms.rc.staff.resources.Resource;
+import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
+import ru.majordomo.hms.rc.staff.resources.*;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.repositories.ServiceRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceSocketRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceTemplateRepository;
-import ru.majordomo.hms.rc.staff.resources.Service;
-import ru.majordomo.hms.rc.staff.resources.ServiceSocket;
-import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 
 @Component
 public class GovernorOfService extends LordOfResources{
 
-    ServiceRepository repository;
-    ServiceSocketRepository socketRepository;
-    ServiceTemplateRepository templateRepository;
-    Cleaner cleaner;
+    private ServiceRepository repository;
+    private ServiceSocketRepository socketRepository;
+    private ServiceTemplateRepository templateRepository;
+    private ConfigTemplateRepository configTemplateRepository;
+    private Cleaner cleaner;
 
     @Autowired
     public void setRepository(ServiceRepository repository) {
@@ -41,6 +40,11 @@ public class GovernorOfService extends LordOfResources{
     }
 
     @Autowired
+    public void setConfigTemplateRepository(ConfigTemplateRepository configTemplateRepository) {
+        this.configTemplateRepository = configTemplateRepository;
+    }
+
+    @Autowired
     public void setCleaner(Cleaner cleaner) {
         this.cleaner = cleaner;
     }
@@ -50,11 +54,10 @@ public class GovernorOfService extends LordOfResources{
         Service service = new Service();
         try {
             LordOfResources.setResourceParams(service, serviceMessage, cleaner);
-            String serviceTemplateId = cleaner.cleanString((String) serviceMessage.getParam("serviceTemplate"));
-            setServiceTemplateById(service, serviceTemplateId);
-            List<String> serviceSocketIds= cleaner.cleanListWithStrings((List<String>) serviceMessage.getParam("serviceSocketList"));
-            setServiceSocketsByIds(service, serviceSocketIds);
-
+            ServiceTemplate serviceTemplate = (ServiceTemplate) serviceMessage.getParam("serviceTemplate");
+            List<ServiceSocket> serviceSockets = (List<ServiceSocket>) serviceMessage.getParam("serviceSockets");
+            service.setServiceTemplate(serviceTemplate);
+            service.setServiceSockets(serviceSockets);
             isValid(service);
             repository.save(service);
         } catch (ClassCastException e) {
@@ -63,13 +66,7 @@ public class GovernorOfService extends LordOfResources{
         return service;
     }
 
-    public void setServiceTemplateById(Service service, String serviceTemplateId) {
-        service.setServiceTemplate(templateRepository.findOne(serviceTemplateId));
-    }
 
-    public void setServiceSocketsByIds(Service service, List<String> serviceSocketIds) {
-        service.setServiceSockets((List<ServiceSocket>)socketRepository.findAll(serviceSocketIds));
-    }
 
     @Override
     public void isValid(Resource resource) throws ParameterValidateException {
@@ -87,6 +84,15 @@ public class GovernorOfService extends LordOfResources{
             throw new ParameterValidateException("ServiceTemplate с ID:" + service.getServiceTemplateId() + " не найден");
         }
 
+        if (serviceTemplate.getConfigTemplates() == null) {
+            throw new ParameterValidateException("Параметр ConfigTemaplates не может быть пустым");
+        }
+        for (ConfigTemplate configTemaplte : serviceTemplate.getConfigTemplates()) {
+            if (configTemplateRepository.findOne(configTemaplte.getId()) == null) {
+                throw new ParameterValidateException("ConfigTemaplte с ID:" + configTemaplte.getId() + " не найден");
+            }
+        }
+
         List<String> serviceSocketIdList= service.getServiceSocketIds();
         if (serviceSocketIdList.isEmpty()) {
             throw new ParameterValidateException("SocketList не может быть пустым");
@@ -95,8 +101,8 @@ public class GovernorOfService extends LordOfResources{
             if (serviceSocketId.equals("")) {
                 throw new ParameterValidateException("ServiceSocketId не может быть пустым");
             }
-            ServiceSocket socket = socketRepository.findOne(serviceSocketId);
-            if (socket == null) {
+            ServiceSocket serviceSocket = socketRepository.findOne(serviceSocketId);
+            if (serviceSocket == null) {
                 throw new ParameterValidateException("ServiceSocket с ID:" + serviceSocketId + " не найден");
             }
         }
@@ -104,6 +110,34 @@ public class GovernorOfService extends LordOfResources{
 
     @Override
     public Resource build(String resourceId) throws ResourceNotFoundException {
-        return null;
+        Service service = repository.findOne(resourceId);
+        if (service == null) {
+            throw new ResourceNotFoundException("Service с ID:" + resourceId + " не найден");
+        }
+
+        for (String serviceSocketId: service.getServiceSocketIds()) {
+            ServiceSocket serviceSocket = socketRepository.findOne(serviceSocketId);
+            if (serviceSocket == null) {
+                throw new ResourceNotFoundException("ServiceSocket с ID:" + serviceSocketId + "не найден");
+            }
+            service.addServiceSocket(serviceSocket);
+        }
+
+        ServiceTemplate serviceTemplate = templateRepository.findOne(service.getServiceTemplateId());
+        if (serviceTemplate == null) {
+            throw new ResourceNotFoundException("ServiceTemplate с ID:" + service.getServiceTemplateId() + "не найден");
+        }
+
+        for (String configTemplateId: serviceTemplate.getConfigTemplateIds()) {
+            ConfigTemplate configTemplate = configTemplateRepository.findOne(configTemplateId);
+            if (configTemplate == null) {
+                throw new ResourceNotFoundException("ConfigTemplate с ID:" + configTemplateId + "не найден");
+            }
+            serviceTemplate.addConfigTemplate(configTemplate);
+        }
+
+        service.setServiceTemplate(serviceTemplate);
+
+        return service;
     }
 }

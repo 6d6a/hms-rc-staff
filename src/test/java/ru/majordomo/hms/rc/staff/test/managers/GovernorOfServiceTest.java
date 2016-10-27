@@ -15,8 +15,10 @@ import java.util.List;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfService;
+import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceSocketRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceTemplateRepository;
+import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
 import ru.majordomo.hms.rc.staff.resources.Service;
 import ru.majordomo.hms.rc.staff.resources.ServiceSocket;
 import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
@@ -30,62 +32,61 @@ import ru.majordomo.hms.rc.staff.test.config.ServiceServicesConfig;
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class GovernorOfServiceTest {
     @Autowired
-    GovernorOfService governor;
+    private GovernorOfService governor;
     @Autowired
-    ServiceSocketRepository socketRepository;
+    private ServiceSocketRepository serviceSocketRepository;
     @Autowired
-    ServiceTemplateRepository templateRepository;
+    private ServiceTemplateRepository serviceTemplateRepository;
+    @Autowired
+    private ConfigTemplateRepository configTemplateRepository;
 
     ServiceMessage testServiceMessage;
     Service testService;
 
     private ServiceMessage generateServiceMessage(String name, Boolean switchedOn,
-                                                  String serviceTemplateId,
-                                                  List<String> serviceSocketIdList) {
+                                                  ServiceTemplate serviceTemplate,
+                                                  List<ServiceSocket> serviceSockets) {
         ServiceMessage serviceMessage = new ServiceMessage();
         serviceMessage.addParam("name", name);
         serviceMessage.addParam("switchedOn", switchedOn);
-        serviceMessage.addParam("serviceTemplate", serviceTemplateId);
-        serviceMessage.addParam("serviceSocketList", serviceSocketIdList);
+        serviceMessage.addParam("serviceTemplate", serviceTemplate);
+        serviceMessage.addParam("serviceSockets", serviceSockets);
 
         return serviceMessage;
     }
 
     private Service generateService(String name, Boolean switchedOn,
                                     ServiceTemplate serviceTemplate,
-                                    List<ServiceSocket> serviceSocketList) {
+                                    List<ServiceSocket> serviceSockets) {
         Service service = new Service();
         service.setName(name);
         service.setSwitchedOn(switchedOn);
         service.setServiceTemplate(serviceTemplate);
-        service.setServiceSockets(serviceSocketList);
+        service.setServiceSockets(serviceSockets);
 
         return service;
     }
 
     @Before
     public void setUp() {
-        /* Создать и сохранить сокет
-           Т.к. для теста нужен только ID сокета, больше ничего не делаем
-         */
-        ServiceSocket socket = new ServiceSocket();
-        socketRepository.save(socket);
 
-        /* Создать темплейт
-           Аналогично - для теста нужен только ID темплейта
-         */
-        ServiceTemplate template = new ServiceTemplate();
-        templateRepository.save(template);
+        ServiceSocket serviceSocket = new ServiceSocket();
+        serviceSocketRepository.save(serviceSocket);
+
+        ConfigTemplate configTemplate = new ConfigTemplate();
+        configTemplateRepository.save(configTemplate);
+
+        ServiceTemplate serviceTemplate = new ServiceTemplate();
+        serviceTemplate.addConfigTemplate(configTemplate);
+        serviceTemplateRepository.save(serviceTemplate);
 
         // Создать сервис и сервисное сообщение
         String name = "Тестовый сервис 1";
         Boolean switchedOn = Boolean.TRUE;
-        List<ServiceSocket> socketList = new ArrayList<>();
-        List<String> socketIdList = new ArrayList<>();
-        socketList.add(socket);
-        socketIdList.add(socket.getId());
-        this.testService = generateService(name, switchedOn, template, socketList);
-        this.testServiceMessage = generateServiceMessage(name, switchedOn, template.getId(), socketIdList);
+        List<ServiceSocket> serviceSockets = new ArrayList<>();
+        serviceSockets.add(serviceSocket);
+        this.testService = generateService(name, switchedOn, serviceTemplate, serviceSockets);
+        this.testServiceMessage = generateServiceMessage(name, switchedOn, serviceTemplate, serviceSockets);
     }
 
     @Test
@@ -109,7 +110,7 @@ public class GovernorOfServiceTest {
         for (int i = 0; i < 5; i++) {
             unknownSocketList.add(ObjectId.get().toString());
         }
-        testServiceMessage.addParam("serviceSocketList", unknownSocketList);
+        testServiceMessage.addParam("serviceSockets", unknownSocketList);
         governor.createResource(testServiceMessage);
     }
 

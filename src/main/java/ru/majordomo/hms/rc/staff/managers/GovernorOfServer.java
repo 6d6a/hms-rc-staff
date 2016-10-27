@@ -5,16 +5,9 @@ import org.springframework.stereotype.Component;
 
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
-import ru.majordomo.hms.rc.staff.repositories.ServerRepository;
-import ru.majordomo.hms.rc.staff.repositories.ServerRoleRepository;
-import ru.majordomo.hms.rc.staff.repositories.ServiceRepository;
-import ru.majordomo.hms.rc.staff.repositories.StorageRepository;
+import ru.majordomo.hms.rc.staff.repositories.*;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
-import ru.majordomo.hms.rc.staff.resources.Resource;
-import ru.majordomo.hms.rc.staff.resources.Server;
-import ru.majordomo.hms.rc.staff.resources.Service;
-import ru.majordomo.hms.rc.staff.resources.Storage;
-import ru.majordomo.hms.rc.staff.resources.ServerRole;
+import ru.majordomo.hms.rc.staff.resources.*;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 
 import java.util.List;
@@ -26,6 +19,9 @@ public class GovernorOfServer extends LordOfResources{
     private ServerRoleRepository serverRoleRepository;
     private ServiceRepository serviceRepository;
     private StorageRepository storageRepository;
+    private ServiceTemplateRepository serviceTemplateRepository;
+    private ConfigTemplateRepository configTemplateRepository;
+    private ServiceSocketRepository serviceSocketRepository;
     private Cleaner cleaner;
 
     @Autowired
@@ -49,6 +45,21 @@ public class GovernorOfServer extends LordOfResources{
     }
 
     @Autowired
+    public void setServiceTemplateRepository(ServiceTemplateRepository serviceTemplateRepository) {
+        this.serviceTemplateRepository = serviceTemplateRepository;
+    }
+
+    @Autowired
+    public void setConfigTemplateRepository(ConfigTemplateRepository configTemplateRepository) {
+        this.configTemplateRepository = configTemplateRepository;
+    }
+
+    @Autowired
+    public void setServiceSocketRepository(ServiceSocketRepository serviceSocketRepository) {
+        this.serviceSocketRepository = serviceSocketRepository;
+    }
+
+    @Autowired
     public void setCleaner(Cleaner cleaner) {
         this.cleaner = cleaner;
     }
@@ -58,18 +69,16 @@ public class GovernorOfServer extends LordOfResources{
         Server server = new Server();
         try {
             LordOfResources.setResourceParams(server, serviceMessage, cleaner);
-            List<String> serviceIds = cleaner.cleanListWithStrings((List<String>) serviceMessage.getParam("serviceIds"));
-            setServiceListByIds(server, serviceIds);
-            if (server.getServices().isEmpty()) {
-                throw new ParameterValidateException("Должен быть задан хотя бы один service");
-            }
-            List<String> storageIds = cleaner.cleanListWithStrings((List<String>) serviceMessage.getParam("storageIds"));
-            setStorageListByIds(server, storageIds);
-            if (server.getStorages().isEmpty()) {
-                throw new ParameterValidateException("Должен быть задан хотя бы один storage");
-            }
-            String serverRoleId = cleaner.cleanString((String) serviceMessage.getParam("serverRoleId"));
-            setServerRoleById(server, serverRoleId);
+
+            List<Service> services = (List<Service>) serviceMessage.getParam("services");
+            server.setServices(services);
+
+            List<Storage> storages = (List<Storage>) serviceMessage.getParam("storages");
+            server.setStorages(storages);
+
+            ServerRole serverRole = (ServerRole) serviceMessage.getParam("serverRole");
+            server.setServerRole(serverRole);
+
             isValid(server);
             serverRepository.save(server);
 
@@ -77,18 +86,6 @@ public class GovernorOfServer extends LordOfResources{
             throw new ParameterValidateException("Один из параметров указан неверно:" + e.getMessage());
         }
         return server;
-    }
-
-    public void setServiceListByIds(Server server, List<String> serviceIdList) throws ParameterValidateException {
-        server.setServices((List<Service>) serviceRepository.findAll(serviceIdList));
-    }
-
-    public void setStorageListByIds(Server server, List<String> storageIdList) throws ParameterValidateException {
-        server.setStorages((List<Storage>) storageRepository.findAll(storageIdList));
-    }
-
-    public void setServerRoleById (Server server, String serverRoleId) throws ParameterValidateException {
-            server.setServerRole(serverRoleRepository.findOne(serverRoleId));
     }
 
     @Override
@@ -124,6 +121,70 @@ public class GovernorOfServer extends LordOfResources{
 
     @Override
     public Resource build(String resourceId) throws ResourceNotFoundException {
-        return null;
+        Server server = serverRepository.findOne(resourceId);
+        if (server == null) {
+            throw new ResourceNotFoundException("Server с ID:" + resourceId + " не найден");
+        }
+
+        ServerRole serverRole = serverRoleRepository.findOne(server.getServerRoleId());
+        if (serverRole == null) {
+            throw new ResourceNotFoundException("ServerRole с ID:" + server.getServerRoleId() + " не найден");
+        }
+        for (String serviceTemplateId: serverRole.getServiceTemplateIds()) {
+            ServiceTemplate serviceTemplate = serviceTemplateRepository.findOne(serviceTemplateId);
+            if (serviceTemplate == null) {
+                throw new ResourceNotFoundException("ServiceTemplate с ID:" + serviceTemplateId + "не найден");
+            }
+
+            for (String configTemplateId: serviceTemplate.getConfigTemplateIds()) {
+                ConfigTemplate configTemplate = configTemplateRepository.findOne(configTemplateId);
+                if (configTemplate == null) {
+                    throw new ResourceNotFoundException("ConfigTemplate с ID:" + configTemplateId + "не найден");
+                }
+                serviceTemplate.addConfigTemplate(configTemplate);
+            }
+
+            serverRole.addServiceTemplate(serviceTemplate);
+        }
+        server.setServerRole(serverRole);
+
+        for (String serviceId : server.getServiceIds()) {
+            Service service = serviceRepository.findOne(serviceId);
+            if (service == null) {
+                throw new ResourceNotFoundException("Service с ID:" + serviceId + " не найден");
+            }
+            for (String serviceSocketId: service.getServiceSocketIds()) {
+                ServiceSocket serviceSocket = serviceSocketRepository.findOne(serviceSocketId);
+                if (serviceSocket == null) {
+                    throw new ResourceNotFoundException("ServiceSocket с ID:" + serviceSocketId + "не найден");
+                }
+                service.addServiceSocket(serviceSocket);
+            }
+
+            ServiceTemplate serviceTemplate = serviceTemplateRepository.findOne(service.getServiceTemplateId());
+            if (serviceTemplate == null) {
+                throw new ResourceNotFoundException("ServiceTemplate с ID:" + service.getServiceTemplateId() + "не найден");
+            }
+
+            for (String configTemplateId: serviceTemplate.getConfigTemplateIds()) {
+                ConfigTemplate configTemplate = configTemplateRepository.findOne(configTemplateId);
+                if (configTemplate == null) {
+                    throw new ResourceNotFoundException("ConfigTemplate с ID:" + configTemplateId + "не найден");
+                }
+                serviceTemplate.addConfigTemplate(configTemplate);
+            }
+
+            service.setServiceTemplate(serviceTemplate);
+            server.addService(service);
+        }
+
+        for (String storageId : server.getStorageIds()) {
+            if (storageRepository.findOne(storageId) == null) {
+                throw new ResourceNotFoundException("Storage с ID:" + storageId + "не найден");
+            }
+            server.addStorage(storageRepository.findOne(storageId));
+        }
+
+        return server;
     }
 }

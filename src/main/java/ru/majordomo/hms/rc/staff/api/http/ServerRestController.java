@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
@@ -39,19 +41,20 @@ public class ServerRestController {
 
     @RequestMapping(value = "/{serverId}", method = RequestMethod.GET)
     public Server readOne(@PathVariable String serverId) {
-        return serverRepository.findOne(serverId);
+        return (Server) governor.build(serverId);
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
     public Collection<Server> readAll() {
-        return serverRepository.findAll();
+        List<Server> servers = new ArrayList<>();
+        for (Server server : serverRepository.findAll()) {
+            servers.add((Server) governor.build(server.getId()));
+        }
+        return servers;
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
     public ResponseEntity<?> create (@RequestBody Server server) throws ParameterValidateException {
-        governor.setServiceListByIds(server, server.getServiceIds());
-        governor.setStorageListByIds(server, server.getStorageIds());
-        governor.setServerRoleById(server, server.getServerRoleId());
         governor.isValid(server);
         Server createdNetwork = serverRepository.save(server);
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -63,9 +66,6 @@ public class ServerRestController {
 
     @RequestMapping(value = "/{serverId}", method = RequestMethod.PATCH)
     public ResponseEntity<?> update(@PathVariable String serverId, @RequestBody Server server) throws ParameterValidateException {
-        governor.setServiceListByIds(server, server.getServiceIds());
-        governor.setStorageListByIds(server, server.getStorageIds());
-        governor.setServerRoleById(server, server.getServerRoleId());
         governor.isValid(server);
         Server storedServer = serverRepository.findOne(serverId);
         if (storedServer == null) {

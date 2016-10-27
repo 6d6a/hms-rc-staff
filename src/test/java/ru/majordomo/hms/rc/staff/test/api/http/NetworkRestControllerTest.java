@@ -1,16 +1,15 @@
 package ru.majordomo.hms.rc.staff.test.api.http;
 
 import org.bson.types.ObjectId;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.JUnitRestDocumentation;
+import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -28,6 +27,13 @@ import ru.majordomo.hms.rc.staff.managers.GovernorOfNetwork;
 import ru.majordomo.hms.rc.staff.repositories.NetworkRepository;
 import ru.majordomo.hms.rc.staff.resources.Network;
 
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -36,6 +42,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {RepositoriesConfig.class, NetworkServicesConfig.class, EmbeddedServltetContainerConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class NetworkRestControllerTest {
+    @Rule
+    public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("build/generated-snippets");
+
     @Autowired
     private GovernorOfNetwork governorOfNetwork;
     @Autowired
@@ -56,10 +65,15 @@ public class NetworkRestControllerTest {
 
     private String resourceName = "network";
 
+    private RestDocumentationResultHandler document;
+
     @Before
     public void generateBatchOfNetworks() {
 
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        this.document = document("network/{method-name}", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()));
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                .apply(documentationConfiguration(this.restDocumentation))
+                .build();
 
         String name = "Тестовая сеть";
         Boolean switchedOn = Boolean.TRUE;
@@ -89,8 +103,21 @@ public class NetworkRestControllerTest {
     public void readOne() {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName
                 + "/" + resourceName + "/" + networks.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
+
+        this.document.snippets(
+                responseFields(
+                        fieldWithPath("id").description("Network ID"),
+                        fieldWithPath("name").description("Имя Network"),
+                        fieldWithPath("switchedOn").description("Статус Network"),
+                        fieldWithPath("address").description("IP-адрес"),
+                        fieldWithPath("mask").description("Маска"),
+                        fieldWithPath("gatewayAddress").description("Шлюз"),
+                        fieldWithPath("vlanNumber").description("Номер сети")
+                )
+        );
+
         try {
-            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
+            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8)).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -101,8 +128,21 @@ public class NetworkRestControllerTest {
     public void readAll() {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName
                 + "/" + resourceName).accept(MediaType.APPLICATION_JSON_UTF8);
+
+        this.document.snippets(
+                responseFields(
+                        fieldWithPath("[].id").description("Network ID"),
+                        fieldWithPath("[].name").description("Имя Network"),
+                        fieldWithPath("[].switchedOn").description("Статус Network"),
+                        fieldWithPath("[].address").description("IP-адрес"),
+                        fieldWithPath("[].mask").description("Маска"),
+                        fieldWithPath("[].gatewayAddress").description("Шлюз"),
+                        fieldWithPath("[].vlanNumber").description("Номер сети")
+                )
+        );
+
         try {
-            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
+            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8)).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -113,6 +153,19 @@ public class NetworkRestControllerTest {
     public void readOneAndCheckObjectFields() {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName
                 + "/" + resourceName + "/" + networks.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
+
+        this.document.snippets(
+                responseFields(
+                        fieldWithPath("id").description("Network ID"),
+                        fieldWithPath("name").description("Имя Network"),
+                        fieldWithPath("switchedOn").description("Статус Network"),
+                        fieldWithPath("address").description("IP-адрес"),
+                        fieldWithPath("mask").description("Маска"),
+                        fieldWithPath("gatewayAddress").description("Шлюз"),
+                        fieldWithPath("vlanNumber").description("Номер сети")
+                )
+        );
+
         try {
             Network testingNetwork = networks.get(0);
             mockMvc.perform(request).andExpect(jsonPath("gatewayAddress").value(testingNetwork.getGatewayAddressAsString()))
@@ -121,7 +174,8 @@ public class NetworkRestControllerTest {
                     .andExpect(jsonPath("vlanNumber").value(testingNetwork.getVlanNumber()))
                     .andExpect(jsonPath("mask").value(testingNetwork.getMask()))
                     .andExpect(jsonPath("name").value(testingNetwork.getName()))
-                    .andExpect(jsonPath("id").value(testingNetwork.getId()));
+                    .andExpect(jsonPath("id").value(testingNetwork.getId()))
+                    .andDo(this.document);
         } catch (Exception ex) {
             ex.printStackTrace();
             Assert.fail();
@@ -137,7 +191,7 @@ public class NetworkRestControllerTest {
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(testingNetwork.toJson());
         try {
-            mockMvc.perform(request).andExpect(status().isCreated());
+            mockMvc.perform(request).andExpect(status().isCreated()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -152,7 +206,7 @@ public class NetworkRestControllerTest {
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(network.toJson());
         try {
-            mockMvc.perform(request).andExpect(status().isOk());
+            mockMvc.perform(request).andExpect(status().isOk()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -167,7 +221,7 @@ public class NetworkRestControllerTest {
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(network.toJson());
         try {
-            mockMvc.perform(request).andExpect(status().isNotFound());
+            mockMvc.perform(request).andExpect(status().isNotFound()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -181,7 +235,7 @@ public class NetworkRestControllerTest {
                 + "/" + resourceName + "/" + network.getId())
                 .accept(MediaType.APPLICATION_JSON_UTF8);
         try {
-            mockMvc.perform(request).andExpect(status().isOk());
+            mockMvc.perform(request).andExpect(status().isOk()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -194,7 +248,7 @@ public class NetworkRestControllerTest {
                 + "/" + resourceName + "/" + ObjectId.get().toString())
                 .accept(MediaType.APPLICATION_JSON_UTF8);
         try {
-            mockMvc.perform(request).andExpect(status().isNotFound());
+            mockMvc.perform(request).andExpect(status().isNotFound()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
