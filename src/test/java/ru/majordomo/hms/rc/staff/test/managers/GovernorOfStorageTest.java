@@ -17,6 +17,8 @@ import ru.majordomo.hms.rc.staff.resources.Storage;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
 import ru.majordomo.hms.rc.staff.test.config.StorageServicesConfig;
 
+import java.util.List;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {StorageServicesConfig.class, RepositoriesConfig.class})
 public class GovernorOfStorageTest {
@@ -76,12 +78,27 @@ public class GovernorOfStorageTest {
     @Test
     public void build() {
         storageRepository.save(testStorage);
+        Storage buildedStorage = (Storage)governor.build(testStorage.getId());
         try {
-            Storage buildedStorage = (Storage)governor.build(testStorage.getId());
             Assert.assertEquals("Имя не совпадает с ожидаемым", testStorage.getName(), buildedStorage.getName());
             Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testStorage.getSwitchedOn(), buildedStorage.getSwitchedOn());
             Assert.assertEquals("Capacity не совпадает с ожидаемым", testStorage.getCapacity(), buildedStorage.getCapacity());
             Assert.assertEquals("CapacityUsed не совпадает с ожидаемым", testStorage.getCapacityUsed(), buildedStorage.getCapacityUsed());
+        } catch (ParameterValidateException | NullPointerException e ) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void buildAll() {
+        storageRepository.save(testStorage);
+        List<Storage> buildedStorage = governor.build();
+        try {
+            Assert.assertEquals("Имя не совпадает с ожидаемым", testStorage.getName(), buildedStorage.get(buildedStorage.size()-1).getName());
+            Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testStorage.getSwitchedOn(), buildedStorage.get(buildedStorage.size()-1).getSwitchedOn());
+            Assert.assertEquals("Capacity не совпадает с ожидаемым", testStorage.getCapacity(), buildedStorage.get(buildedStorage.size()-1).getCapacity());
+            Assert.assertEquals("CapacityUsed не совпадает с ожидаемым", testStorage.getCapacityUsed(), buildedStorage.get(buildedStorage.size()-1).getCapacityUsed());
         } catch (ParameterValidateException | NullPointerException e ) {
             e.printStackTrace();
             Assert.fail();

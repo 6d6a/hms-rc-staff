@@ -15,13 +15,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
+import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfConfigTemplate;
-import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
 import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
 
 @RestController
@@ -29,14 +27,8 @@ import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
 @RequestMapping("/${spring.application.name}/config-template")
 public class ConfigTemplateRestController {
 
-    private ConfigTemplateRepository repository;
     private GovernorOfConfigTemplate governor;
     private String applicationName;
-
-    @Autowired
-    public void setRepository(ConfigTemplateRepository repository) {
-        this.repository = repository;
-    }
 
     @Autowired
     public void setGovernor(GovernorOfConfigTemplate governor) {
@@ -55,17 +47,13 @@ public class ConfigTemplateRestController {
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public Collection<ConfigTemplate> readAll() {
-        List<ConfigTemplate> configTemplates = new ArrayList<>();
-        for (ConfigTemplate configTemplate : repository.findAll()) {
-            configTemplates.add((ConfigTemplate) governor.build(configTemplate.getId()));
-        }
-        return configTemplates;
+        return governor.build();
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
     public ResponseEntity<?> create(@RequestBody ConfigTemplate configTemplate) throws ParameterValidateException {
         governor.isValid(configTemplate);
-        ConfigTemplate createdConfigTemplate = repository.save(configTemplate);
+        ConfigTemplate createdConfigTemplate = (ConfigTemplate) governor.save(configTemplate);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{id}")
@@ -78,22 +66,24 @@ public class ConfigTemplateRestController {
                                     @RequestBody ConfigTemplate configTemplate)
                                     throws ParameterValidateException {
         governor.isValid(configTemplate);
-        ConfigTemplate storedConfigTemplate = repository.findOne(configTemplateId);
-        if (storedConfigTemplate == null) {
+        try {
+            ConfigTemplate storedConfigTemplate = (ConfigTemplate) governor.build(configTemplateId);
+            configTemplate.setId(storedConfigTemplate.getId());
+            governor.save(configTemplate);
+        } catch (ResourceNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        configTemplate.setId(storedConfigTemplate.getId());
-        repository.save(configTemplate);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{configTemplateId}", method = RequestMethod.DELETE)
     public ResponseEntity<?> delete(@PathVariable String configTemplateId) {
-        ConfigTemplate storedConfigTemplate = repository.findOne(configTemplateId);
-        if (storedConfigTemplate == null) {
+        try {
+            ConfigTemplate configTemplate = (ConfigTemplate) governor.build(configTemplateId);
+        } catch (ResourceNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        repository.delete(configTemplateId);
+        governor.delete(configTemplateId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

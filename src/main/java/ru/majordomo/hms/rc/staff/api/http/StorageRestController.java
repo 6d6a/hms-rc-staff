@@ -11,14 +11,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
+import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfStorage;
-import ru.majordomo.hms.rc.staff.repositories.StorageRepository;
 import ru.majordomo.hms.rc.staff.resources.Storage;
 
 @RestController
@@ -26,13 +24,7 @@ import ru.majordomo.hms.rc.staff.resources.Storage;
 @CrossOrigin("*")
 public class StorageRestController {
 
-    private StorageRepository repository;
     private GovernorOfStorage governor;
-
-    @Autowired
-    public void setRepository(StorageRepository repository) {
-        this.repository = repository;
-    }
 
     @Autowired
     public void setGovernor(GovernorOfStorage governor) {
@@ -46,17 +38,13 @@ public class StorageRestController {
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
     public Collection<Storage> readAll() {
-        List<Storage> storages = new ArrayList<>();
-        for (Storage storage : repository.findAll()) {
-            storages.add((Storage) governor.build(storage.getId()));
-        }
-        return storages;
+        return governor.build();
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
     public ResponseEntity<?> create (@RequestBody Storage storage) throws ParameterValidateException {
         governor.isValid(storage);
-        Storage createdStorage = repository.save(storage);
+        Storage createdStorage = (Storage) governor.save(storage);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{id}")
@@ -67,22 +55,24 @@ public class StorageRestController {
     @RequestMapping(value = "/{storageId}", method = RequestMethod.PATCH)
     public ResponseEntity<?> update(@PathVariable String storageId, @RequestBody Storage storage) throws ParameterValidateException {
         governor.isValid(storage);
-        Storage storedStorage = repository.findOne(storageId);
-        if (storedStorage == null) {
+        try {
+            Storage storedStorage = (Storage) governor.build(storageId);
+            storage.setId(storedStorage.getId());
+            governor.save(storage);
+        } catch (ResourceNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        storage.setId(storedStorage.getId());
-        repository.save(storage);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{storageId}", method = RequestMethod.DELETE)
     public ResponseEntity<?> delete(@PathVariable String storageId) {
-        Storage storedStorage = repository.findOne(storageId);
-        if (storedStorage == null) {
+        try {
+            Storage storedStorage = (Storage) governor.build(storageId);
+        } catch (ResourceNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        repository.delete(storageId);
+        governor.delete(storageId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

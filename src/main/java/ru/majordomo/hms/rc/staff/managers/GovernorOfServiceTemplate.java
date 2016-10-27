@@ -73,22 +73,22 @@ public class GovernorOfServiceTemplate extends LordOfResources {
     }
 
     @Override
-    public Resource save(Resource resource) {
-        return null;
+    public List<ServiceTemplate> build() {
+        List<ServiceTemplate> buildedServiceTemplates = new ArrayList<>();
+        for (ServiceTemplate serviceTemplate : serviceTemplateRepository.findAll()) {
+            buildedServiceTemplates.add((ServiceTemplate) build(serviceTemplate.getId()));
+        }
+        return buildedServiceTemplates;
     }
 
     @Override
-    public Resource findOne(String resourceId) {
-        return null;
+    public Resource save(Resource resource) {
+        return serviceTemplateRepository.save((ServiceTemplate) resource);
     }
 
     @Override
     public void delete(String resourceId) {
-
+        serviceTemplateRepository.delete(resourceId);
     }
 
-    @Override
-    public List<? extends Resource> findAll() {
-        return null;
-    }
 }

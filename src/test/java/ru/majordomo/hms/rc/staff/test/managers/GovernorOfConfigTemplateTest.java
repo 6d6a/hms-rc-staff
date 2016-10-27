@@ -60,8 +60,8 @@ public class GovernorOfConfigTemplateTest {
         configTemplate.setSwitchedOn(switchedOn);
         configTemplateRepository.save(configTemplate);
 
+        ConfigTemplate buildedConfigTemplate = (ConfigTemplate)governorOfConfigTemplate.build(configTemplate.getId());
         try {
-            ConfigTemplate buildedConfigTemplate = (ConfigTemplate)governorOfConfigTemplate.build(configTemplate.getId());
             Assert.assertEquals("name соответствует ожидаемому", fileName, buildedConfigTemplate.getName());
             Assert.assertEquals("switchedOn соответствует ожидаемомему", switchedOn, buildedConfigTemplate.getSwitchedOn());
             Assert.assertEquals("fileLink соответствует ожидаемому", fileLink, buildedConfigTemplate.getFileLink());
@@ -69,6 +69,29 @@ public class GovernorOfConfigTemplateTest {
             e.printStackTrace();
             Assert.fail();
         }
+    }
+
+    @Test
+    public void buildAll() {
+        String fileName = "apache.conf";
+        String fileLink = "http://file-service/file/" + ObjectId.get().toString();
+        Boolean switchedOn = Boolean.TRUE;
+        ConfigTemplate configTemplate = new ConfigTemplate();
+        configTemplate.setFileLink(fileLink);
+        configTemplate.setName(fileName);
+        configTemplate.setSwitchedOn(switchedOn);
+        configTemplateRepository.save(configTemplate);
+
+        List<ConfigTemplate> buildedConfigTemplates = governorOfConfigTemplate.build();
+        try {
+            Assert.assertEquals("name соответствует ожидаемому", fileName, buildedConfigTemplates.get(buildedConfigTemplates.size()-1).getName());
+            Assert.assertEquals("switchedOn соответствует ожидаемомему", switchedOn, buildedConfigTemplates.get(buildedConfigTemplates.size()-1).getSwitchedOn());
+            Assert.assertEquals("fileLink соответствует ожидаемому", fileLink, buildedConfigTemplates.get(buildedConfigTemplates.size()-1).getFileLink());
+        } catch (ParameterValidateException | NullPointerException e ) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+
     }
 
     @Test(expected = ParameterValidateException.class)

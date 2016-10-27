@@ -65,24 +65,18 @@ public class GovernorOfConfigTemplate extends LordOfResources {
     }
 
     @Override
-    public Resource save(Resource resource) {
-        return null;
+    public List<ConfigTemplate> build() {
+        return configTemplateRepository.findAll();
     }
 
     @Override
-    public Resource findOne(String resourceId) {
-        return null;
+    public Resource save(Resource resource) {
+        return configTemplateRepository.save((ConfigTemplate) resource);
     }
 
     @Override
     public void delete(String resourceId) {
-
+        configTemplateRepository.delete(resourceId);
     }
-
-    @Override
-    public List<? extends Resource> findAll() {
-        return null;
-    }
-
 
 }

@@ -16,6 +16,8 @@ import ru.majordomo.hms.rc.staff.managers.GovernorOfNetwork;
 import ru.majordomo.hms.rc.staff.repositories.NetworkRepository;
 import ru.majordomo.hms.rc.staff.resources.Network;
 
+import java.util.List;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {RepositoriesConfig.class, NetworkServicesConfig.class})
 public class GovernorOfNetworkTest {
@@ -87,14 +89,39 @@ public class GovernorOfNetworkTest {
         network.setVlanNumber(vlanNumber);
         networkRepository.save(network);
 
+        Network buildedNetwork = (Network)governorOfNetwork.build(network.getId());
         try {
-            Network buildedNetwork = (Network)governorOfNetwork.build(network.getId());
             Assert.assertEquals("Имя сети, полученное из базы не совпадает с ожидаемым", name, buildedNetwork.getName());
             Assert.assertEquals("Флаг switchedOn не совпадает с ожидаемым", switchedOn, buildedNetwork.getSwitchedOn());
             Assert.assertEquals("Адрес сети не совпадает с ожидаемым", address, buildedNetwork.getAddressAsString());
             Assert.assertEquals("Маска сети не совпадает с ожидаемой", mask, buildedNetwork.getMask());
             Assert.assertEquals("Gateway не совпадает с ожидаемым", gatewayAddress, buildedNetwork.getGatewayAddressAsString());
             Assert.assertEquals("Номер VLAN'а не совпадает с ожидаемым", vlanNumber, buildedNetwork.getVlanNumber());
+        } catch (ParameterValidateException | NullPointerException e ) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void buildAll() {
+        Network network = new Network();
+        network.setName(name);
+        network.setSwitchedOn(switchedOn);
+        network.setAddress(address);
+        network.setMask(mask);
+        network.setGatewayAddress(gatewayAddress);
+        network.setVlanNumber(vlanNumber);
+        networkRepository.save(network);
+
+        List<Network> buildedNetworks = governorOfNetwork.build();
+        try {
+            Assert.assertEquals("Имя сети, полученное из базы не совпадает с ожидаемым", name, buildedNetworks.get(buildedNetworks.size()-1).getName());
+            Assert.assertEquals("Флаг switchedOn не совпадает с ожидаемым", switchedOn, buildedNetworks.get(buildedNetworks.size()-1).getSwitchedOn());
+            Assert.assertEquals("Адрес сети не совпадает с ожидаемым", address, buildedNetworks.get(buildedNetworks.size()-1).getAddressAsString());
+            Assert.assertEquals("Маска сети не совпадает с ожидаемой", mask, buildedNetworks.get(buildedNetworks.size()-1).getMask());
+            Assert.assertEquals("Gateway не совпадает с ожидаемым", gatewayAddress, buildedNetworks.get(buildedNetworks.size()-1).getGatewayAddressAsString());
+            Assert.assertEquals("Номер VLAN'а не совпадает с ожидаемым", vlanNumber, buildedNetworks.get(buildedNetworks.size()-1).getVlanNumber());
         } catch (ParameterValidateException | NullPointerException e ) {
             e.printStackTrace();
             Assert.fail();

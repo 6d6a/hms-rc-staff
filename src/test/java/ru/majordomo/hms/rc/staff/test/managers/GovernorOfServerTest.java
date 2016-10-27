@@ -128,8 +128,8 @@ public class GovernorOfServerTest {
     @Test
     public void build() {
         serverRepository.save(testServer);
+        Server buildedServer = (Server) governor.build(testServer.getId());
         try {
-            Server buildedServer = (Server) governor.build(testServer.getId());
             Assert.assertEquals("Имя не совпадает с ожидаемым", testServer.getName(), buildedServer.getName());
             Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testServer.getSwitchedOn(), buildedServer.getSwitchedOn());
             Assert.assertTrue(testServer.getServices().size() == buildedServer.getServices().size());
@@ -137,6 +137,24 @@ public class GovernorOfServerTest {
             Assert.assertTrue(testServer.getStorages().size() == buildedServer.getStorages().size());
             Assert.assertTrue(testServer.getStorageIds().containsAll(buildedServer.getStorageIds()));
             Assert.assertTrue(testServer.getServerRoleId().equals(buildedServer.getServerRoleId()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void buildAll() {
+        serverRepository.save(testServer);
+        List<Server> buildedServers = governor.build();
+        try {
+            Assert.assertEquals("Имя не совпадает с ожидаемым", testServer.getName(), buildedServers.get(buildedServers.size()-1).getName());
+            Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testServer.getSwitchedOn(), buildedServers.get(buildedServers.size()-1).getSwitchedOn());
+            Assert.assertTrue(testServer.getServices().size() == buildedServers.get(buildedServers.size()-1).getServices().size());
+            Assert.assertTrue(testServer.getServiceIds().containsAll(buildedServers.get(buildedServers.size()-1).getServiceIds()));
+            Assert.assertTrue(testServer.getStorages().size() == buildedServers.get(buildedServers.size()-1).getStorages().size());
+            Assert.assertTrue(testServer.getStorageIds().containsAll(buildedServers.get(buildedServers.size()-1).getStorageIds()));
+            Assert.assertTrue(testServer.getServerRoleId().equals(buildedServers.get(buildedServers.size()-1).getServerRoleId()));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();

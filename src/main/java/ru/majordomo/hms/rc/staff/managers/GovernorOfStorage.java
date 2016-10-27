@@ -92,22 +92,18 @@ public class GovernorOfStorage extends LordOfResources {
     }
 
     @Override
-    public Resource save(Resource resource) {
-        return null;
+    public List<Storage> build() {
+        return repository.findAll();
     }
 
     @Override
-    public Resource findOne(String resourceId) {
-        return null;
+    public Resource save(Resource resource) {
+        return repository.save((Storage) resource);
     }
 
     @Override
     public void delete(String resourceId) {
-
+        repository.delete(resourceId);
     }
 
-    @Override
-    public List<? extends Resource> findAll() {
-        return null;
-    }
 }

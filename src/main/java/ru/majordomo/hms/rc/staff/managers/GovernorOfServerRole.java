@@ -3,6 +3,7 @@ package ru.majordomo.hms.rc.staff.managers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
@@ -115,22 +116,22 @@ public class GovernorOfServerRole extends LordOfResources{
     }
 
     @Override
-    public Resource save(Resource resource) {
-        return null;
+    public List<ServerRole> build() {
+        List<ServerRole> buildedServerRoles = new ArrayList<>();
+        for (ServerRole serverRole : serverRoleRepository.findAll()) {
+            buildedServerRoles.add((ServerRole) build(serverRole.getId()));
+        }
+        return buildedServerRoles;
     }
 
     @Override
-    public Resource findOne(String resourceId) {
-        return null;
+    public Resource save(Resource resource) {
+        return serverRoleRepository.save((ServerRole) resource);
     }
 
     @Override
     public void delete(String resourceId) {
-
+        serverRoleRepository.delete(resourceId);
     }
 
-    @Override
-    public List<? extends Resource> findAll() {
-        return null;
-    }
 }

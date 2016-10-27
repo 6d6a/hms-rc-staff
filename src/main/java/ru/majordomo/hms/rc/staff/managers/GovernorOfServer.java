@@ -5,11 +5,19 @@ import org.springframework.stereotype.Component;
 
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
-import ru.majordomo.hms.rc.staff.repositories.*;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
-import ru.majordomo.hms.rc.staff.resources.*;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
+import ru.majordomo.hms.rc.staff.repositories.ServerRepository;
+import ru.majordomo.hms.rc.staff.repositories.ServerRoleRepository;
+import ru.majordomo.hms.rc.staff.repositories.ServiceRepository;
+import ru.majordomo.hms.rc.staff.repositories.StorageRepository;
+import ru.majordomo.hms.rc.staff.resources.Server;
+import ru.majordomo.hms.rc.staff.resources.ServerRole;
+import ru.majordomo.hms.rc.staff.resources.Service;
+import ru.majordomo.hms.rc.staff.resources.Storage;
+import ru.majordomo.hms.rc.staff.resources.Resource;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -19,9 +27,6 @@ public class GovernorOfServer extends LordOfResources{
     private ServerRoleRepository serverRoleRepository;
     private ServiceRepository serviceRepository;
     private StorageRepository storageRepository;
-    private ServiceTemplateRepository serviceTemplateRepository;
-    private ConfigTemplateRepository configTemplateRepository;
-    private ServiceSocketRepository serviceSocketRepository;
     private GovernorOfServerRole governorOfServerRole;
     private GovernorOfService governorOfService;
     private GovernorOfStorage governorOfStorage;
@@ -45,21 +50,6 @@ public class GovernorOfServer extends LordOfResources{
     @Autowired
     public void setStorageRepository(StorageRepository storageRepository) {
         this.storageRepository = storageRepository;
-    }
-
-    @Autowired
-    public void setServiceTemplateRepository(ServiceTemplateRepository serviceTemplateRepository) {
-        this.serviceTemplateRepository = serviceTemplateRepository;
-    }
-
-    @Autowired
-    public void setConfigTemplateRepository(ConfigTemplateRepository configTemplateRepository) {
-        this.configTemplateRepository = configTemplateRepository;
-    }
-
-    @Autowired
-    public void setServiceSocketRepository(ServiceSocketRepository serviceSocketRepository) {
-        this.serviceSocketRepository = serviceSocketRepository;
     }
 
     @Autowired
@@ -161,22 +151,22 @@ public class GovernorOfServer extends LordOfResources{
     }
 
     @Override
-    public Resource save(Resource resource) {
-        return null;
+    public List<Server> build() {
+        List<Server> buildedServers = new ArrayList<>();
+        for (Server server : serverRepository.findAll()) {
+            buildedServers.add((Server) build(server.getId()));
+        }
+        return buildedServers;
     }
 
     @Override
-    public Resource findOne(String resourceId) {
-        return null;
+    public Resource save(Resource resource) {
+        return serverRepository.save((Server) resource);
     }
 
     @Override
     public void delete(String resourceId) {
-
+        serverRepository.delete(resourceId);
     }
 
-    @Override
-    public List<? extends Resource> findAll() {
-        return null;
-    }
 }

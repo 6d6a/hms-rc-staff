@@ -11,46 +11,22 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
+import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfService;
-import ru.majordomo.hms.rc.staff.repositories.ServiceRepository;
-import ru.majordomo.hms.rc.staff.repositories.ServiceSocketRepository;
-import ru.majordomo.hms.rc.staff.repositories.ServiceTemplateRepository;
 import ru.majordomo.hms.rc.staff.resources.Service;
-import ru.majordomo.hms.rc.staff.resources.ServiceSocket;
-import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 
 @RestController
 @RequestMapping("/${spring.application.name}/service")
 public class ServiceRestController {
 
-    private ServiceRepository repository;
     private GovernorOfService governor;
-    private ServiceTemplateRepository templateRepository;
-    private ServiceSocketRepository socketRepository;
-
-    @Autowired
-    public void setTemplateRepository(ServiceTemplateRepository templateRepository) {
-        this.templateRepository = templateRepository;
-    }
-
-    @Autowired
-    public void setSocketRepository(ServiceSocketRepository socketRepository) {
-        this.socketRepository = socketRepository;
-    }
 
     @Autowired
     public void setGovernor(GovernorOfService governor) {
         this.governor = governor;
-    }
-
-    @Autowired
-    public void setRepository(ServiceRepository repository) {
-        this.repository = repository;
     }
 
     @RequestMapping(value = "/{serviceId}", method = RequestMethod.GET)
@@ -60,17 +36,13 @@ public class ServiceRestController {
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
     public Collection<Service> readAll() {
-        List<Service> services = new ArrayList<>();
-        for (Service service : repository.findAll()) {
-            services.add((Service) governor.build(service.getId()));
-        }
-        return services;
+        return governor.build();
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
     public ResponseEntity<?> create(@RequestBody Service service) throws ParameterValidateException {
         governor.isValid(service);
-        Service createdService = repository.save(service);
+        Service createdService = (Service) governor.save(service);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{id}")
@@ -82,22 +54,24 @@ public class ServiceRestController {
     public ResponseEntity<?> update(@PathVariable String serviceId,
                                     @RequestBody Service service) throws ParameterValidateException {
         governor.isValid(service);
-        Service storedService = repository.findOne(serviceId);
-        if (storedService == null) {
+        try {
+            Service storedService = (Service) governor.build(serviceId);
+            service.setId(storedService.getId());
+            governor.save(service);
+        } catch (ResourceNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        service.setId(storedService.getId());
-        repository.save(service);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{serviceId}", method = RequestMethod.DELETE)
     public ResponseEntity<?> delete(@PathVariable String serviceId) throws ParameterValidateException {
-        Service storedService = repository.findOne(serviceId);
-        if (storedService == null) {
+        try {
+            Service storedService = (Service) governor.build(serviceId);
+        } catch (ResourceNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        repository.delete(serviceId);
+        governor.delete(serviceId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

@@ -86,22 +86,18 @@ public class GovernorOfServiceSocket extends LordOfResources {
     }
 
     @Override
-    public Resource save(Resource resource) {
-        return null;
+    public List<ServiceSocket> build() {
+        return serviceSocketRepository.findAll();
     }
 
     @Override
-    public Resource findOne(String resourceId) {
-        return null;
+    public Resource save(Resource resource) {
+        return serviceSocketRepository.save((ServiceSocket) resource);
     }
 
     @Override
     public void delete(String resourceId) {
-
+        serviceSocketRepository.delete(resourceId);
     }
 
-    @Override
-    public List<? extends Resource> findAll() {
-        return null;
-    }
 }

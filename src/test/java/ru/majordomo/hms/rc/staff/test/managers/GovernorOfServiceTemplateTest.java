@@ -74,11 +74,28 @@ public class GovernorOfServiceTemplateTest {
         serviceTemplate.setName("Тестовый service template");
         serviceTemplate.setSwitchedOn(Boolean.TRUE);
         serviceTemplateRepository.save(serviceTemplate);
+        ServiceTemplate buildedServiceTemplate = (ServiceTemplate) governorOfServiceTemplate.build(serviceTemplate.getId());
         try {
-            ServiceTemplate buildedServiceTemplate = (ServiceTemplate) governorOfServiceTemplate.build(serviceTemplate.getId());
             Assert.assertEquals("Имя сервиса установлено неверно", "Тестовый service template", buildedServiceTemplate.getName());
             Assert.assertEquals("configTemplates указаны неверно", configTemplates.size(), buildedServiceTemplate.getConfigTemplates().size());
             Assert.assertEquals("Статус включен/выключен установлен неверно", Boolean.TRUE, buildedServiceTemplate.getSwitchedOn());
+        } catch (ParameterValidateException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void buildAll() {
+        ServiceTemplate serviceTemplate = new ServiceTemplate();
+        serviceTemplate.setConfigTemplates(configTemplates);
+        serviceTemplate.setName("Тестовый service template");
+        serviceTemplate.setSwitchedOn(Boolean.TRUE);
+        serviceTemplateRepository.save(serviceTemplate);
+        List<ServiceTemplate> buildedServiceTemplates = governorOfServiceTemplate.build();
+        try {
+            Assert.assertEquals("Имя сервиса установлено неверно", "Тестовый service template", buildedServiceTemplates.get(buildedServiceTemplates.size()-1).getName());
+            Assert.assertEquals("configTemplates указаны неверно", configTemplates.size(), buildedServiceTemplates.get(buildedServiceTemplates.size()-1).getConfigTemplates().size());
+            Assert.assertEquals("Статус включен/выключен установлен неверно", Boolean.TRUE, buildedServiceTemplates.get(buildedServiceTemplates.size()-1).getSwitchedOn());
         } catch (ParameterValidateException e) {
             e.printStackTrace();
         }

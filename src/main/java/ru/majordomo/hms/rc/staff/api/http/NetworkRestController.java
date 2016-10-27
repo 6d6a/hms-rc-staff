@@ -11,12 +11,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
+import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfNetwork;
 import ru.majordomo.hms.rc.staff.resources.Network;
 
@@ -38,11 +37,7 @@ public class NetworkRestController {
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
     public Collection<Network> readAll() {
-        List<Network> networks = new ArrayList<>();
-        for (Network network : governor.findAll()) {
-            networks.add((Network) governor.build(network.getId()));
-        }
-        return networks;
+        return governor.build();
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
@@ -59,19 +54,21 @@ public class NetworkRestController {
     @RequestMapping(value = "/{networkId}", method = RequestMethod.PATCH)
     public ResponseEntity<?> update(@PathVariable String networkId, @RequestBody Network network) throws ParameterValidateException {
         governor.isValid(network);
-        Network storedNetwork = (Network) governor.findOne(networkId);
-        if (storedNetwork == null) {
+        try {
+            Network storedNetwork = (Network) governor.build(networkId);
+            network.setId(storedNetwork.getId());
+            governor.save(network);
+        } catch (ResourceNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        network.setId(storedNetwork.getId());
-        governor.save(network);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{networkId}", method = RequestMethod.DELETE)
     public ResponseEntity<?> delete(@PathVariable String networkId) {
-        Network storedNetwork = (Network) governor.findOne(networkId);
-        if (storedNetwork == null) {
+        try {
+            Network storedNetwork = (Network) governor.build(networkId);
+        } catch (ResourceNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         governor.delete(networkId);

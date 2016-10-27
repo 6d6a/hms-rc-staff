@@ -18,6 +18,8 @@ import ru.majordomo.hms.rc.staff.repositories.ServiceSocketRepository;
 import ru.majordomo.hms.rc.staff.resources.Network;
 import ru.majordomo.hms.rc.staff.resources.ServiceSocket;
 
+import java.util.List;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {ServiceSocketServicesConfig.class, RepositoriesConfig.class})
 public class GovernorOfServiceSocketTest {
@@ -88,12 +90,27 @@ public class GovernorOfServiceSocketTest {
     @Test
     public void build() {
         repository.save(testServiceSocket);
+        ServiceSocket buildedServiceSocket = (ServiceSocket) governor.build(testServiceSocket.getId());
         try {
-            ServiceSocket buildedServiceSocket = (ServiceSocket) governor.build(testServiceSocket.getId());
             Assert.assertEquals("Имя не совпадает с ожидаемым", testServiceSocket.getName(), buildedServiceSocket.getName());
             Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testServiceSocket.getName(), buildedServiceSocket.getName());
             Assert.assertEquals("Адрес не совпадает с ожидаемым", testServiceSocket.getAddress(), buildedServiceSocket.getAddress());
             Assert.assertEquals("Порт не совпадает с ожидаемым", testServiceSocket.getPort(), buildedServiceSocket.getPort());
+        } catch (ParameterValidateException e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void buildAll() {
+        repository.save(testServiceSocket);
+        List<ServiceSocket> buildedServiceSockets = governor.build();
+        try {
+            Assert.assertEquals("Имя не совпадает с ожидаемым", testServiceSocket.getName(), buildedServiceSockets.get(buildedServiceSockets.size()-1).getName());
+            Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testServiceSocket.getName(), buildedServiceSockets.get(buildedServiceSockets.size()-1).getName());
+            Assert.assertEquals("Адрес не совпадает с ожидаемым", testServiceSocket.getAddress(), buildedServiceSockets.get(buildedServiceSockets.size()-1).getAddress());
+            Assert.assertEquals("Порт не совпадает с ожидаемым", testServiceSocket.getPort(), buildedServiceSockets.get(buildedServiceSockets.size()-1).getPort());
         } catch (ParameterValidateException e) {
             e.printStackTrace();
             Assert.fail();

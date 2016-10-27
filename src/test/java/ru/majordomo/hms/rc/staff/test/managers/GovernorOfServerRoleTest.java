@@ -19,6 +19,7 @@ import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServerRoleRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceTemplateRepository;
 import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
+import ru.majordomo.hms.rc.staff.resources.Server;
 import ru.majordomo.hms.rc.staff.resources.ServerRole;
 import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 import ru.majordomo.hms.rc.staff.test.config.EmbeddedServltetContainerConfig;
@@ -104,6 +105,21 @@ public class GovernorOfServerRoleTest {
             Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testServerRole.getSwitchedOn(), buildedServerRole.getSwitchedOn());
             Assert.assertTrue(testServerRole.getServiceTemplates().size() == buildedServerRole.getServiceTemplates().size());
             Assert.assertTrue(testServerRole.getServiceTemplateIds().containsAll(buildedServerRole.getServiceTemplateIds()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void buildAll() {
+        serverRoleRepository.save(testServerRole);
+        List<ServerRole> buildedServerRoles = governor.build();
+        try {
+            Assert.assertEquals("Имя не совпадает с ожидаемым", testServerRole.getName(), buildedServerRoles.get(buildedServerRoles.size()-1).getName());
+            Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testServerRole.getSwitchedOn(), buildedServerRoles.get(buildedServerRoles.size()-1).getSwitchedOn());
+            Assert.assertTrue(testServerRole.getServiceTemplates().size() == buildedServerRoles.get(buildedServerRoles.size()-1).getServiceTemplates().size());
+            Assert.assertTrue(testServerRole.getServiceTemplateIds().containsAll(buildedServerRoles.get(buildedServerRoles.size()-1).getServiceTemplateIds()));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();

@@ -106,23 +106,18 @@ public class GovernorOfNetwork extends LordOfResources {
     }
 
     @Override
+    public List<Network> build() {
+        return networkRepository.findAll();
+    }
+
+    @Override
     public Resource save(Resource resource) {
         return networkRepository.save((Network) resource);
     }
 
     @Override
-    public Resource findOne(String resourceId) {
-        return networkRepository.findOne(resourceId);
-    }
-
-    @Override
     public void delete(String resourceId) {
         networkRepository.delete(resourceId);
-    }
-
-    @Override
-    public List<Network> findAll() {
-        return networkRepository.findAll();
     }
 
 }

@@ -12,10 +12,9 @@ public abstract class LordOfResources {
     public abstract Resource createResource(ServiceMessage serviceMessage) throws ParameterValidateException;
     public abstract void isValid(Resource resource) throws ParameterValidateException;
     public abstract Resource build(String resourceId) throws ResourceNotFoundException;
+    public abstract List<? extends Resource> build();
     public abstract Resource save(Resource resource);
-    public abstract Resource findOne(String resourceId);
     public abstract void delete(String resourceId);
-    public abstract List<? extends Resource> findAll();
     public static Resource setResourceParams(Resource resource, ServiceMessage serviceMessage, Cleaner cleaner) throws ClassCastException{
         String name = cleaner.cleanString((String) serviceMessage.getParam("name"));
         resource.setName(name);

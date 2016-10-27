@@ -17,8 +17,8 @@ import java.util.List;
 
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
+import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfServer;
-import ru.majordomo.hms.rc.staff.repositories.ServerRepository;
 import ru.majordomo.hms.rc.staff.resources.Server;
 
 @RestController
@@ -26,13 +26,7 @@ import ru.majordomo.hms.rc.staff.resources.Server;
 @RequestMapping(value = "/${spring.application.name}/server")
 public class ServerRestController {
 
-    private ServerRepository serverRepository;
     private GovernorOfServer governor;
-
-    @Autowired
-    public void setRepository(ServerRepository repository) {
-        this.serverRepository = repository;
-    }
 
     @Autowired
     public void setGovernor(GovernorOfServer governor) {
@@ -46,17 +40,13 @@ public class ServerRestController {
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
     public Collection<Server> readAll() {
-        List<Server> servers = new ArrayList<>();
-        for (Server server : serverRepository.findAll()) {
-            servers.add((Server) governor.build(server.getId()));
-        }
-        return servers;
+        return governor.build();
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
     public ResponseEntity<?> create (@RequestBody Server server) throws ParameterValidateException {
         governor.isValid(server);
-        Server createdNetwork = serverRepository.save(server);
+        Server createdNetwork = (Server) governor.save(server);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{id}")
@@ -67,22 +57,24 @@ public class ServerRestController {
     @RequestMapping(value = "/{serverId}", method = RequestMethod.PATCH)
     public ResponseEntity<?> update(@PathVariable String serverId, @RequestBody Server server) throws ParameterValidateException {
         governor.isValid(server);
-        Server storedServer = serverRepository.findOne(serverId);
-        if (storedServer == null) {
+        try {
+            Server storedServer = (Server) governor.build(serverId);
+            server.setId(storedServer.getId());
+            governor.save(server);
+        } catch (ResourceNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        server.setId(storedServer.getId());
-        serverRepository.save(server);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{serverId}", method = RequestMethod.DELETE)
     public ResponseEntity<?> delete(@PathVariable String serverId) {
-        Server storedNetwork = serverRepository.findOne(serverId);
-        if (storedNetwork == null) {
+        try {
+            Server storedNetwork = (Server) governor.build(serverId);
+        } catch (ResourceNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        serverRepository.delete(serverId);
+        governor.delete(serverId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
