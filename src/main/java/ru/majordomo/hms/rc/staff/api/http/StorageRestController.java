@@ -44,11 +44,11 @@ public class StorageRestController {
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
     public ResponseEntity<?> create (@RequestBody Storage storage) throws ParameterValidateException {
         governor.isValid(storage);
-        Storage createdStorage = (Storage) governor.save(storage);
+        governor.save(storage);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{id}")
-                .buildAndExpand(createdStorage.getId()).toUri());
+                .buildAndExpand(storage.getId()).toUri());
         return new ResponseEntity<>(null, httpHeaders, HttpStatus.CREATED);
     }
 

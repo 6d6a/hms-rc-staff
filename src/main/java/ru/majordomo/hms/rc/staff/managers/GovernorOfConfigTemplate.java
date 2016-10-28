@@ -36,7 +36,7 @@ public class GovernorOfConfigTemplate extends LordOfResources {
         String fileLink = cleaner.cleanString((String)serviceMessage.getParam("fileLink"));
         configTemplate.setFileLink(fileLink);
         isValid(configTemplate);
-        configTemplateRepository.save(configTemplate);
+        save(configTemplate);
         return configTemplate;
     }
 
@@ -70,8 +70,8 @@ public class GovernorOfConfigTemplate extends LordOfResources {
     }
 
     @Override
-    public Resource save(Resource resource) {
-        return configTemplateRepository.save((ConfigTemplate) resource);
+    public void save(Resource resource) {
+        configTemplateRepository.save((ConfigTemplate) resource);
     }
 
     @Override

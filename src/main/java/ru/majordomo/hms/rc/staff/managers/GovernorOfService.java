@@ -72,7 +72,7 @@ public class GovernorOfService extends LordOfResources{
             service.setServiceTemplate(serviceTemplate);
             service.setServiceSockets(serviceSockets);
             isValid(service);
-            repository.save(service);
+            save(service);
         } catch (ClassCastException e) {
             throw new ParameterValidateException("один из параметров указан неверно:" + e.getMessage());
         }
@@ -149,8 +149,8 @@ public class GovernorOfService extends LordOfResources{
     }
 
     @Override
-    public Resource save(Resource resource) {
-        return repository.save((Service) resource);
+    public void save(Resource resource) {
+        repository.save((Service) resource);
     }
 
     @Override

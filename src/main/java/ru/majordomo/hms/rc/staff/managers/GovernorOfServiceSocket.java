@@ -45,7 +45,7 @@ public class GovernorOfServiceSocket extends LordOfResources {
             serviceSocket.setAddress(address);
             serviceSocket.setPort(port);
             isValid(serviceSocket);
-            serviceSocketRepository.save(serviceSocket);
+            save(serviceSocket);
         } catch (ClassCastException e) {
             throw new ParameterValidateException("один из параметров указан неверно:" + e.getMessage());
         }
@@ -91,8 +91,8 @@ public class GovernorOfServiceSocket extends LordOfResources {
     }
 
     @Override
-    public Resource save(Resource resource) {
-        return serviceSocketRepository.save((ServiceSocket) resource);
+    public void save(Resource resource) {
+        serviceSocketRepository.save((ServiceSocket) resource);
     }
 
     @Override

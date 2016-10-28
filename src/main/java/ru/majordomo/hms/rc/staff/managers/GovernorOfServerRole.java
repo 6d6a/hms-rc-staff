@@ -64,7 +64,7 @@ public class GovernorOfServerRole extends LordOfResources{
             if (serverRole.getServiceTemplates().isEmpty()) {
                 throw new ParameterValidateException("Должен быть задан хотя бы один service template");
             }
-            serverRoleRepository.save(serverRole);
+            save(serverRole);
 
         } catch (ClassCastException e) {
             throw new ParameterValidateException("Один из параметров указан неверно:" + e.getMessage());
@@ -125,8 +125,8 @@ public class GovernorOfServerRole extends LordOfResources{
     }
 
     @Override
-    public Resource save(Resource resource) {
-        return serverRoleRepository.save((ServerRole) resource);
+    public void save(Resource resource) {
+        serverRoleRepository.save((ServerRole) resource);
     }
 
     @Override

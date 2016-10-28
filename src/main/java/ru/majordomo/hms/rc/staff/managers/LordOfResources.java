@@ -13,7 +13,7 @@ public abstract class LordOfResources {
     public abstract void isValid(Resource resource) throws ParameterValidateException;
     public abstract Resource build(String resourceId) throws ResourceNotFoundException;
     public abstract List<? extends Resource> build();
-    public abstract Resource save(Resource resource);
+    public abstract void save(Resource resource);
     public abstract void delete(String resourceId);
     public static Resource setResourceParams(Resource resource, ServiceMessage serviceMessage, Cleaner cleaner) throws ClassCastException{
         String name = cleaner.cleanString((String) serviceMessage.getParam("name"));

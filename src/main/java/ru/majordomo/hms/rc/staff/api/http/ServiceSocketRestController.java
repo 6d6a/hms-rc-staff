@@ -51,11 +51,11 @@ public class ServiceSocketRestController {
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
     public ResponseEntity<?> create(@RequestBody ServiceSocket socket) throws ParameterValidateException {
         governor.isValid(socket);
-        ServiceSocket createdSocket = (ServiceSocket) governor.save(socket);
+        governor.save(socket);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{id}")
-                .buildAndExpand(createdSocket.getId()).toUri());
+                .buildAndExpand(socket.getId()).toUri());
         return new ResponseEntity<>(null, httpHeaders, HttpStatus.CREATED);
     }
 

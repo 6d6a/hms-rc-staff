@@ -88,7 +88,7 @@ public class GovernorOfServer extends LordOfResources{
             server.setServerRole(serverRole);
 
             isValid(server);
-            serverRepository.save(server);
+            save(server);
 
         } catch (ClassCastException e) {
             throw new ParameterValidateException("Один из параметров указан неверно:" + e.getMessage());
@@ -160,8 +160,8 @@ public class GovernorOfServer extends LordOfResources{
     }
 
     @Override
-    public Resource save(Resource resource) {
-        return serverRepository.save((Server) resource);
+    public void save(Resource resource) {
+        serverRepository.save((Server) resource);
     }
 
     @Override

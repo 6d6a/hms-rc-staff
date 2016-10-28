@@ -44,7 +44,7 @@ public class GovernorOfServiceTemplate extends LordOfResources {
         List<ConfigTemplate> configTemplates = (List<ConfigTemplate>)serviceMessage.getParam("configTemplates");
         serviceTemplate.setConfigTemplates(configTemplates);
         isValid(serviceTemplate);
-        serviceTemplateRepository.save(serviceTemplate);
+        save(serviceTemplate);
 
         return serviceTemplate;
     }
@@ -82,8 +82,8 @@ public class GovernorOfServiceTemplate extends LordOfResources {
     }
 
     @Override
-    public Resource save(Resource resource) {
-        return serviceTemplateRepository.save((ServiceTemplate) resource);
+    public void save(Resource resource) {
+        serviceTemplateRepository.save((ServiceTemplate) resource);
     }
 
     @Override

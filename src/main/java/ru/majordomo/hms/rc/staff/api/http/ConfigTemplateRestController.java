@@ -53,11 +53,11 @@ public class ConfigTemplateRestController {
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
     public ResponseEntity<?> create(@RequestBody ConfigTemplate configTemplate) throws ParameterValidateException {
         governor.isValid(configTemplate);
-        ConfigTemplate createdConfigTemplate = (ConfigTemplate) governor.save(configTemplate);
+        governor.save(configTemplate);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{id}")
-                .buildAndExpand(createdConfigTemplate.getId()).toUri());
+                .buildAndExpand(configTemplate.getId()).toUri());
         return new ResponseEntity<>(null, httpHeaders, HttpStatus.CREATED);
     }
 

@@ -44,11 +44,11 @@ public class ServiceTemplateRestController {
     @RequestMapping(value = {"", ""}, method = RequestMethod.POST)
     public ResponseEntity<?> create(@RequestBody ServiceTemplate serviceTemplate) throws ParameterValidateException {
         governor.isValid(serviceTemplate);
-        ServiceTemplate createdServiceTemplate = (ServiceTemplate) governor.save(serviceTemplate);
+        governor.save(serviceTemplate);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{id}")
-                .buildAndExpand(createdServiceTemplate.getId()).toUri());
+                .buildAndExpand(serviceTemplate.getId()).toUri());
         return new ResponseEntity<>(null, httpHeaders, HttpStatus.CREATED);
     }
 

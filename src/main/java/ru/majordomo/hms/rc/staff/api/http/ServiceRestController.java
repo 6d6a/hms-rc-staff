@@ -42,11 +42,11 @@ public class ServiceRestController {
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
     public ResponseEntity<?> create(@RequestBody Service service) throws ParameterValidateException {
         governor.isValid(service);
-        Service createdService = (Service) governor.save(service);
+        governor.save(service);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{id}")
-                .buildAndExpand(createdService.getId()).toUri());
+                .buildAndExpand(service.getId()).toUri());
         return new ResponseEntity<>(null, httpHeaders, HttpStatus.CREATED);
     }
 

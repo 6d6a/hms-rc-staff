@@ -111,8 +111,8 @@ public class GovernorOfNetwork extends LordOfResources {
     }
 
     @Override
-    public Resource save(Resource resource) {
-        return networkRepository.save((Network) resource);
+    public void save(Resource resource) {
+        networkRepository.save((Network) resource);
     }
 
     @Override

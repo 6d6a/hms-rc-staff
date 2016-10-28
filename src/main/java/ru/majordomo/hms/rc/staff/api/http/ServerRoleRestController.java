@@ -38,11 +38,11 @@ public class ServerRoleRestController {
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
     public ResponseEntity<?> create (@RequestBody ServerRole serverRole) throws ParameterValidateException {
         governor.isValid(serverRole);
-        ServerRole createdServerRole = (ServerRole) governor.save(serverRole);
+        governor.save(serverRole);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{id}")
-                .buildAndExpand(createdServerRole.getId()).toUri());
+                .buildAndExpand(serverRole.getId()).toUri());
         return new ResponseEntity<>(null, httpHeaders, HttpStatus.CREATED);
     }
 

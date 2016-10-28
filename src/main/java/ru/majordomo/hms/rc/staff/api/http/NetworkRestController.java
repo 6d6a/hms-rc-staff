@@ -43,11 +43,11 @@ public class NetworkRestController {
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
     public ResponseEntity<?> create (@RequestBody Network network) throws ParameterValidateException {
         governor.isValid(network);
-        Network createdNetwork = (Network) governor.save(network);
+        governor.save(network);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{id}")
-                .buildAndExpand(createdNetwork.getId()).toUri());
+                .buildAndExpand(network.getId()).toUri());
         return new ResponseEntity<>(null, httpHeaders, HttpStatus.CREATED);
     }
 

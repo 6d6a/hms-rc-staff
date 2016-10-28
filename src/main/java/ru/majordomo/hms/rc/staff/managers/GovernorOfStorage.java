@@ -54,7 +54,7 @@ public class GovernorOfStorage extends LordOfResources {
             storage.setCapacity(capacity);
             storage.setCapacityUsed(capacityUsed);
 
-            repository.save(storage);
+            save(storage);
         } catch (ClassCastException e){
             throw new ParameterValidateException("один из параметров указан неверно:" + e.getMessage());
         }
@@ -97,8 +97,8 @@ public class GovernorOfStorage extends LordOfResources {
     }
 
     @Override
-    public Resource save(Resource resource) {
-        return repository.save((Storage) resource);
+    public void save(Resource resource) {
+        repository.save((Storage) resource);
     }
 
     @Override

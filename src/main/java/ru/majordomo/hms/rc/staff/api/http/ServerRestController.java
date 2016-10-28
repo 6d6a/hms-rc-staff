@@ -41,11 +41,11 @@ public class ServerRestController {
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
     public ResponseEntity<?> create (@RequestBody Server server) throws ParameterValidateException {
         governor.isValid(server);
-        Server createdServer = (Server) governor.save(server);
+        governor.save(server);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{id}")
-                .buildAndExpand(createdServer.getId()).toUri());
+                .buildAndExpand(server.getId()).toUri());
         return new ResponseEntity<>(null, httpHeaders, HttpStatus.CREATED);
     }
 
