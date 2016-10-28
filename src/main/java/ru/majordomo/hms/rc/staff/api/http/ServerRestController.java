@@ -4,12 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -57,23 +52,15 @@ public class ServerRestController {
     @RequestMapping(value = "/{serverId}", method = {RequestMethod.PATCH, RequestMethod.PUT})
     public ResponseEntity<?> update(@PathVariable String serverId, @RequestBody Server server) throws ParameterValidateException {
         governor.isValid(server);
-        try {
-            Server storedServer = (Server) governor.build(serverId);
-            server.setId(storedServer.getId());
-            governor.save(server);
-        } catch (ResourceNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        Server storedServer = (Server) governor.build(serverId);
+        server.setId(storedServer.getId());
+        governor.save(server);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{serverId}", method = RequestMethod.DELETE)
     public ResponseEntity<?> delete(@PathVariable String serverId) {
-        try {
-            Server storedServer = (Server) governor.build(serverId);
-        } catch (ResourceNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        Server storedServer = (Server) governor.build(serverId);
         governor.delete(serverId);
         return new ResponseEntity<>(HttpStatus.OK);
     }

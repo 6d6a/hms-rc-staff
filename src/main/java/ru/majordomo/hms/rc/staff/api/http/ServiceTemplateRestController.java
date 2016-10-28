@@ -56,23 +56,15 @@ public class ServiceTemplateRestController {
     public ResponseEntity<?> update(@PathVariable String serviceTemplateId,
                                     @RequestBody ServiceTemplate serviceTemplate) throws ParameterValidateException {
         governor.isValid(serviceTemplate);
-        try {
-            ServiceTemplate storedServiceTemplate = (ServiceTemplate) governor.build(serviceTemplateId);
-            serviceTemplate.setId(storedServiceTemplate.getId());
-            governor.save(serviceTemplate);
-        } catch (ResourceNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        ServiceTemplate storedServiceTemplate = (ServiceTemplate) governor.build(serviceTemplateId);
+        serviceTemplate.setId(storedServiceTemplate.getId());
+        governor.save(serviceTemplate);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{serviceTemplateId}", method = RequestMethod.DELETE)
     public ResponseEntity<?> delete(@PathVariable String serviceTemplateId) {
-        try {
-            ServiceTemplate storedServiceTemplate = (ServiceTemplate) governor.build(serviceTemplateId);
-        } catch (ResourceNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        ServiceTemplate storedServiceTemplate = (ServiceTemplate) governor.build(serviceTemplateId);
         governor.delete(serviceTemplateId);
         return new ResponseEntity<>(HttpStatus.OK);
     }

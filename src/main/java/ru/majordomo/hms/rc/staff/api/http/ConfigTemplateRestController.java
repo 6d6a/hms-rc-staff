@@ -66,23 +66,15 @@ public class ConfigTemplateRestController {
                                     @RequestBody ConfigTemplate configTemplate)
                                     throws ParameterValidateException {
         governor.isValid(configTemplate);
-        try {
-            ConfigTemplate storedConfigTemplate = (ConfigTemplate) governor.build(configTemplateId);
-            configTemplate.setId(storedConfigTemplate.getId());
-            governor.save(configTemplate);
-        } catch (ResourceNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        ConfigTemplate storedConfigTemplate = (ConfigTemplate) governor.build(configTemplateId);
+        configTemplate.setId(storedConfigTemplate.getId());
+        governor.save(configTemplate);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{configTemplateId}", method = RequestMethod.DELETE)
     public ResponseEntity<?> delete(@PathVariable String configTemplateId) {
-        try {
-            ConfigTemplate configTemplate = (ConfigTemplate) governor.build(configTemplateId);
-        } catch (ResourceNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        ConfigTemplate configTemplate = (ConfigTemplate) governor.build(configTemplateId);
         governor.delete(configTemplateId);
         return new ResponseEntity<>(HttpStatus.OK);
     }

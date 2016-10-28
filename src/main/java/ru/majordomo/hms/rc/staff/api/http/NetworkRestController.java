@@ -54,23 +54,15 @@ public class NetworkRestController {
     @RequestMapping(value = "/{networkId}", method = {RequestMethod.PATCH, RequestMethod.PUT})
     public ResponseEntity<?> update(@PathVariable String networkId, @RequestBody Network network) throws ParameterValidateException {
         governor.isValid(network);
-        try {
-            Network storedNetwork = (Network) governor.build(networkId);
-            network.setId(storedNetwork.getId());
-            governor.save(network);
-        } catch (ResourceNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        Network storedNetwork = (Network) governor.build(networkId);
+        network.setId(storedNetwork.getId());
+        governor.save(network);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{networkId}", method = RequestMethod.DELETE)
     public ResponseEntity<?> delete(@PathVariable String networkId) {
-        try {
-            Network storedNetwork = (Network) governor.build(networkId);
-        } catch (ResourceNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        Network storedNetwork = (Network) governor.build(networkId);
         governor.delete(networkId);
         return new ResponseEntity<>(HttpStatus.OK);
     }

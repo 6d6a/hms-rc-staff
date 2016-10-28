@@ -55,23 +55,15 @@ public class StorageRestController {
     @RequestMapping(value = "/{storageId}", method = {RequestMethod.PATCH, RequestMethod.PUT})
     public ResponseEntity<?> update(@PathVariable String storageId, @RequestBody Storage storage) throws ParameterValidateException {
         governor.isValid(storage);
-        try {
-            Storage storedStorage = (Storage) governor.build(storageId);
-            storage.setId(storedStorage.getId());
-            governor.save(storage);
-        } catch (ResourceNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        Storage storedStorage = (Storage) governor.build(storageId);
+        storage.setId(storedStorage.getId());
+        governor.save(storage);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{storageId}", method = RequestMethod.DELETE)
     public ResponseEntity<?> delete(@PathVariable String storageId) {
-        try {
-            Storage storedStorage = (Storage) governor.build(storageId);
-        } catch (ResourceNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        Storage storedStorage = (Storage) governor.build(storageId);
         governor.delete(storageId);
         return new ResponseEntity<>(HttpStatus.OK);
     }

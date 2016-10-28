@@ -48,23 +48,15 @@ public class ServerRoleRestController {
 
     @RequestMapping(value = "/{serverRoleId}", method = {RequestMethod.PATCH, RequestMethod.PUT})
     public ResponseEntity<?> update(@PathVariable String serverRoleId, @RequestBody ServerRole serverRole) throws ParameterValidateException {
-        try {
-            ServerRole storedServerRole = (ServerRole) governor.build(serverRoleId);
-            serverRole.setId(storedServerRole.getId());
-            governor.save(serverRole);
-        } catch (ResourceNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        ServerRole storedServerRole = (ServerRole) governor.build(serverRoleId);
+        serverRole.setId(storedServerRole.getId());
+        governor.save(serverRole);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{serverRoleId}", method = RequestMethod.DELETE)
     public ResponseEntity<?> delete(@PathVariable String serverRoleId) {
-        try {
-            ServerRole storedServerRole = (ServerRole) governor.build(serverRoleId);
-        } catch (ResourceNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        ServerRole storedServerRole = (ServerRole) governor.build(serverRoleId);
         governor.delete(serverRoleId);
         return new ResponseEntity<>(HttpStatus.OK);
     }

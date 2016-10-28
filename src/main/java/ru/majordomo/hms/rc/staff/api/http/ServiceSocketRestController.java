@@ -62,23 +62,15 @@ public class ServiceSocketRestController {
     @RequestMapping(value = "/{serviceSocketId}", method = {RequestMethod.PATCH, RequestMethod.PUT})
     public ResponseEntity<?> update(@PathVariable String serviceSocketId, @RequestBody ServiceSocket socket) throws ParameterValidateException {
         governor.isValid(socket);
-        try {
-            ServiceSocket storedSocket = (ServiceSocket) governor.build(serviceSocketId);
-            socket.setId(storedSocket.getId());
-            governor.save(socket);
-        } catch (ResourceNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        ServiceSocket storedSocket = (ServiceSocket) governor.build(serviceSocketId);
+        socket.setId(storedSocket.getId());
+        governor.save(socket);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{serviceSocketId}", method = RequestMethod.DELETE)
     public ResponseEntity<?> delete(@PathVariable String serviceSocketId) {
-        try {
-            ServiceSocket storedSocket = (ServiceSocket) governor.build(serviceSocketId);
-        } catch (ResourceNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        ServiceSocket storedSocket = (ServiceSocket) governor.build(serviceSocketId);
         governor.delete(serviceSocketId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
