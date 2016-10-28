@@ -50,7 +50,7 @@ public class ServiceRestController {
         return new ResponseEntity<>(null, httpHeaders, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/{serviceId}", method = RequestMethod.PATCH)
+    @RequestMapping(value = "/{serviceId}", method = {RequestMethod.PATCH, RequestMethod.PUT})
     public ResponseEntity<?> update(@PathVariable String serviceId,
                                     @RequestBody Service service) throws ParameterValidateException {
         governor.isValid(service);

@@ -52,7 +52,7 @@ public class StorageRestController {
         return new ResponseEntity<>(null, httpHeaders, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/{storageId}", method = RequestMethod.PATCH)
+    @RequestMapping(value = "/{storageId}", method = {RequestMethod.PATCH, RequestMethod.PUT})
     public ResponseEntity<?> update(@PathVariable String storageId, @RequestBody Storage storage) throws ParameterValidateException {
         governor.isValid(storage);
         try {

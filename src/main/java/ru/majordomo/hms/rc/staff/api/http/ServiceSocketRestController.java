@@ -59,7 +59,7 @@ public class ServiceSocketRestController {
         return new ResponseEntity<>(null, httpHeaders, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/{serviceSocketId}", method = RequestMethod.PATCH)
+    @RequestMapping(value = "/{serviceSocketId}", method = {RequestMethod.PATCH, RequestMethod.PUT})
     public ResponseEntity<?> update(@PathVariable String serviceSocketId, @RequestBody ServiceSocket socket) throws ParameterValidateException {
         governor.isValid(socket);
         try {

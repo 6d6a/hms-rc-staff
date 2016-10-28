@@ -61,7 +61,7 @@ public class ConfigTemplateRestController {
         return new ResponseEntity<>(null, httpHeaders, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/{configTemplateId}", method = RequestMethod.PATCH)
+    @RequestMapping(value = "/{configTemplateId}", method = {RequestMethod.PATCH, RequestMethod.PUT})
     public ResponseEntity<?> update(@PathVariable String configTemplateId,
                                     @RequestBody ConfigTemplate configTemplate)
                                     throws ParameterValidateException {

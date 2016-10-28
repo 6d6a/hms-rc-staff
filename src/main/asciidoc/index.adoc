@@ -122,3 +122,444 @@ include::{snippets}/server-role/delete/curl-request.adoc[]
 ==== Пример ответа
 
 include::{snippets}/server-role/delete/http-response.adoc[]
+
+
+[[resource-server]]
+== Server
+
+=== Read One
+`GET` запрос для получения Server по ID.
+
+include::{snippets}/server/read-one/response-fields.adoc[]
+
+==== Пример запроса
+
+include::{snippets}/server/read-one/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/server/read-one/http-response.adoc[]
+
+=== Read All
+`GET` запрос для получения всех Server.
+
+include::{snippets}/server/read-all/response-fields.adoc[]
+
+==== Пример запроса
+
+include::{snippets}/server/read-all/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/server/read-all/http-response.adoc[]
+
+=== Create
+`POST` запрос для создания Server.
+
+==== Пример запроса
+
+include::{snippets}/server/create/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/server/create/http-response.adoc[]
+
+=== Update
+`PATCH` запрос для изменения Server. Идентичен `PUT` запросу.
+
+==== Пример запроса
+
+include::{snippets}/server/update/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/server/update/http-response.adoc[]
+
+=== Delete
+`DELETE` запрос для удаления Server.
+
+==== Пример запроса
+
+include::{snippets}/server/delete/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/server/delete/http-response.adoc[]
+
+
+[[resource-config-template]]
+== Config Template
+
+=== Read One
+`GET` запрос для получения Config Template по ID.
+
+include::{snippets}/config-template/read-one/response-fields.adoc[]
+
+==== Пример запроса
+
+include::{snippets}/config-template/read-one/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/config-template/read-one/http-response.adoc[]
+
+=== Read All
+`GET` запрос для получения всех Config Template.
+
+include::{snippets}/config-template/read-all/response-fields.adoc[]
+
+==== Пример запроса
+
+include::{snippets}/config-template/read-all/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/config-template/read-all/http-response.adoc[]
+
+=== Create
+`POST` запрос для создания Config Template.
+
+==== Пример запроса
+
+include::{snippets}/config-template/create/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/config-template/create/http-response.adoc[]
+
+=== Update
+`PATCH` запрос для изменения Config Template. Идентичен `PUT` запросу.
+
+==== Пример запроса
+
+include::{snippets}/config-template/update/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/config-template/update/http-response.adoc[]
+
+=== Delete
+`DELETE` запрос для удаления Config Template.
+
+==== Пример запроса
+
+include::{snippets}/config-template/delete/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/config-template/delete/http-response.adoc[]
+
+
+[[resource-network]]
+== Network
+
+=== Read One
+`GET` запрос для получения Network по ID.
+
+include::{snippets}/network/read-one/response-fields.adoc[]
+
+==== Пример запроса
+
+include::{snippets}/network/read-one/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/network/read-one/http-response.adoc[]
+
+=== Read All
+`GET` запрос для получения всех Network.
+
+include::{snippets}/network/read-all/response-fields.adoc[]
+
+==== Пример запроса
+
+include::{snippets}/network/read-all/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/network/read-all/http-response.adoc[]
+
+=== Create
+`POST` запрос для создания Network.
+
+==== Пример запроса
+
+include::{snippets}/network/create/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/network/create/http-response.adoc[]
+
+=== Update
+`PATCH` запрос для изменения Network. Идентичен `PUT` запросу.
+
+==== Пример запроса
+
+include::{snippets}/network/update/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/network/update/http-response.adoc[]
+
+=== Delete
+`DELETE` запрос для удаления Network.
+
+==== Пример запроса
+
+include::{snippets}/network/delete/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/network/delete/http-response.adoc[]
+
+
+[[resource-service]]
+== Service
+
+=== Read One
+`GET` запрос для получения Service по ID.
+
+include::{snippets}/service/read-one/response-fields.adoc[]
+
+==== Пример запроса
+
+include::{snippets}/service/read-one/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/service/read-one/http-response.adoc[]
+
+=== Read All
+`GET` запрос для получения всех Service.
+
+include::{snippets}/service/read-all/response-fields.adoc[]
+
+==== Пример запроса
+
+include::{snippets}/service/read-all/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/service/read-all/http-response.adoc[]
+
+=== Create
+`POST` запрос для создания Service.
+
+==== Пример запроса
+
+include::{snippets}/service/create/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/service/create/http-response.adoc[]
+
+=== Update
+`PATCH` запрос для изменения Service. Идентичен `PUT` запросу.
+
+==== Пример запроса
+
+include::{snippets}/service/update/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/service/update/http-response.adoc[]
+
+=== Delete
+`DELETE` запрос для удаления Service.
+
+==== Пример запроса
+
+include::{snippets}/service/delete/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/service/delete/http-response.adoc[]
+
+
+[[resource-service-socket]]
+== Service Socket
+
+=== Read One
+`GET` запрос для получения Service Socket по ID.
+
+include::{snippets}/service-socket/read-one/response-fields.adoc[]
+
+==== Пример запроса
+
+include::{snippets}/service-socket/read-one/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/service-socket/read-one/http-response.adoc[]
+
+=== Read All
+`GET` запрос для получения всех Service Socket.
+
+include::{snippets}/service-socket/read-all/response-fields.adoc[]
+
+==== Пример запроса
+
+include::{snippets}/service-socket/read-all/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/service-socket/read-all/http-response.adoc[]
+
+=== Create
+`POST` запрос для создания Service Socket.
+
+==== Пример запроса
+
+include::{snippets}/service-socket/create/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/service-socket/create/http-response.adoc[]
+
+=== Update
+`PATCH` запрос для изменения Service Socket. Идентичен `PUT` запросу.
+
+==== Пример запроса
+
+include::{snippets}/service-socket/update/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/service-socket/update/http-response.adoc[]
+
+=== Delete
+`DELETE` запрос для удаления Service Socket.
+
+==== Пример запроса
+
+include::{snippets}/service-socket/delete/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/service-socket/delete/http-response.adoc[]
+
+
+[[resource-service-template]]
+== Service Template
+
+=== Read One
+`GET` запрос для получения Service Template по ID.
+
+include::{snippets}/service-template/read-one/response-fields.adoc[]
+
+==== Пример запроса
+
+include::{snippets}/service-template/read-one/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/service-template/read-one/http-response.adoc[]
+
+=== Read All
+`GET` запрос для получения всех Service Template.
+
+include::{snippets}/service-template/read-all/response-fields.adoc[]
+
+==== Пример запроса
+
+include::{snippets}/service-template/read-all/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/service-template/read-all/http-response.adoc[]
+
+=== Create
+`POST` запрос для создания Service Template.
+
+==== Пример запроса
+
+include::{snippets}/service-template/create/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/service-template/create/http-response.adoc[]
+
+=== Update
+`PATCH` запрос для изменения Service Template. Идентичен `PUT` запросу.
+
+==== Пример запроса
+
+include::{snippets}/service-template/update/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/service-template/update/http-response.adoc[]
+
+=== Delete
+`DELETE` запрос для удаления Service Template.
+
+==== Пример запроса
+
+include::{snippets}/service-template/delete/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/service-template/delete/http-response.adoc[]
+
+
+[[resource-storage]]
+== Storage
+
+=== Read One
+`GET` запрос для получения Storage по ID.
+
+include::{snippets}/storage/read-one/response-fields.adoc[]
+
+==== Пример запроса
+
+include::{snippets}/storage/read-one/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/storage/read-one/http-response.adoc[]
+
+=== Read All
+`GET` запрос для получения всех Storage.
+
+include::{snippets}/storage/read-all/response-fields.adoc[]
+
+==== Пример запроса
+
+include::{snippets}/storage/read-all/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/storage/read-all/http-response.adoc[]
+
+=== Create
+`POST` запрос для создания Storage.
+
+==== Пример запроса
+
+include::{snippets}/storage/create/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/storage/create/http-response.adoc[]
+
+=== Update
+`PATCH` запрос для изменения Storage. Идентичен `PUT` запросу.
+
+==== Пример запроса
+
+include::{snippets}/storage/update/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/storage/update/http-response.adoc[]
+
+=== Delete
+`DELETE` запрос для удаления Storage.
+
+==== Пример запроса
+
+include::{snippets}/storage/delete/curl-request.adoc[]
+
+==== Пример ответа
+
+include::{snippets}/storage/delete/http-response.adoc[]

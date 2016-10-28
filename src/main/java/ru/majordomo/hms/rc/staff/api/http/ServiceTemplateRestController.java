@@ -52,7 +52,7 @@ public class ServiceTemplateRestController {
         return new ResponseEntity<>(null, httpHeaders, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/{serviceTemplateId}", method = RequestMethod.PATCH)
+    @RequestMapping(value = "/{serviceTemplateId}", method = {RequestMethod.PATCH, RequestMethod.PUT})
     public ResponseEntity<?> update(@PathVariable String serviceTemplateId,
                                     @RequestBody ServiceTemplate serviceTemplate) throws ParameterValidateException {
         governor.isValid(serviceTemplate);

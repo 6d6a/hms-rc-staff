@@ -51,7 +51,7 @@ public class NetworkRestController {
         return new ResponseEntity<>(null, httpHeaders, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/{networkId}", method = RequestMethod.PATCH)
+    @RequestMapping(value = "/{networkId}", method = {RequestMethod.PATCH, RequestMethod.PUT})
     public ResponseEntity<?> update(@PathVariable String networkId, @RequestBody Network network) throws ParameterValidateException {
         governor.isValid(network);
         try {
