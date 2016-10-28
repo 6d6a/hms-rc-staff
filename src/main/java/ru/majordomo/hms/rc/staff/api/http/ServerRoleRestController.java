@@ -48,6 +48,7 @@ public class ServerRoleRestController {
 
     @RequestMapping(value = "/{serverRoleId}", method = {RequestMethod.PATCH, RequestMethod.PUT})
     public ResponseEntity<?> update(@PathVariable String serverRoleId, @RequestBody ServerRole serverRole) throws ParameterValidateException {
+        governor.isValid(serverRole);
         ServerRole storedServerRole = (ServerRole) governor.build(serverRoleId);
         serverRole.setId(storedServerRole.getId());
         governor.save(serverRole);
