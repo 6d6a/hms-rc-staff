@@ -85,8 +85,7 @@ public class ConfigTemplateRestControllerTest {
 
     @Test
     public void readOne() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName
-                + "/" + resourceName + "/" + configTemplates.get(0).getId())
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + configTemplates.get(0).getId())
                 .accept(MediaType.APPLICATION_JSON_UTF8);
 
         this.document.snippets(
@@ -110,8 +109,7 @@ public class ConfigTemplateRestControllerTest {
 
     @Test
     public void readAll() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName
-                + "/" + resourceName + "/").accept(MediaType.APPLICATION_JSON_UTF8);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/").accept(MediaType.APPLICATION_JSON_UTF8);
 
         this.document.snippets(
                 responseFields(
@@ -135,8 +133,7 @@ public class ConfigTemplateRestControllerTest {
     @Test
     public void readOneAndCheckObjectFields() {
         ConfigTemplate configTemplate = configTemplates.get(0);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName
-            + "/" + resourceName + "/" + configTemplate.getId()).accept(MediaType.APPLICATION_JSON_UTF8);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + configTemplate.getId()).accept(MediaType.APPLICATION_JSON_UTF8);
 
         this.document.snippets(
                 responseFields(
@@ -162,8 +159,7 @@ public class ConfigTemplateRestControllerTest {
     public void create() {
         ConfigTemplate configTemplate = configTemplates.get(0);
         configTemplate.setId(null);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + applicationName
-                + "/" + resourceName)
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + resourceName)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(configTemplate.toJson());
         try {
@@ -177,8 +173,7 @@ public class ConfigTemplateRestControllerTest {
     @Test
     public void update() {
         ConfigTemplate configTemplate = configTemplates.get(0);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + applicationName
-                + "/" + resourceName + "/" + configTemplate.getId())
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + resourceName + "/" + configTemplate.getId())
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(configTemplate.toJson());
         try {
@@ -192,8 +187,7 @@ public class ConfigTemplateRestControllerTest {
     @Test
     public void updateNotExistingResource() {
         ConfigTemplate configTemplate = configTemplates.get(0);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + applicationName
-                + "/" + resourceName + "/" + ObjectId.get().toString())
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + resourceName + "/" + ObjectId.get().toString())
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(configTemplate.toJson());
         try {
@@ -207,8 +201,7 @@ public class ConfigTemplateRestControllerTest {
     @Test
     public void delete() {
         ConfigTemplate configTemplate = configTemplates.get(0);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + applicationName
-                + "/" + resourceName + "/" + configTemplate.getId())
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + resourceName + "/" + configTemplate.getId())
                 .accept(MediaType.APPLICATION_JSON_UTF8);
         try {
             mockMvc.perform(request).andExpect(status().isOk()).andDo(this.document);
@@ -220,8 +213,7 @@ public class ConfigTemplateRestControllerTest {
 
     @Test
     public void deleteNotExisting() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + applicationName
-                + "/" + resourceName + "/" + ObjectId.get().toString())
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + resourceName + "/" + ObjectId.get().toString())
                 .accept(MediaType.APPLICATION_JSON_UTF8);
         try {
             mockMvc.perform(request).andExpect(status().isNotFound()).andDo(this.document);

@@ -36,7 +36,7 @@ public class ServerAMQPController {
     }
 
     private static final Logger logger = LoggerFactory.getLogger(ServerAMQPController.class);
-    @RabbitListener(bindings = @QueueBinding(value = @Queue(value = "server.${spring.application.name}", durable = "true", autoDelete = "true"),
+    @RabbitListener(bindings = @QueueBinding(value = @Queue(value = "service.${spring.application.name}", durable = "true", autoDelete = "true"),
             exchange = @Exchange(value = "server.create", type = "topic"),
             key = "server.${spring.application.name}"))
     public void create(@Payload ServiceMessage serviceMessage) {

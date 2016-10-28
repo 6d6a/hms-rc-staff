@@ -109,4 +109,26 @@ public class Server extends Resource {
             this.serviceIds.add(serviceId);
         }
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        Server server = (Server) o;
+
+        if (getServices() != null ? !getServices().equals(server.getServices()) : server.getServices() != null)
+            return false;
+        if (getServiceIds() != null ? !getServiceIds().equals(server.getServiceIds()) : server.getServiceIds() != null)
+            return false;
+        if (getServerRole() != null ? !getServerRole().equals(server.getServerRole()) : server.getServerRole() != null)
+            return false;
+        if (getServerRoleId() != null ? !getServerRoleId().equals(server.getServerRoleId()) : server.getServerRoleId() != null)
+            return false;
+        if (getStorages() != null ? !getStorages().equals(server.getStorages()) : server.getStorages() != null)
+            return false;
+        return getStorageIds() != null ? getStorageIds().equals(server.getStorageIds()) : server.getStorageIds() == null;
+
+    }
 }

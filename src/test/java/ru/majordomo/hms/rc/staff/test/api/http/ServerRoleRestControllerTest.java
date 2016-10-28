@@ -102,8 +102,7 @@ public class ServerRoleRestControllerTest {
 
     @Test
     public void readOne() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName +
-            "/" + resourceName + "/" + testServerRoles.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testServerRoles.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
 
         this.document.snippets(
                 responseFields(
@@ -125,8 +124,7 @@ public class ServerRoleRestControllerTest {
 
     @Test
     public void readAll() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName +
-                "/" + resourceName).accept(MediaType.APPLICATION_JSON_UTF8);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName).accept(MediaType.APPLICATION_JSON_UTF8);
 
         this.document.snippets(
                 responseFields(
@@ -150,8 +148,7 @@ public class ServerRoleRestControllerTest {
     @Test
     public void readOneAndCheckObjectFields() {
         ServerRole testingServerRole = testServerRoles.get(0);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName +
-                "/" + resourceName + "/" + testingServerRole.getId()).accept(MediaType.APPLICATION_JSON_UTF8);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testingServerRole.getId()).accept(MediaType.APPLICATION_JSON_UTF8);
 
         this.document.snippets(
                 responseFields(
@@ -179,8 +176,7 @@ public class ServerRoleRestControllerTest {
     public void create() {
         ServerRole serverRole = testServerRoles.get(0);
         serverRole.setId(null);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + applicationName
-                + "/" + resourceName)
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + resourceName)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(serverRole.toJson());
         try {
@@ -194,8 +190,7 @@ public class ServerRoleRestControllerTest {
     @Test
     public void update() {
         ServerRole serverRole = testServerRoles.get(0);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + applicationName
-                + "/" + resourceName + "/" + serverRole.getId())
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + resourceName + "/" + serverRole.getId())
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(serverRole.toJson());
         try {
@@ -209,8 +204,7 @@ public class ServerRoleRestControllerTest {
     @Test
     public void updateNotExistingResource() {
         ServerRole serverRole = testServerRoles.get(0);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + applicationName
-                + "/" + resourceName + "/" + ObjectId.get().toString())
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + resourceName + "/" + ObjectId.get().toString())
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(serverRole.toJson());
         try {
@@ -224,8 +218,7 @@ public class ServerRoleRestControllerTest {
     @Test
     public void delete() {
         ServerRole serverRole = testServerRoles.get(0);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + applicationName
-                + "/" + resourceName + "/" + serverRole.getId())
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + resourceName + "/" + serverRole.getId())
                 .accept(MediaType.APPLICATION_JSON_UTF8);
         try {
             mockMvc.perform(request).andExpect(status().isOk()).andDo(this.document);
@@ -237,8 +230,7 @@ public class ServerRoleRestControllerTest {
 
     @Test
     public void deleteNotExisting() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + applicationName
-                + "/" + resourceName + "/" + ObjectId.get().toString())
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + resourceName + "/" + ObjectId.get().toString())
                 .accept(MediaType.APPLICATION_JSON_UTF8);
         try {
             mockMvc.perform(request).andExpect(status().isNotFound()).andDo(this.document);

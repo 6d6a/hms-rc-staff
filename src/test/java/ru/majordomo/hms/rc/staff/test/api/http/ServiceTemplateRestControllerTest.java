@@ -93,8 +93,7 @@ public class ServiceTemplateRestControllerTest {
 
     @Test
     public void readOne() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName +
-                                                "/" + resourceName +
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName +
                                                 "/" + serviceTemplates.get(0).getId())
                                                 .accept(MediaType.APPLICATION_JSON_UTF8);
         this.document.snippets(
@@ -118,7 +117,7 @@ public class ServiceTemplateRestControllerTest {
 
     @Test
     public void readAll() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName + "/"
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/"
                                                 + resourceName + "/").accept(MediaType.APPLICATION_JSON_UTF8);
 
         this.document.snippets(
@@ -144,8 +143,7 @@ public class ServiceTemplateRestControllerTest {
     public void readOneAndCheckObjectFields() {
         ServiceTemplate serviceTemplate = serviceTemplates.get(0);
         String testedServiceTemplateId = serviceTemplate.getId();
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName
-                                                + "/" + resourceName + "/" + testedServiceTemplateId)
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testedServiceTemplateId)
                                                 .accept(MediaType.APPLICATION_JSON_UTF8);
 
         this.document.snippets(
@@ -173,8 +171,7 @@ public class ServiceTemplateRestControllerTest {
     public void create() {
         ServiceTemplate serviceTemplate = serviceTemplates.get(0);
         serviceTemplate.setId(null);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + applicationName +
-                                                "/" + resourceName + "/")
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + resourceName + "/")
                                                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                                                 .content(serviceTemplate.toJson());
         try {
@@ -188,8 +185,7 @@ public class ServiceTemplateRestControllerTest {
     @Test
     public void update() {
         ServiceTemplate serviceTemplate = serviceTemplates.get(0);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + applicationName
-                                                + "/" + resourceName + "/" + serviceTemplate.getId())
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + resourceName + "/" + serviceTemplate.getId())
                                                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                                                 .content(serviceTemplate.toJson());
         try {
@@ -203,8 +199,7 @@ public class ServiceTemplateRestControllerTest {
     @Test
     public void updateNotExistingResource() {
         ServiceTemplate serviceTemplate = serviceTemplates.get(0);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + applicationName
-                                                + "/" + resourceName + "/" + ObjectId.get().toString())
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + resourceName + "/" + ObjectId.get().toString())
                                                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                                                 .content(serviceTemplate.toJson());
         try {
@@ -218,8 +213,7 @@ public class ServiceTemplateRestControllerTest {
     @Test
     public void delete() {
         ServiceTemplate serviceTemplate = serviceTemplates.get(0);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + applicationName
-                                                + "/" + resourceName + "/" + serviceTemplate.getId())
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + resourceName + "/" + serviceTemplate.getId())
                                                 .accept(MediaType.APPLICATION_JSON_UTF8);
         try {
             mockMvc.perform(request).andExpect(status().isOk()).andDo(this.document);
@@ -232,8 +226,7 @@ public class ServiceTemplateRestControllerTest {
     @Test
     public void deleteNotExisting() {
         String unknownServiceTemplateId = ObjectId.get().toString();
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + applicationName
-                                                + "/" + resourceName + "/" + unknownServiceTemplateId)
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + resourceName + "/" + unknownServiceTemplateId)
                                                 .accept(MediaType.APPLICATION_JSON_UTF8);
         try {
             mockMvc.perform(request).andExpect(status().isNotFound()).andDo(this.document);

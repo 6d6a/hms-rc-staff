@@ -22,7 +22,7 @@ import ru.majordomo.hms.rc.staff.resources.ServiceSocket;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping("/${spring.application.name}/service-socket")
+@RequestMapping("/service-socket")
 public class ServiceSocketRestController {
 
     private GovernorOfServiceSocket governor;

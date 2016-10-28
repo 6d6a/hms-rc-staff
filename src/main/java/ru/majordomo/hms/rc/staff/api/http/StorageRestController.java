@@ -20,7 +20,7 @@ import ru.majordomo.hms.rc.staff.managers.GovernorOfStorage;
 import ru.majordomo.hms.rc.staff.resources.Storage;
 
 @RestController
-@RequestMapping("/${spring.application.name}/storage")
+@RequestMapping("/storage")
 @CrossOrigin("*")
 public class StorageRestController {
 

@@ -50,4 +50,18 @@ public class ServiceTemplate extends Resource {
             this.configTemplateIds.add(configTemplate.getId());
         }
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        ServiceTemplate that = (ServiceTemplate) o;
+
+        if (getConfigTemplateIds() != null ? !getConfigTemplateIds().equals(that.getConfigTemplateIds()) : that.getConfigTemplateIds() != null)
+            return false;
+        return getConfigTemplates() != null ? getConfigTemplates().equals(that.getConfigTemplates()) : that.getConfigTemplates() == null;
+
+    }
 }

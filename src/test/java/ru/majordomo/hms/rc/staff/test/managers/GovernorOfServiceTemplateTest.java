@@ -60,7 +60,7 @@ public class GovernorOfServiceTemplateTest {
         try {
             ServiceTemplate serviceTemplate = (ServiceTemplate) governorOfServiceTemplate.createResource(serviceMessage);
             Assert.assertEquals("Имя сервиса установлено неверно", "Тестовый service template", serviceTemplate.getName());
-            Assert.assertEquals("configTemplates указаны неверно", configTemplates.size(), serviceTemplate.getConfigTemplates().size());
+            Assert.assertTrue("configTemplates указаны неверно", configTemplates.equals(serviceTemplate.getConfigTemplates()));
             Assert.assertEquals("Статус включен/выключен установлен неверно", Boolean.TRUE, serviceTemplate.getSwitchedOn());
         } catch (ParameterValidateException e) {
             e.printStackTrace();
@@ -77,7 +77,7 @@ public class GovernorOfServiceTemplateTest {
         ServiceTemplate buildedServiceTemplate = (ServiceTemplate) governorOfServiceTemplate.build(serviceTemplate.getId());
         try {
             Assert.assertEquals("Имя сервиса установлено неверно", "Тестовый service template", buildedServiceTemplate.getName());
-            Assert.assertEquals("configTemplates указаны неверно", configTemplates.size(), buildedServiceTemplate.getConfigTemplates().size());
+            Assert.assertTrue("configTemplates указаны неверно", configTemplates.equals(buildedServiceTemplate.getConfigTemplates()));
             Assert.assertEquals("Статус включен/выключен установлен неверно", Boolean.TRUE, buildedServiceTemplate.getSwitchedOn());
         } catch (ParameterValidateException e) {
             e.printStackTrace();
@@ -94,7 +94,7 @@ public class GovernorOfServiceTemplateTest {
         List<ServiceTemplate> buildedServiceTemplates = governorOfServiceTemplate.build();
         try {
             Assert.assertEquals("Имя сервиса установлено неверно", "Тестовый service template", buildedServiceTemplates.get(buildedServiceTemplates.size()-1).getName());
-            Assert.assertEquals("configTemplates указаны неверно", configTemplates.size(), buildedServiceTemplates.get(buildedServiceTemplates.size()-1).getConfigTemplates().size());
+            Assert.assertTrue("configTemplates указаны неверно", configTemplates.equals(buildedServiceTemplates.get(buildedServiceTemplates.size()-1).getConfigTemplates()));
             Assert.assertEquals("Статус включен/выключен установлен неверно", Boolean.TRUE, buildedServiceTemplates.get(buildedServiceTemplates.size()-1).getSwitchedOn());
         } catch (ParameterValidateException e) {
             e.printStackTrace();

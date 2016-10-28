@@ -21,11 +21,18 @@ import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
 public class GovernorOfConfigTemplate extends LordOfResources {
     private static final Logger logger = LoggerFactory.getLogger(GovernorOfConfigTemplate.class);
 
-    @Autowired
-    Cleaner cleaner;
+    private Cleaner cleaner;
+    private ConfigTemplateRepository configTemplateRepository;
 
     @Autowired
-    ConfigTemplateRepository configTemplateRepository;
+    public void setConfigTemplateRepository(ConfigTemplateRepository configTemplateRepository) {
+        this.configTemplateRepository = configTemplateRepository;
+    }
+
+    @Autowired
+    public void setCleaner(Cleaner cleaner) {
+        this.cleaner = cleaner;
+    }
 
     @Override
     public Resource createResource(ServiceMessage serviceMessage) throws ParameterValidateException {

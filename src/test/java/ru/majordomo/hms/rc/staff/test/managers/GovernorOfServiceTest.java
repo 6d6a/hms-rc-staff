@@ -99,7 +99,7 @@ public class GovernorOfServiceTest {
             Assert.assertEquals("name не совпадает с ожидаемым", testService.getName(), createdService.getName());
             Assert.assertEquals("switchedOn не совпадает с ожидаемым", testService.getSwitchedOn(), createdService.getSwitchedOn());
             Assert.assertEquals("serviceTemplate не совпадает с ожидаемым", testService.getServiceTemplate().getId(), createdService.getServiceTemplate().getId());
-            Assert.assertTrue(testService.getServiceSocketIds().size() == createdService.getServiceSocketIds().size());
+            Assert.assertTrue(testService.getServiceSocketIds().equals(createdService.getServiceSocketIds()));
             Assert.assertTrue(testService.getServiceSocketIds().containsAll(createdService.getServiceSocketIds()));
         } catch (ParameterValidateException e) {
             e.printStackTrace();
@@ -115,7 +115,7 @@ public class GovernorOfServiceTest {
             Assert.assertEquals("name не совпадает с ожидаемым", testService.getName(), buildedService.getName());
             Assert.assertEquals("switchedOn не совпадает с ожидаемым", testService.getSwitchedOn(), buildedService.getSwitchedOn());
             Assert.assertEquals("serviceTemplate не совпадает с ожидаемым", testService.getServiceTemplate().getId(), buildedService.getServiceTemplate().getId());
-            Assert.assertTrue(testService.getServiceSocketIds().size() == buildedService.getServiceSocketIds().size());
+            Assert.assertTrue(testService.getServiceSocketIds().equals(buildedService.getServiceSocketIds()));
             Assert.assertTrue(testService.getServiceSocketIds().containsAll(buildedService.getServiceSocketIds()));
         } catch (ParameterValidateException e) {
             e.printStackTrace();
@@ -131,7 +131,7 @@ public class GovernorOfServiceTest {
             Assert.assertEquals("name не совпадает с ожидаемым", testService.getName(), buildedServices.get(buildedServices.size()-1).getName());
             Assert.assertEquals("switchedOn не совпадает с ожидаемым", testService.getSwitchedOn(), buildedServices.get(buildedServices.size()-1).getSwitchedOn());
             Assert.assertEquals("serviceTemplate не совпадает с ожидаемым", testService.getServiceTemplate().getId(), buildedServices.get(buildedServices.size()-1).getServiceTemplate().getId());
-            Assert.assertTrue(testService.getServiceSocketIds().size() == buildedServices.get(buildedServices.size()-1).getServiceSocketIds().size());
+            Assert.assertTrue(testService.getServiceSocketIds().equals(buildedServices.get(buildedServices.size() - 1).getServiceSocketIds()));
             Assert.assertTrue(testService.getServiceSocketIds().containsAll(buildedServices.get(buildedServices.size()-1).getServiceSocketIds()));
         } catch (ParameterValidateException e) {
             e.printStackTrace();

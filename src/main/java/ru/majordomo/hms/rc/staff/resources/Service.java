@@ -81,4 +81,22 @@ public class Service extends Resource {
     public void addServiceSocketId(String serviceSocketId) {
         this.serviceSocketIds.add(serviceSocketId);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        Service service = (Service) o;
+
+        if (getServiceTemplate() != null ? !getServiceTemplate().equals(service.getServiceTemplate()) : service.getServiceTemplate() != null)
+            return false;
+        if (getServiceSockets() != null ? !getServiceSockets().equals(service.getServiceSockets()) : service.getServiceSockets() != null)
+            return false;
+        if (getServiceTemplateId() != null ? !getServiceTemplateId().equals(service.getServiceTemplateId()) : service.getServiceTemplateId() != null)
+            return false;
+        return getServiceSocketIds() != null ? getServiceSocketIds().equals(service.getServiceSocketIds()) : service.getServiceSocketIds() == null;
+
+    }
 }

@@ -18,8 +18,8 @@ import java.util.List;
 @Service
 public class GovernorOfStorage extends LordOfResources {
 
-    StorageRepository repository;
-    Cleaner cleaner;
+    private StorageRepository repository;
+    private Cleaner cleaner;
 
     @Autowired
     public void setCleaner(Cleaner cleaner) {

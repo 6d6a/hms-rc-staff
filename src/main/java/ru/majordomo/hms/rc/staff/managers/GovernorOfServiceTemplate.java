@@ -13,24 +13,30 @@ import ru.majordomo.hms.rc.staff.resources.Resource;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
-import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceTemplateRepository;
 import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
 import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 
 @Component
 public class GovernorOfServiceTemplate extends LordOfResources {
-    @Autowired
-    Cleaner cleaner;
+    private Cleaner cleaner;
+    private ServiceTemplateRepository serviceTemplateRepository;
+    private GovernorOfConfigTemplate governorOfConfigTemplate;
 
     @Autowired
-    ServiceTemplateRepository serviceTemplateRepository;
+    public void setCleaner(Cleaner cleaner) {
+        this.cleaner = cleaner;
+    }
 
     @Autowired
-    ConfigTemplateRepository configTemplateRepository;
+    public void setServiceTemplateRepository(ServiceTemplateRepository serviceTemplateRepository) {
+        this.serviceTemplateRepository = serviceTemplateRepository;
+    }
 
     @Autowired
-    GovernorOfConfigTemplate governorOfConfigTemplate;
+    public void setGovernorOfConfigTemplate(GovernorOfConfigTemplate governorOfConfigTemplate) {
+        this.governorOfConfigTemplate = governorOfConfigTemplate;
+    }
 
     private static final Logger logger = LoggerFactory.getLogger(GovernorOfServiceTemplate.class);
 
@@ -51,12 +57,26 @@ public class GovernorOfServiceTemplate extends LordOfResources {
 
     @Override
     public void isValid(Resource resource) throws ParameterValidateException {
-        ServiceTemplate template = (ServiceTemplate) resource;
-        List<String> configTemplateIds = template.getConfigTemplateIds();
-        List<ConfigTemplate> configTemplates = (List<ConfigTemplate>) configTemplateRepository.findAll(configTemplateIds);
-        if (configTemplateIds.size() != configTemplates.size()) {
-            throw new ParameterValidateException("Передан некорретный список configTemplates");
+        ServiceTemplate serviceTemplate = (ServiceTemplate) resource;
+
+        if (serviceTemplate.getConfigTemplates().isEmpty()) {
+            throw new ParameterValidateException("Не найден ни один ConfigTemplate");
         }
+        if (serviceTemplate.getConfigTemplateIds().isEmpty()) {
+            throw new ParameterValidateException("Не найден ни один ConfigTemplateId");
+        }
+
+        //Валидация ConfigTemplate
+        for (ConfigTemplate configTemplateToValidate : serviceTemplate.getConfigTemplates()) {
+            ConfigTemplate configTemplateFromRepository = (ConfigTemplate) governorOfConfigTemplate.build(configTemplateToValidate.getId());
+            if (configTemplateFromRepository == null) {
+                throw new ParameterValidateException("ConfigTemplate с ID: " + configTemplateToValidate.getId() + " не найден");
+            }
+            if(!configTemplateFromRepository.equals(configTemplateToValidate)) {
+                throw new ParameterValidateException("ConfigTemplate с ID: " + configTemplateToValidate.getId() + " задан некорректно");
+            }
+        }
+
     }
 
     @Override

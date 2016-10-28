@@ -114,10 +114,11 @@ public class GovernorOfServerTest {
             Server createdServer = (Server) governor.createResource(testServiceMessage);
             Assert.assertEquals("Имя не совпадает с ожидаемым", testServer.getName(), createdServer.getName());
             Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testServer.getSwitchedOn(), createdServer.getSwitchedOn());
-            Assert.assertTrue(testServer.getServices().size() == createdServer.getServices().size());
+            Assert.assertTrue(testServer.getServices().equals(createdServer.getServices()));
             Assert.assertTrue(testServer.getServiceIds().containsAll(createdServer.getServiceIds()));
-            Assert.assertTrue(testServer.getStorages().size() == createdServer.getStorages().size());
+            Assert.assertTrue(testServer.getStorages().equals(createdServer.getStorages()));
             Assert.assertTrue(testServer.getStorageIds().containsAll(createdServer.getStorageIds()));
+            Assert.assertTrue(testServer.getServerRole().equals(createdServer.getServerRole()));
             Assert.assertTrue(testServer.getServerRoleId().equals(createdServer.getServerRoleId()));
         } catch (Exception e) {
             e.printStackTrace();
@@ -132,10 +133,11 @@ public class GovernorOfServerTest {
         try {
             Assert.assertEquals("Имя не совпадает с ожидаемым", testServer.getName(), buildedServer.getName());
             Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testServer.getSwitchedOn(), buildedServer.getSwitchedOn());
-            Assert.assertTrue(testServer.getServices().size() == buildedServer.getServices().size());
+            Assert.assertTrue(testServer.getServices().equals(buildedServer.getServices()));
             Assert.assertTrue(testServer.getServiceIds().containsAll(buildedServer.getServiceIds()));
-            Assert.assertTrue(testServer.getStorages().size() == buildedServer.getStorages().size());
+            Assert.assertTrue(testServer.getStorages().equals(buildedServer.getStorages()));
             Assert.assertTrue(testServer.getStorageIds().containsAll(buildedServer.getStorageIds()));
+            Assert.assertTrue(testServer.getServerRole().equals(buildedServer.getServerRole()));
             Assert.assertTrue(testServer.getServerRoleId().equals(buildedServer.getServerRoleId()));
         } catch (Exception e) {
             e.printStackTrace();
@@ -150,11 +152,12 @@ public class GovernorOfServerTest {
         try {
             Assert.assertEquals("Имя не совпадает с ожидаемым", testServer.getName(), buildedServers.get(buildedServers.size()-1).getName());
             Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testServer.getSwitchedOn(), buildedServers.get(buildedServers.size()-1).getSwitchedOn());
-            Assert.assertTrue(testServer.getServices().size() == buildedServers.get(buildedServers.size()-1).getServices().size());
+            Assert.assertTrue(testServer.getServices().equals(buildedServers.get(buildedServers.size()-1).getServices()));
             Assert.assertTrue(testServer.getServiceIds().containsAll(buildedServers.get(buildedServers.size()-1).getServiceIds()));
-            Assert.assertTrue(testServer.getStorages().size() == buildedServers.get(buildedServers.size()-1).getStorages().size());
+            Assert.assertTrue(testServer.getStorages().equals(buildedServers.get(buildedServers.size()-1).getStorages()));
             Assert.assertTrue(testServer.getStorageIds().containsAll(buildedServers.get(buildedServers.size()-1).getStorageIds()));
             Assert.assertTrue(testServer.getServerRoleId().equals(buildedServers.get(buildedServers.size()-1).getServerRoleId()));
+            Assert.assertTrue(testServer.getServerRole().equals(buildedServers.get(buildedServers.size()-1).getServerRole()));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();

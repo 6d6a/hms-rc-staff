@@ -18,7 +18,7 @@ import ru.majordomo.hms.rc.staff.resources.Server;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping(value = "/${spring.application.name}/server")
+@RequestMapping(value = "/server")
 public class ServerRestController {
 
     private GovernorOfServer governor;

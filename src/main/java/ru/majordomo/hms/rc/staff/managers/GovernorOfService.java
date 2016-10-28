@@ -20,9 +20,6 @@ import ru.majordomo.hms.rc.staff.repositories.ServiceTemplateRepository;
 public class GovernorOfService extends LordOfResources{
 
     private ServiceRepository repository;
-    private ServiceSocketRepository socketRepository;
-    private ServiceTemplateRepository templateRepository;
-    private ConfigTemplateRepository configTemplateRepository;
     private GovernorOfServiceTemplate governorOfServiceTemplate;
     private GovernorOfServiceSocket governorOfServiceSocket;
     private Cleaner cleaner;
@@ -30,21 +27,6 @@ public class GovernorOfService extends LordOfResources{
     @Autowired
     public void setRepository(ServiceRepository repository) {
         this.repository = repository;
-    }
-
-    @Autowired
-    public void setSocketRepository(ServiceSocketRepository socketRepository) {
-        this.socketRepository = socketRepository;
-    }
-
-    @Autowired
-    public void setTemplateRepository(ServiceTemplateRepository templateRepository) {
-        this.templateRepository = templateRepository;
-    }
-
-    @Autowired
-    public void setConfigTemplateRepository(ConfigTemplateRepository configTemplateRepository) {
-        this.configTemplateRepository = configTemplateRepository;
     }
 
     @Autowired
@@ -84,39 +66,32 @@ public class GovernorOfService extends LordOfResources{
     @Override
     public void isValid(Resource resource) throws ParameterValidateException {
         Service service = (Service) resource;
-        ServiceTemplate serviceTemplate = service.getServiceTemplate();
-        if (serviceTemplate == null) {
-            throw new ParameterValidateException("Параметр serviceTemplate не может быть null");
+
+        if (service.getServiceTemplate() == null || service.getServiceTemplate().getId() == null || service.getServiceTemplateId() == null) {
+            throw new ParameterValidateException("Отсутствует ServiceTemplate");
         }
-        if (serviceTemplate.getId().equals("")) {
-            throw new ParameterValidateException("Параметр serviceTemplate не может быть пустым");
+        if (service.getServiceSockets().isEmpty() || service.getServiceSocketIds().isEmpty()) {
+            throw new ParameterValidateException("Не найден ни один ServiceSocket");
         }
 
-        ServiceTemplate storedServiceTemplate = templateRepository.findOne(service.getServiceTemplateId());
-        if (storedServiceTemplate == null) {
-            throw new ParameterValidateException("ServiceTemplate с ID:" + service.getServiceTemplateId() + " не найден");
+        //Валидация ServiceTemplate
+        ServiceTemplate serviceTemplateToValidate = service.getServiceTemplate();
+        ServiceTemplate serviceTemplateFromRepository = (ServiceTemplate) governorOfServiceTemplate.build(serviceTemplateToValidate.getId());
+        if (serviceTemplateFromRepository == null) {
+            throw new ParameterValidateException("ServiceTemplate с ID: " + serviceTemplateToValidate.getId() + " не найден");
+        }
+        if(!serviceTemplateFromRepository.equals(serviceTemplateToValidate)) {
+            throw new ParameterValidateException("ServiceTemplate с ID: " + serviceTemplateToValidate.getId() + " задан некорректно");
         }
 
-        if (serviceTemplate.getConfigTemplates() == null) {
-            throw new ParameterValidateException("Параметр ConfigTemaplates не может быть пустым");
-        }
-        for (ConfigTemplate configTemaplte : serviceTemplate.getConfigTemplates()) {
-            if (configTemplateRepository.findOne(configTemaplte.getId()) == null) {
-                throw new ParameterValidateException("ConfigTemaplte с ID:" + configTemaplte.getId() + " не найден");
+        //Валидация ServiceSockets
+        for (ServiceSocket serviceSocketToValidate : service.getServiceSockets()) {
+            ServiceSocket serviceSocketFromRepository = (ServiceSocket) governorOfServiceSocket.build(serviceSocketToValidate.getId());
+            if (serviceSocketFromRepository == null) {
+                throw new ParameterValidateException("ServiceSocket с ID: " + serviceSocketToValidate.getId() + " не найден");
             }
-        }
-
-        List<String> serviceSocketIdList= service.getServiceSocketIds();
-        if (serviceSocketIdList.isEmpty()) {
-            throw new ParameterValidateException("SocketList не может быть пустым");
-        }
-        for (String serviceSocketId: serviceSocketIdList) {
-            if (serviceSocketId.equals("")) {
-                throw new ParameterValidateException("ServiceSocketId не может быть пустым");
-            }
-            ServiceSocket serviceSocket = socketRepository.findOne(serviceSocketId);
-            if (serviceSocket == null) {
-                throw new ParameterValidateException("ServiceSocket с ID:" + serviceSocketId + " не найден");
+            if(!serviceSocketFromRepository.equals(serviceSocketToValidate)) {
+                throw new ParameterValidateException("ServiceSocket с ID: " + serviceSocketToValidate.getId() + " задан некорректно");
             }
         }
     }

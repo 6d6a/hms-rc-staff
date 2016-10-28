@@ -21,16 +21,26 @@ import ru.majordomo.hms.rc.staff.resources.ServiceSocket;
 @Service
 public class GovernorOfServiceSocket extends LordOfResources {
 
-    @Autowired
-    Cleaner cleaner;
-
-    @Autowired
-    NetworkRepository networkRepository;
-
-    @Autowired
-    ServiceSocketRepository serviceSocketRepository;
+    private Cleaner cleaner;
+    private NetworkRepository networkRepository;
+    private ServiceSocketRepository serviceSocketRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(GovernorOfServiceSocket.class);
+
+    @Autowired
+    public void setCleaner(Cleaner cleaner) {
+        this.cleaner = cleaner;
+    }
+
+    @Autowired
+    public void setServiceSocketRepository(ServiceSocketRepository serviceSocketRepository) {
+        this.serviceSocketRepository = serviceSocketRepository;
+    }
+
+    @Autowired
+    public void setNetworkRepository(NetworkRepository networkRepository) {
+        this.networkRepository = networkRepository;
+    }
 
     @Override
     public Resource createResource(ServiceMessage serviceMessage) throws ParameterValidateException {

@@ -111,8 +111,7 @@ public class ServiceRestControllerTest {
 
     @Test
     public void readOne() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName +
-            "/" + resourceName + "/" + testServices.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testServices.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
 
         this.document.snippets(
                 responseFields(
@@ -134,8 +133,7 @@ public class ServiceRestControllerTest {
 
     @Test
     public void readAll() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName +
-            "/" + resourceName + "/").accept(MediaType.APPLICATION_JSON_UTF8);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/").accept(MediaType.APPLICATION_JSON_UTF8);
 
         this.document.snippets(
                 responseFields(
@@ -160,8 +158,7 @@ public class ServiceRestControllerTest {
     @Test
     public void readOneAndCheckObjectFields() {
         Service testingService = testServices.get(0);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName +
-            "/" + resourceName + "/" + testingService.getId()).accept(MediaType.APPLICATION_JSON_UTF8);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testingService.getId()).accept(MediaType.APPLICATION_JSON_UTF8);
 
         this.document.snippets(
                 responseFields(
@@ -191,8 +188,7 @@ public class ServiceRestControllerTest {
     public void create() {
         Service service = testServices.get(0);
         service.setId(null);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + applicationName +
-                                                "/" + resourceName)
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + resourceName)
                                                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                                                 .content(service.toJson());
         try {
@@ -206,8 +202,7 @@ public class ServiceRestControllerTest {
     @Test
     public void update() {
         Service service = testServices.get(0);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + applicationName
-                                                + "/" + resourceName + "/" + service.getId())
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + resourceName + "/" + service.getId())
                                                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                                                 .content(service.toJson());
         try {
@@ -222,8 +217,7 @@ public class ServiceRestControllerTest {
     public void updateNotExistingResource() {
         Service service = testServices.get(0);
         String unknownServiceId = ObjectId.get().toString();
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + applicationName
-                                                + "/" + resourceName + "/" + unknownServiceId)
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + resourceName + "/" + unknownServiceId)
                                                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                                                 .content(service.toJson());
         try {
@@ -237,8 +231,7 @@ public class ServiceRestControllerTest {
     @Test
     public void delete() {
         String serviceIdToDelete = testServices.get(0).getId();
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + applicationName
-                                                + "/" + resourceName + "/" + serviceIdToDelete)
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + resourceName + "/" + serviceIdToDelete)
                                                 .accept(MediaType.APPLICATION_JSON_UTF8);
         try {
             mockMvc.perform(request).andExpect(status().isOk()).andDo(this.document);
@@ -251,8 +244,7 @@ public class ServiceRestControllerTest {
     @Test
     public void deleteNotExisting() {
         String unknownServiceId = ObjectId.get().toString();
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + applicationName
-                                                + "/" + resourceName + "/" + unknownServiceId);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + resourceName + "/" + unknownServiceId);
         try {
             mockMvc.perform(request).andExpect(status().isNotFound()).andDo(this.document);
         } catch (Exception e) {

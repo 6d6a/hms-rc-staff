@@ -24,7 +24,7 @@ import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping("/${spring.application.name}/config-template")
+@RequestMapping("/config-template")
 public class ConfigTemplateRestController {
 
     private GovernorOfConfigTemplate governor;

@@ -88,7 +88,7 @@ public class GovernorOfServerRoleTest {
             ServerRole createdRole = (ServerRole) governor.createResource(testServiceMessage);
             Assert.assertEquals("Имя не совпадает с ожидаемым", testServerRole.getName(), createdRole.getName());
             Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testServerRole.getSwitchedOn(), createdRole.getSwitchedOn());
-            Assert.assertTrue(testServerRole.getServiceTemplates().size() == createdRole.getServiceTemplates().size());
+            Assert.assertTrue(testServerRole.getServiceTemplates().equals(createdRole.getServiceTemplates()));
             Assert.assertTrue(testServerRole.getServiceTemplateIds().containsAll(createdRole.getServiceTemplateIds()));
         } catch (Exception e) {
             e.printStackTrace();
@@ -103,7 +103,7 @@ public class GovernorOfServerRoleTest {
             ServerRole buildedServerRole = (ServerRole) governor.build(testServerRole.getId());
             Assert.assertEquals("Имя не совпадает с ожидаемым", testServerRole.getName(), buildedServerRole.getName());
             Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testServerRole.getSwitchedOn(), buildedServerRole.getSwitchedOn());
-            Assert.assertTrue(testServerRole.getServiceTemplates().size() == buildedServerRole.getServiceTemplates().size());
+            Assert.assertTrue(testServerRole.getServiceTemplates().equals(buildedServerRole.getServiceTemplates()));
             Assert.assertTrue(testServerRole.getServiceTemplateIds().containsAll(buildedServerRole.getServiceTemplateIds()));
         } catch (Exception e) {
             e.printStackTrace();
@@ -118,7 +118,7 @@ public class GovernorOfServerRoleTest {
         try {
             Assert.assertEquals("Имя не совпадает с ожидаемым", testServerRole.getName(), buildedServerRoles.get(buildedServerRoles.size()-1).getName());
             Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testServerRole.getSwitchedOn(), buildedServerRoles.get(buildedServerRoles.size()-1).getSwitchedOn());
-            Assert.assertTrue(testServerRole.getServiceTemplates().size() == buildedServerRoles.get(buildedServerRoles.size()-1).getServiceTemplates().size());
+            Assert.assertTrue(testServerRole.getServiceTemplates().equals(buildedServerRoles.get(buildedServerRoles.size() - 1).getServiceTemplates()));
             Assert.assertTrue(testServerRole.getServiceTemplateIds().containsAll(buildedServerRoles.get(buildedServerRoles.size()-1).getServiceTemplateIds()));
         } catch (Exception e) {
             e.printStackTrace();

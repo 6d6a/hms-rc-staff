@@ -88,8 +88,7 @@ public class StorageRestControllerTest {
 
     @Test
     public void readOne() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName +
-                "/" + resourceName + "/" + storages.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + storages.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
 
         this.document.snippets(
                 responseFields(
@@ -111,7 +110,7 @@ public class StorageRestControllerTest {
 
     @Test
     public void readAll() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName + "/" + resourceName + "/").accept(MediaType.APPLICATION_JSON_UTF8);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/").accept(MediaType.APPLICATION_JSON_UTF8);
 
         this.document.snippets(
                 responseFields(
@@ -134,7 +133,7 @@ public class StorageRestControllerTest {
     @Test
     public void readOneAndCheckObjectFields() {
         Storage testingStorage = storages.get(0);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName + "/" + resourceName + "/" + testingStorage.getId()).accept(MediaType.APPLICATION_JSON_UTF8);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testingStorage.getId()).accept(MediaType.APPLICATION_JSON_UTF8);
 
         this.document.snippets(
                 responseFields(
@@ -163,8 +162,7 @@ public class StorageRestControllerTest {
     public void create() {
         Storage testingStorage = storages.get(0);
         testingStorage.setId(null);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + applicationName
-                + "/" + resourceName)
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + resourceName)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(testingStorage.toJson());
         try {
@@ -178,8 +176,7 @@ public class StorageRestControllerTest {
     @Test
     public void update() {
         Storage storage = storages.get(0);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + applicationName
-                + "/" + resourceName + "/" + storage.getId())
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + resourceName + "/" + storage.getId())
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(storage.toJson());
         try {
@@ -193,8 +190,7 @@ public class StorageRestControllerTest {
     @Test
     public void updateNotExistingResource() {
         Storage storage = storages.get(0);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + applicationName
-                + "/" + resourceName + "/" + ObjectId.get().toString())
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + resourceName + "/" + ObjectId.get().toString())
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(storage.toJson());
         try {
@@ -208,8 +204,7 @@ public class StorageRestControllerTest {
     @Test
     public void delete() {
         Storage storage = storages.get(0);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + applicationName
-                + "/" + resourceName + "/" + storage.getId())
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + resourceName + "/" + storage.getId())
                 .accept(MediaType.APPLICATION_JSON_UTF8);
         try {
             mockMvc.perform(request).andExpect(status().isOk()).andDo(this.document);
@@ -221,8 +216,7 @@ public class StorageRestControllerTest {
 
     @Test
     public void deleteNotExisting() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + applicationName
-                + "/" + resourceName + "/" + ObjectId.get().toString())
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + resourceName + "/" + ObjectId.get().toString())
                 .accept(MediaType.APPLICATION_JSON_UTF8);
         try {
             mockMvc.perform(request).andExpect(status().isNotFound()).andDo(this.document);

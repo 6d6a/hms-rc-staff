@@ -15,7 +15,7 @@ import ru.majordomo.hms.rc.staff.managers.GovernorOfServerRole;
 import ru.majordomo.hms.rc.staff.resources.ServerRole;
 
 @RestController
-@RequestMapping(value = "/${spring.application.name}/server-role")
+@RequestMapping(value = "/server-role")
 public class ServerRoleRestController {
 
     private GovernorOfServerRole governor;

@@ -21,7 +21,7 @@ import ru.majordomo.hms.rc.staff.resources.Network;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping("/${spring.application.name}/network")
+@RequestMapping("/network")
 public class NetworkRestController {
     private GovernorOfNetwork governor;
 

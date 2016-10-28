@@ -19,4 +19,16 @@ public class ConfigTemplate extends Resource {
     public void setFileLink(String fileLink) {
         this.fileLink = fileLink;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        ConfigTemplate that = (ConfigTemplate) o;
+
+        return getFileLink() != null ? getFileLink().equals(that.getFileLink()) : that.getFileLink() == null;
+
+    }
 }

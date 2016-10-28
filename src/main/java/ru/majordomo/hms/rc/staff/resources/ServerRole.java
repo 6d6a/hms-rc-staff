@@ -50,4 +50,17 @@ public class ServerRole extends Resource {
             this.serviceTemplateIds.add(serviceTemplate.getId());
         }
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ServerRole that = (ServerRole) o;
+
+        if (getServiceTemplateIds() != null ? !getServiceTemplateIds().equals(that.getServiceTemplateIds()) : that.getServiceTemplateIds() != null)
+            return false;
+        return getServiceTemplates() != null ? getServiceTemplates().equals(that.getServiceTemplates()) : that.getServiceTemplates() == null;
+
+    }
 }

@@ -101,8 +101,7 @@ public class NetworkRestControllerTest {
 
     @Test
     public void readOne() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName
-                + "/" + resourceName + "/" + networks.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + networks.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
 
         this.document.snippets(
                 responseFields(
@@ -126,8 +125,7 @@ public class NetworkRestControllerTest {
 
     @Test
     public void readAll() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName
-                + "/" + resourceName).accept(MediaType.APPLICATION_JSON_UTF8);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName).accept(MediaType.APPLICATION_JSON_UTF8);
 
         this.document.snippets(
                 responseFields(
@@ -151,8 +149,7 @@ public class NetworkRestControllerTest {
 
     @Test
     public void readOneAndCheckObjectFields() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName
-                + "/" + resourceName + "/" + networks.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + networks.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
 
         this.document.snippets(
                 responseFields(
@@ -186,8 +183,7 @@ public class NetworkRestControllerTest {
     public void create() {
         Network testingNetwork = networks.get(0);
         testingNetwork.setId(null);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + applicationName
-                + "/" + resourceName)
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + resourceName)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(testingNetwork.toJson());
         try {
@@ -201,8 +197,7 @@ public class NetworkRestControllerTest {
     @Test
     public void update() {
         Network network = networks.get(0);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + applicationName
-                + "/" + resourceName + "/" + network.getId())
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + resourceName + "/" + network.getId())
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(network.toJson());
         try {
@@ -216,8 +211,7 @@ public class NetworkRestControllerTest {
     @Test
     public void updateNotExistingResource() {
         Network network = networks.get(0);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + applicationName
-                + "/" + resourceName + "/" + ObjectId.get().toString())
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + resourceName + "/" + ObjectId.get().toString())
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(network.toJson());
         try {
@@ -231,8 +225,7 @@ public class NetworkRestControllerTest {
     @Test
     public void delete() {
         Network network = networks.get(0);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + applicationName
-                + "/" + resourceName + "/" + network.getId())
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + resourceName + "/" + network.getId())
                 .accept(MediaType.APPLICATION_JSON_UTF8);
         try {
             mockMvc.perform(request).andExpect(status().isOk()).andDo(this.document);
@@ -244,8 +237,7 @@ public class NetworkRestControllerTest {
 
     @Test
     public void deleteNotExisting() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + applicationName
-                + "/" + resourceName + "/" + ObjectId.get().toString())
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + resourceName + "/" + ObjectId.get().toString())
                 .accept(MediaType.APPLICATION_JSON_UTF8);
         try {
             mockMvc.perform(request).andExpect(status().isNotFound()).andDo(this.document);

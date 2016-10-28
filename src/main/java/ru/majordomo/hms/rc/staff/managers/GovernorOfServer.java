@@ -8,9 +8,6 @@ import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.repositories.ServerRepository;
-import ru.majordomo.hms.rc.staff.repositories.ServerRoleRepository;
-import ru.majordomo.hms.rc.staff.repositories.ServiceRepository;
-import ru.majordomo.hms.rc.staff.repositories.StorageRepository;
 import ru.majordomo.hms.rc.staff.resources.Server;
 import ru.majordomo.hms.rc.staff.resources.ServerRole;
 import ru.majordomo.hms.rc.staff.resources.Service;
@@ -24,9 +21,6 @@ import java.util.List;
 public class GovernorOfServer extends LordOfResources{
 
     private ServerRepository serverRepository;
-    private ServerRoleRepository serverRoleRepository;
-    private ServiceRepository serviceRepository;
-    private StorageRepository storageRepository;
     private GovernorOfServerRole governorOfServerRole;
     private GovernorOfService governorOfService;
     private GovernorOfStorage governorOfStorage;
@@ -35,21 +29,6 @@ public class GovernorOfServer extends LordOfResources{
     @Autowired
     public void setRepository(ServerRepository repository) {
         this.serverRepository = repository;
-    }
-
-    @Autowired
-    public void setTemplateRepository(ServerRoleRepository serverRoleRepository) {
-        this.serverRoleRepository = serverRoleRepository;
-    }
-
-    @Autowired
-    public void setServiceRepository(ServiceRepository serviceRepository) {
-        this.serviceRepository = serviceRepository;
-    }
-
-    @Autowired
-    public void setStorageRepository(StorageRepository storageRepository) {
-        this.storageRepository = storageRepository;
     }
 
     @Autowired
@@ -99,31 +78,47 @@ public class GovernorOfServer extends LordOfResources{
     @Override
     public void isValid(Resource resource) throws ParameterValidateException {
         Server server = (Server) resource;
-        if (server.getServices().isEmpty()) {
+
+        if (server.getServices().isEmpty() || server.getServiceIds().isEmpty()) {
             throw new ParameterValidateException("Не найден ни один Service");
         }
-        if (server.getStorages().isEmpty()) {
+        if (server.getStorages().isEmpty() || server.getStorageIds().isEmpty()) {
             throw new ParameterValidateException("Не найден ни один Storage");
         }
-        if (server.getServerRole() == null || server.getServerRole().getId() == null) {
+        if (server.getServerRole() == null || server.getServerRole().getId() == null || server.getServerRoleId() == null) {
             throw new ParameterValidateException("Отсутствует ServerRole");
         }
-        for (String serviceId: server.getServiceIds()) {
-            Service service = serviceRepository.findOne(serviceId);
-            if (service == null) {
-                throw new ParameterValidateException("Service с ID: " + serviceId + " не найден");
+
+        //Валидация Service
+        for (Service serviceToValidate : server.getServices()) {
+            Service serviceFromRepository = (Service) governorOfService.build(serviceToValidate.getId());
+            if (serviceFromRepository == null) {
+                throw new ParameterValidateException("Service с ID: " + serviceToValidate.getId() + " не найден");
+            }
+            if(!serviceFromRepository.equals(serviceToValidate)) {
+                throw new ParameterValidateException("Service с ID: " + serviceToValidate.getId() + " задан некорректно");
             }
         }
-        for (String storageId: server.getStorageIds()) {
-            Storage storage = storageRepository.findOne(storageId);
-            if (storage == null) {
-                throw new ParameterValidateException("Storage с ID: " + storageId + " не найден");
+
+        //Валидация Storage
+        for (Storage storageToValidate : server.getStorages()) {
+            Storage storageFromRepository = (Storage) governorOfStorage.build(storageToValidate.getId());
+            if (storageFromRepository == null) {
+                throw new ParameterValidateException("Storage с ID: " + storageToValidate.getId() + " не найден");
+            }
+            if(!storageFromRepository.equals(storageToValidate)) {
+                throw new ParameterValidateException("Storage с ID: " + storageToValidate.getId() + " задан некорректно");
             }
         }
-        String serverRoleId = server.getServerRoleId();
-        ServerRole serverRole = serverRoleRepository.findOne(serverRoleId);
-        if (serverRole == null) {
-            throw new ParameterValidateException("ServerRole с ID: " + serverRoleId + " не найден");
+
+        //Валидация ServerRole
+        ServerRole serverRoleToValidate = server.getServerRole();
+        ServerRole serverRoleFromRepository = (ServerRole) governorOfServerRole.build(serverRoleToValidate.getId());
+        if (serverRoleFromRepository == null) {
+            throw new ParameterValidateException("ServerRole с ID: " + serverRoleToValidate.getId() + " не найден");
+        }
+        if(!serverRoleFromRepository.equals(serverRoleToValidate)) {
+            throw new ParameterValidateException("ServerRole с ID: " + serverRoleToValidate.getId() + " задан некорректно");
         }
     }
 

@@ -28,4 +28,18 @@ public class Storage extends Resource {
     public void setCapacityUsed(Double capacityUsed) {
         this.capacityUsed = capacityUsed;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        Storage storage = (Storage) o;
+
+        if (getCapacity() != null ? !getCapacity().equals(storage.getCapacity()) : storage.getCapacity() != null)
+            return false;
+        return getCapacityUsed() != null ? getCapacityUsed().equals(storage.getCapacityUsed()) : storage.getCapacityUsed() == null;
+
+    }
 }

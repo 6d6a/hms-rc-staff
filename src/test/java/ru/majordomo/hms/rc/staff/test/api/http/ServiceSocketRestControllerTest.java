@@ -106,7 +106,7 @@ public class ServiceSocketRestControllerTest {
 
     @Test
     public void readOne() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName + "/" + resourceName + "/" + serviceSocketList.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + serviceSocketList.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
 
         this.document.snippets(
                 responseFields(
@@ -128,7 +128,7 @@ public class ServiceSocketRestControllerTest {
 
     @Test
     public void readAll() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName + "/" + resourceName + "/").accept(MediaType.APPLICATION_JSON_UTF8);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/").accept(MediaType.APPLICATION_JSON_UTF8);
 
         this.document.snippets(
                 responseFields(
@@ -153,7 +153,7 @@ public class ServiceSocketRestControllerTest {
 
         try {
             ServiceSocket testingServiceSocket = serviceSocketList.get(0);
-            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName + "/" + resourceName + "/" + testingServiceSocket.getId()).accept(MediaType.APPLICATION_JSON_UTF8);
+            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testingServiceSocket.getId()).accept(MediaType.APPLICATION_JSON_UTF8);
 
             this.document.snippets(
                     responseFields(
@@ -182,7 +182,7 @@ public class ServiceSocketRestControllerTest {
         try {
             ServiceSocket testingServiceSocket = serviceSocketList.get(0);
             testingServiceSocket.setId(null);
-            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + applicationName + "/" + resourceName + "/")
+            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + resourceName + "/")
                     .contentType(MediaType.APPLICATION_JSON_UTF8)
                     .content(testingServiceSocket.toJson());
             mockMvc.perform(request).andExpect(status().isCreated()).andDo(this.document);
@@ -199,7 +199,7 @@ public class ServiceSocketRestControllerTest {
             ServiceSocket testingServiceSocket = serviceSocketList.get(0);
             testingServiceSocket.setId(null);
             testingServiceSocket.setAddress("10.10.10.10");
-            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + applicationName + "/" + resourceName + "/")
+            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + resourceName + "/")
                     .contentType(MediaType.APPLICATION_JSON_UTF8)
                     .content(testingServiceSocket.toJson());
             mockMvc.perform(request).andExpect(status().isBadRequest()).andDo(this.document);
@@ -214,7 +214,7 @@ public class ServiceSocketRestControllerTest {
     public void update() {
         try {
             ServiceSocket testingServiceSocket = serviceSocketList.get(0);
-            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + applicationName + "/" + resourceName + "/" + testingServiceSocket.getId())
+            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + resourceName + "/" + testingServiceSocket.getId())
                     .contentType(MediaType.APPLICATION_JSON_UTF8)
                     .content(testingServiceSocket.toJson());
             mockMvc.perform(request).andExpect(status().isOk()).andDo(this.document);
@@ -228,7 +228,7 @@ public class ServiceSocketRestControllerTest {
     public void updateNotExistingResource() {
         try {
             ServiceSocket testingServiceSocket = serviceSocketList.get(0);
-            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + applicationName + "/" + resourceName + "/" + ObjectId.get().toString())
+            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + resourceName + "/" + ObjectId.get().toString())
                     .contentType(MediaType.APPLICATION_JSON_UTF8)
                     .content(testingServiceSocket.toJson());
             mockMvc.perform(request).andExpect(status().isNotFound()).andDo(this.document);
@@ -242,7 +242,7 @@ public class ServiceSocketRestControllerTest {
     public void delete() {
         try {
             ServiceSocket testingServiceSocket = serviceSocketList.get(0);
-            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + applicationName + "/" + resourceName + "/" + testingServiceSocket.getId())
+            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + resourceName + "/" + testingServiceSocket.getId())
                     .contentType(MediaType.APPLICATION_JSON_UTF8);
             mockMvc.perform(request).andExpect(status().isOk()).andDo(this.document);
         } catch (Exception e) {
@@ -255,7 +255,7 @@ public class ServiceSocketRestControllerTest {
     public void deleteNotExisting() {
         try {
             ServiceSocket testingServiceSocket = serviceSocketList.get(0);
-            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + applicationName + "/" + resourceName + "/" + ObjectId.get().toString())
+            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + resourceName + "/" + ObjectId.get().toString())
                     .contentType(MediaType.APPLICATION_JSON_UTF8);
             mockMvc.perform(request).andExpect(status().isNotFound()).andDo(this.document);
         } catch (Exception e) {

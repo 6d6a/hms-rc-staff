@@ -19,7 +19,7 @@ import ru.majordomo.hms.rc.staff.managers.GovernorOfService;
 import ru.majordomo.hms.rc.staff.resources.Service;
 
 @RestController
-@RequestMapping("/${spring.application.name}/service")
+@RequestMapping("/service")
 public class ServiceRestController {
 
     private GovernorOfService governor;

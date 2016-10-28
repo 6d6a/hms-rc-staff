@@ -21,7 +21,7 @@ import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/${spring.application.name}/service-template")
+@RequestMapping("/service-template")
 public class ServiceTemplateRestController {
 
     GovernorOfServiceTemplate governor;
