@@ -46,11 +46,11 @@ public class ServerRestController {
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
     public ResponseEntity<?> create (@RequestBody Server server) throws ParameterValidateException {
         governor.isValid(server);
-        Server createdNetwork = (Server) governor.save(server);
+        Server createdServer = (Server) governor.save(server);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{id}")
-                .buildAndExpand(createdNetwork.getId()).toUri());
+                .buildAndExpand(createdServer.getId()).toUri());
         return new ResponseEntity<>(null, httpHeaders, HttpStatus.CREATED);
     }
 
@@ -70,7 +70,7 @@ public class ServerRestController {
     @RequestMapping(value = "/{serverId}", method = RequestMethod.DELETE)
     public ResponseEntity<?> delete(@PathVariable String serverId) {
         try {
-            Server storedNetwork = (Server) governor.build(serverId);
+            Server storedServer = (Server) governor.build(serverId);
         } catch (ResourceNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
