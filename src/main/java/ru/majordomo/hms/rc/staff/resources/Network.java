@@ -110,4 +110,21 @@ public class Network extends Resource {
                 ", vlanNumber=" + vlanNumber +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        Network network = (Network) o;
+
+        if (getAddress() != null ? !getAddress().equals(network.getAddress()) : network.getAddress() != null)
+            return false;
+        if (getMask() != null ? !getMask().equals(network.getMask()) : network.getMask() != null) return false;
+        if (getGatewayAddress() != null ? !getGatewayAddress().equals(network.getGatewayAddress()) : network.getGatewayAddress() != null)
+            return false;
+        return getVlanNumber() != null ? getVlanNumber().equals(network.getVlanNumber()) : network.getVlanNumber() == null;
+
+    }
 }

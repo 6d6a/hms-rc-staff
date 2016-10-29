@@ -3,6 +3,7 @@ package ru.majordomo.hms.rc.staff.test.api.http;
 import org.bson.types.ObjectId;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.JUnitRestDocumentation;
+import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -20,7 +23,6 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.repositories.NetworkRepository;
 import ru.majordomo.hms.rc.staff.resources.Network;
 import ru.majordomo.hms.rc.staff.test.config.EmbeddedServltetContainerConfig;
@@ -29,6 +31,13 @@ import ru.majordomo.hms.rc.staff.test.config.ServiceSocketServicesConfig;
 import ru.majordomo.hms.rc.staff.repositories.ServiceSocketRepository;
 import ru.majordomo.hms.rc.staff.resources.ServiceSocket;
 
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -37,9 +46,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {RepositoriesConfig.class, ServiceSocketServicesConfig.class, EmbeddedServltetContainerConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ServiceSocketRestControllerTest {
+    @Rule
+    public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("build/generated-snippets");
 
     @Autowired
-    private ServiceSocketRepository repository;
+    private ServiceSocketRepository serviceSocketRepository;
     @Autowired
     private NetworkRepository networkRepository;
     @Autowired
@@ -49,6 +60,8 @@ public class ServiceSocketRestControllerTest {
     @Value("${spring.application.name}")
     private String applicationName;
     private String resourceName = "service-socket";
+
+    private RestDocumentationResultHandler document;
 
     private MockMvc mockMvc;
     private List<ServiceSocket> serviceSocketList = new ArrayList<>();
@@ -75,24 +88,38 @@ public class ServiceSocketRestControllerTest {
             serviceSocket.setAddress(address);
             serviceSocket.setPort(port);
 
-            repository.save(serviceSocket);
+            serviceSocketRepository.save(serviceSocket);
             serviceSocketList.add(serviceSocket);
         }
     }
 
     @Before
     public void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(ctx).build();
-        repository.deleteAll();
+        this.document = document("service-socket/{method-name}", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()));
+        mockMvc = MockMvcBuilders.webAppContextSetup(ctx)
+                .apply(documentationConfiguration(this.restDocumentation))
+                .build();
+        serviceSocketRepository.deleteAll();
         networkRepository.deleteAll();
         generateBatchOfSockets();
     }
 
     @Test
     public void readOne() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName + "/" + resourceName + "/" + serviceSocketList.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + serviceSocketList.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
+
         try {
-            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
+            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                    responseFields(
+                            fieldWithPath("id").description("ServiceSocket ID"),
+                            fieldWithPath("name").description("Имя ServiceSocket"),
+                            fieldWithPath("switchedOn").description("Статус ServiceSocket"),
+                            fieldWithPath("port").description("Порт"),
+                            fieldWithPath("address").description("IP")
+                    )
+            ));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -101,9 +128,20 @@ public class ServiceSocketRestControllerTest {
 
     @Test
     public void readAll() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName + "/" + resourceName + "/").accept(MediaType.APPLICATION_JSON_UTF8);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/").accept(MediaType.APPLICATION_JSON_UTF8);
+
         try {
-            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
+            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                    responseFields(
+                            fieldWithPath("[].id").description("ServiceSocket ID"),
+                            fieldWithPath("[].name").description("Имя ServiceSocket"),
+                            fieldWithPath("[].switchedOn").description("Статус ServiceSocket"),
+                            fieldWithPath("[].port").description("Порт"),
+                            fieldWithPath("[].address").description("IP")
+                    )
+            ));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -115,12 +153,23 @@ public class ServiceSocketRestControllerTest {
 
         try {
             ServiceSocket testingServiceSocket = serviceSocketList.get(0);
-            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName + "/" + resourceName + "/" + testingServiceSocket.getId()).accept(MediaType.APPLICATION_JSON_UTF8);
+            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testingServiceSocket.getId()).accept(MediaType.APPLICATION_JSON_UTF8);
+
             mockMvc.perform(request).andExpect(jsonPath("port").value(testingServiceSocket.getPort()))
                     .andExpect(jsonPath("address").value(testingServiceSocket.getAddressAsString()))
                     .andExpect(jsonPath("switchedOn").value(testingServiceSocket.getSwitchedOn()))
                     .andExpect(jsonPath("name").value(testingServiceSocket.getName()))
-                    .andExpect(jsonPath("id").value(testingServiceSocket.getId()));
+                    .andExpect(jsonPath("id").value(testingServiceSocket.getId()))
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                            responseFields(
+                                    fieldWithPath("id").description("ServiceSocket ID"),
+                                    fieldWithPath("name").description("Имя ServiceSocket"),
+                                    fieldWithPath("switchedOn").description("Статус ServiceSocket"),
+                                    fieldWithPath("port").description("Порт"),
+                                    fieldWithPath("address").description("IP")
+                            )
+                    ));
         } catch (Exception ex) {
             ex.printStackTrace();
             Assert.fail();
@@ -132,10 +181,10 @@ public class ServiceSocketRestControllerTest {
         try {
             ServiceSocket testingServiceSocket = serviceSocketList.get(0);
             testingServiceSocket.setId(null);
-            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + applicationName + "/" + resourceName + "/")
+            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + resourceName + "/")
                     .contentType(MediaType.APPLICATION_JSON_UTF8)
                     .content(testingServiceSocket.toJson());
-            mockMvc.perform(request).andExpect(status().isCreated());
+            mockMvc.perform(request).andExpect(status().isCreated()).andDo(this.document);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -149,10 +198,10 @@ public class ServiceSocketRestControllerTest {
             ServiceSocket testingServiceSocket = serviceSocketList.get(0);
             testingServiceSocket.setId(null);
             testingServiceSocket.setAddress("10.10.10.10");
-            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + applicationName + "/" + resourceName + "/")
+            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + resourceName + "/")
                     .contentType(MediaType.APPLICATION_JSON_UTF8)
                     .content(testingServiceSocket.toJson());
-            mockMvc.perform(request).andExpect(status().isBadRequest());
+            mockMvc.perform(request).andExpect(status().isBadRequest()).andDo(this.document);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -164,10 +213,10 @@ public class ServiceSocketRestControllerTest {
     public void update() {
         try {
             ServiceSocket testingServiceSocket = serviceSocketList.get(0);
-            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + applicationName + "/" + resourceName + "/" + testingServiceSocket.getId())
+            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + resourceName + "/" + testingServiceSocket.getId())
                     .contentType(MediaType.APPLICATION_JSON_UTF8)
                     .content(testingServiceSocket.toJson());
-            mockMvc.perform(request).andExpect(status().isOk());
+            mockMvc.perform(request).andExpect(status().isOk()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -178,10 +227,10 @@ public class ServiceSocketRestControllerTest {
     public void updateNotExistingResource() {
         try {
             ServiceSocket testingServiceSocket = serviceSocketList.get(0);
-            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + applicationName + "/" + resourceName + "/" + ObjectId.get().toString())
+            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + resourceName + "/" + ObjectId.get().toString())
                     .contentType(MediaType.APPLICATION_JSON_UTF8)
                     .content(testingServiceSocket.toJson());
-            mockMvc.perform(request).andExpect(status().isNotFound());
+            mockMvc.perform(request).andExpect(status().isNotFound()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -192,9 +241,9 @@ public class ServiceSocketRestControllerTest {
     public void delete() {
         try {
             ServiceSocket testingServiceSocket = serviceSocketList.get(0);
-            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + applicationName + "/" + resourceName + "/" + testingServiceSocket.getId())
+            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + resourceName + "/" + testingServiceSocket.getId())
                     .contentType(MediaType.APPLICATION_JSON_UTF8);
-            mockMvc.perform(request).andExpect(status().isOk());
+            mockMvc.perform(request).andExpect(status().isOk()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -205,9 +254,9 @@ public class ServiceSocketRestControllerTest {
     public void deleteNotExisting() {
         try {
             ServiceSocket testingServiceSocket = serviceSocketList.get(0);
-            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + applicationName + "/" + resourceName + "/" + ObjectId.get().toString())
+            MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + resourceName + "/" + ObjectId.get().toString())
                     .contentType(MediaType.APPLICATION_JSON_UTF8);
-            mockMvc.perform(request).andExpect(status().isNotFound());
+            mockMvc.perform(request).andExpect(status().isNotFound()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();

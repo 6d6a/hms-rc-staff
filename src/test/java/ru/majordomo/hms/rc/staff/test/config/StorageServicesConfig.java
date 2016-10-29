@@ -22,6 +22,7 @@ public class StorageServicesConfig {
     public GovernorOfStorage governorOfStorage() {
         return new GovernorOfStorage();
     }
+
     @Bean
     public StorageRestController storageRestController() {
         return new StorageRestController();

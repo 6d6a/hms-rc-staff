@@ -20,13 +20,14 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.restdocs.RestDocumentation;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServerRoleRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceTemplateRepository;
+import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
 import ru.majordomo.hms.rc.staff.resources.ServerRole;
 import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 import ru.majordomo.hms.rc.staff.test.config.EmbeddedServltetContainerConfig;
@@ -54,9 +55,11 @@ public class ServerRoleRestControllerTest {
     @Autowired
     WebApplicationContext ctx;
     @Autowired
-    private ServerRoleRepository repository;
+    private ServerRoleRepository serverRoleRepository;
     @Autowired
-    private ServiceTemplateRepository templateRepository;
+    private ServiceTemplateRepository serviceTemplateRepository;
+    @Autowired
+    private ConfigTemplateRepository configTemplateRepository;
 
     private RestDocumentationResultHandler document;
 
@@ -70,9 +73,12 @@ public class ServerRoleRestControllerTest {
 
     private void generateBatchOfServerRoles() {
         for (int i = 1; i < 6; i++) {
+            ConfigTemplate configTemplate = new ConfigTemplate();
+            configTemplateRepository.save(configTemplate);
             //создать сервис темплейт и сохранить его
             ServiceTemplate template = new ServiceTemplate();
-            templateRepository.save(template);
+            template.addConfigTemplate(configTemplate);
+            serviceTemplateRepository.save(template);
             // создать сервер роль без сохранения
             String name = "Серверная роль " + i;
             Boolean switchedOn = Boolean.TRUE;
@@ -80,7 +86,7 @@ public class ServerRoleRestControllerTest {
             serverRole.setName(name);
             serverRole.setSwitchedOn(switchedOn);
             serverRole.addServiceTemplate(template);
-            repository.save(serverRole);
+            serverRoleRepository.save(serverRole);
             testServerRoles.add(serverRole);
         }
     }
@@ -96,21 +102,19 @@ public class ServerRoleRestControllerTest {
 
     @Test
     public void readOne() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName +
-            "/" + resourceName + "/" + testServerRoles.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
-
-        this.document.snippets(
-                responseFields(
-                        fieldWithPath("id").description("ServerRole ID"),
-                        fieldWithPath("name").description("Имя ServerRole"),
-                        fieldWithPath("switchedOn").description("Статус ServerRole"),
-                        fieldWithPath("serviceTemplates").description("ServerRole ServiceTemplates ID's")
-                )
-        );
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testServerRoles.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
 
         try {
             mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                    .andDo(this.document);
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                            responseFields(
+                                    fieldWithPath("id").description("ServerRole ID"),
+                                    fieldWithPath("name").description("Имя ServerRole"),
+                                    fieldWithPath("switchedOn").description("Статус ServerRole"),
+                                    fieldWithPath("serviceTemplates").description("Список ServiceTemplates для ServerRole")
+                            )
+                    ));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -119,22 +123,21 @@ public class ServerRoleRestControllerTest {
 
     @Test
     public void readAll() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName +
-                "/" + resourceName).accept(MediaType.APPLICATION_JSON_UTF8);
-
-        this.document.snippets(
-                responseFields(
-                        fieldWithPath("[].id").description("ServerRole ID"),
-                        fieldWithPath("[].name").description("Имя ServerRole"),
-                        fieldWithPath("[].switchedOn").description("Статус ServerRole"),
-                        fieldWithPath("[].serviceTemplates").description("ServerRole ServiceTemplates ID's")
-                )
-        );
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName).accept(MediaType.APPLICATION_JSON_UTF8);
 
         try {
             mockMvc.perform(request).andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                    .andExpect(jsonPath("$").isArray()).andDo(this.document);
+                    .andExpect(jsonPath("$").isArray())
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                    responseFields(
+                            fieldWithPath("[].id").description("ServerRole ID"),
+                            fieldWithPath("[].name").description("Имя ServerRole"),
+                            fieldWithPath("[].switchedOn").description("Статус ServerRole"),
+                            fieldWithPath("[].serviceTemplates").description("Список ServiceTemplates для ServerRole")
+                    )
+            ));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -144,25 +147,23 @@ public class ServerRoleRestControllerTest {
     @Test
     public void readOneAndCheckObjectFields() {
         ServerRole testingServerRole = testServerRoles.get(0);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName +
-                "/" + resourceName + "/" + testingServerRole.getId()).accept(MediaType.APPLICATION_JSON_UTF8);
-
-        this.document.snippets(
-                responseFields(
-                        fieldWithPath("id").description("ServerRole ID"),
-                        fieldWithPath("name").description("Имя ServerRole"),
-                        fieldWithPath("switchedOn").description("Статус ServerRole"),
-                        fieldWithPath("serviceTemplates").description("ServerRole ServiceTemplates ID's")
-                )
-        );
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testingServerRole.getId()).accept(MediaType.APPLICATION_JSON_UTF8);
 
         try {
             mockMvc.perform(request).andExpect(jsonPath("id").value(testingServerRole.getId()))
                     .andExpect(jsonPath("name").value(testingServerRole.getName()))
                     .andExpect(jsonPath("switchedOn").value(testingServerRole.getSwitchedOn()))
                     .andExpect(jsonPath("serviceTemplates").isArray())
-                    .andExpect(jsonPath("serviceTemplates.[0]").value(testingServerRole.getServiceTemplates().get(0).getId()))
-                    .andDo(print()).andDo(this.document);
+                    .andExpect(jsonPath("serviceTemplates.[0].id").value(testingServerRole.getServiceTemplates().get(0).getId()))
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                            responseFields(
+                                    fieldWithPath("id").description("ServerRole ID"),
+                                    fieldWithPath("name").description("Имя ServerRole"),
+                                    fieldWithPath("switchedOn").description("Статус ServerRole"),
+                                    fieldWithPath("serviceTemplates").description("Список ServiceTemplates для ServerRole")
+                            )
+                    ));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -173,8 +174,7 @@ public class ServerRoleRestControllerTest {
     public void create() {
         ServerRole serverRole = testServerRoles.get(0);
         serverRole.setId(null);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + applicationName
-                + "/" + resourceName)
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + resourceName)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(serverRole.toJson());
         try {
@@ -188,8 +188,7 @@ public class ServerRoleRestControllerTest {
     @Test
     public void update() {
         ServerRole serverRole = testServerRoles.get(0);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + applicationName
-                + "/" + resourceName + "/" + serverRole.getId())
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + resourceName + "/" + serverRole.getId())
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(serverRole.toJson());
         try {
@@ -203,8 +202,7 @@ public class ServerRoleRestControllerTest {
     @Test
     public void updateNotExistingResource() {
         ServerRole serverRole = testServerRoles.get(0);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + applicationName
-                + "/" + resourceName + "/" + ObjectId.get().toString())
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + resourceName + "/" + ObjectId.get().toString())
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(serverRole.toJson());
         try {
@@ -218,8 +216,7 @@ public class ServerRoleRestControllerTest {
     @Test
     public void delete() {
         ServerRole serverRole = testServerRoles.get(0);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + applicationName
-                + "/" + resourceName + "/" + serverRole.getId())
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + resourceName + "/" + serverRole.getId())
                 .accept(MediaType.APPLICATION_JSON_UTF8);
         try {
             mockMvc.perform(request).andExpect(status().isOk()).andDo(this.document);
@@ -231,8 +228,7 @@ public class ServerRoleRestControllerTest {
 
     @Test
     public void deleteNotExisting() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + applicationName
-                + "/" + resourceName + "/" + ObjectId.get().toString())
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + resourceName + "/" + ObjectId.get().toString())
                 .accept(MediaType.APPLICATION_JSON_UTF8);
         try {
             mockMvc.perform(request).andExpect(status().isNotFound()).andDo(this.document);

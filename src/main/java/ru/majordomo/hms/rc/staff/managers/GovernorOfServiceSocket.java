@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.resources.Resource;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
@@ -20,16 +21,26 @@ import ru.majordomo.hms.rc.staff.resources.ServiceSocket;
 @Service
 public class GovernorOfServiceSocket extends LordOfResources {
 
-    @Autowired
-    Cleaner cleaner;
-
-    @Autowired
-    NetworkRepository networkRepository;
-
-    @Autowired
-    ServiceSocketRepository serviceSocketRepository;
+    private Cleaner cleaner;
+    private NetworkRepository networkRepository;
+    private ServiceSocketRepository serviceSocketRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(GovernorOfServiceSocket.class);
+
+    @Autowired
+    public void setCleaner(Cleaner cleaner) {
+        this.cleaner = cleaner;
+    }
+
+    @Autowired
+    public void setServiceSocketRepository(ServiceSocketRepository serviceSocketRepository) {
+        this.serviceSocketRepository = serviceSocketRepository;
+    }
+
+    @Autowired
+    public void setNetworkRepository(NetworkRepository networkRepository) {
+        this.networkRepository = networkRepository;
+    }
 
     @Override
     public Resource createResource(ServiceMessage serviceMessage) throws ParameterValidateException {
@@ -44,7 +55,7 @@ public class GovernorOfServiceSocket extends LordOfResources {
             serviceSocket.setAddress(address);
             serviceSocket.setPort(port);
             isValid(serviceSocket);
-            serviceSocketRepository.save(serviceSocket);
+            save(serviceSocket);
         } catch (ClassCastException e) {
             throw new ParameterValidateException("один из параметров указан неверно:" + e.getMessage());
         }
@@ -74,4 +85,29 @@ public class GovernorOfServiceSocket extends LordOfResources {
         }
 
     }
+
+    @Override
+    public Resource build(String resourceId) throws ResourceNotFoundException {
+        ServiceSocket serviceSocket = serviceSocketRepository.findOne(resourceId);
+        if (serviceSocket == null) {
+            throw new ResourceNotFoundException("ServiceSocket с ID:" + resourceId + " не найден");
+        }
+        return serviceSocket;
+    }
+
+    @Override
+    public List<ServiceSocket> build() {
+        return serviceSocketRepository.findAll();
+    }
+
+    @Override
+    public void save(Resource resource) {
+        serviceSocketRepository.save((ServiceSocket) resource);
+    }
+
+    @Override
+    public void delete(String resourceId) {
+        serviceSocketRepository.delete(resourceId);
+    }
+
 }

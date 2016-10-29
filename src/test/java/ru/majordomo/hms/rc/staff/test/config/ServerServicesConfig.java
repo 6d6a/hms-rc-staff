@@ -6,7 +6,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import ru.majordomo.hms.rc.staff.api.http.ServerRestController;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
-import ru.majordomo.hms.rc.staff.managers.GovernorOfServer;
+import ru.majordomo.hms.rc.staff.managers.*;
 
 @Configuration
 @EnableWebMvc
@@ -24,5 +24,35 @@ public class ServerServicesConfig {
     @Bean
     public ServerRestController serverRestController() {
         return new ServerRestController();
+    }
+
+    @Bean
+    public GovernorOfServerRole governorOfServerRole() {
+        return new GovernorOfServerRole();
+    }
+
+    @Bean
+    public GovernorOfService governorOfService() {
+        return new GovernorOfService();
+    }
+
+    @Bean
+    public GovernorOfServiceTemplate governorOfServiceTemplate() {
+        return new GovernorOfServiceTemplate();
+    }
+
+    @Bean
+    public GovernorOfConfigTemplate governorOfConfigTemplate() {
+        return new GovernorOfConfigTemplate();
+    }
+
+    @Bean
+    public GovernorOfServiceSocket governorOfServiceSocket() {
+        return new GovernorOfServiceSocket();
+    }
+
+    @Bean
+    public GovernorOfStorage governorOfStorage() {
+        return new GovernorOfStorage();
     }
 }

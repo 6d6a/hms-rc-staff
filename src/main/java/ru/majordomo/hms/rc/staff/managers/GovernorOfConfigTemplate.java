@@ -7,7 +7,9 @@ import org.springframework.stereotype.Component;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
+import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.resources.Resource;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
@@ -19,11 +21,18 @@ import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
 public class GovernorOfConfigTemplate extends LordOfResources {
     private static final Logger logger = LoggerFactory.getLogger(GovernorOfConfigTemplate.class);
 
-    @Autowired
-    Cleaner cleaner;
+    private Cleaner cleaner;
+    private ConfigTemplateRepository configTemplateRepository;
 
     @Autowired
-    ConfigTemplateRepository configTemplateRepository;
+    public void setConfigTemplateRepository(ConfigTemplateRepository configTemplateRepository) {
+        this.configTemplateRepository = configTemplateRepository;
+    }
+
+    @Autowired
+    public void setCleaner(Cleaner cleaner) {
+        this.cleaner = cleaner;
+    }
 
     @Override
     public Resource createResource(ServiceMessage serviceMessage) throws ParameterValidateException {
@@ -34,7 +43,7 @@ public class GovernorOfConfigTemplate extends LordOfResources {
         String fileLink = cleaner.cleanString((String)serviceMessage.getParam("fileLink"));
         configTemplate.setFileLink(fileLink);
         isValid(configTemplate);
-        configTemplateRepository.save(configTemplate);
+        save(configTemplate);
         return configTemplate;
     }
 
@@ -53,5 +62,28 @@ public class GovernorOfConfigTemplate extends LordOfResources {
         }
     }
 
+    @Override
+    public Resource build(String resourceId) throws ResourceNotFoundException {
+        ConfigTemplate configTemplate = configTemplateRepository.findOne(resourceId);
+        if (configTemplate == null) {
+            throw new ResourceNotFoundException("ConfigTemplate с ID:" + resourceId + " не найден");
+        }
+        return configTemplate;
+    }
+
+    @Override
+    public List<ConfigTemplate> build() {
+        return configTemplateRepository.findAll();
+    }
+
+    @Override
+    public void save(Resource resource) {
+        configTemplateRepository.save((ConfigTemplate) resource);
+    }
+
+    @Override
+    public void delete(String resourceId) {
+        configTemplateRepository.delete(resourceId);
+    }
 
 }

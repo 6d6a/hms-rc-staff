@@ -3,6 +3,7 @@ package ru.majordomo.hms.rc.staff.test.api.http;
 import org.bson.types.ObjectId;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.JUnitRestDocumentation;
+import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -28,6 +31,13 @@ import ru.majordomo.hms.rc.staff.test.config.EmbeddedServltetContainerConfig;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
 import ru.majordomo.hms.rc.staff.test.config.ServiceTemplateServicesConfig;
 
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -36,14 +46,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = {RepositoriesConfig.class, EmbeddedServltetContainerConfig.class, ServiceTemplateServicesConfig.class},
                 webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ServiceTemplateRestControllerTest {
+    @Rule
+    public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("build/generated-snippets");
+
     @Autowired
-    private ServiceTemplateRepository repository;
+    private ServiceTemplateRepository serviceTempalteRepository;
     @Autowired
     private ConfigTemplateRepository configTemplateRepository;
     @Autowired
-    private TestRestTemplate restTemplate;
-    @Autowired
     private WebApplicationContext ctx;
+
+    private RestDocumentationResultHandler document;
+
     @Value("${spring.application.name}")
     private String applicationName;
     private String resourceName = "service-template";
@@ -58,31 +72,43 @@ public class ServiceTemplateRestControllerTest {
             ConfigTemplate configTemplate = new ConfigTemplate();
             configTemplateRepository.save(configTemplate);
             ServiceTemplate serviceTemplate = new ServiceTemplate();
-            serviceTemplate.setName(namePattern);
+            serviceTemplate.setName(name);
             serviceTemplate.setSwitchedOn(switchedOn);
             serviceTemplate.addConfigTemplate(configTemplate);
-            repository.save(serviceTemplate);
+            serviceTempalteRepository.save(serviceTemplate);
             serviceTemplates.add(serviceTemplate);
         }
     }
 
     @Before
     public void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(ctx).build();
-        repository.deleteAll();
+        this.document = document("service-template/{method-name}", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()));
+        mockMvc = MockMvcBuilders.webAppContextSetup(ctx)
+                .apply(documentationConfiguration(this.restDocumentation))
+                .build();
+        serviceTempalteRepository.deleteAll();
         configTemplateRepository.deleteAll();
         generateBatchOfServiceTemplates();
     }
 
     @Test
     public void readOne() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName +
-                                                "/" + resourceName +
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName +
                                                 "/" + serviceTemplates.get(0).getId())
                                                 .accept(MediaType.APPLICATION_JSON_UTF8);
+
         try {
             mockMvc.perform(request).andExpect(status().isOk())
-                                    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
+                                    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                                    .andDo(this.document)
+                                    .andDo(this.document.document(
+                                            responseFields(
+                                                    fieldWithPath("id").description("ServiceTemplate ID"),
+                                                    fieldWithPath("name").description("Имя ServiceTemplate"),
+                                                    fieldWithPath("switchedOn").description("Статус ServiceTemplate"),
+                                                    fieldWithPath("configTemplates").description("Список СonfigTemplates для ServiceTemplate")
+                                            )
+                                    ));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -91,10 +117,21 @@ public class ServiceTemplateRestControllerTest {
 
     @Test
     public void readAll() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName + "/"
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/"
                                                 + resourceName + "/").accept(MediaType.APPLICATION_JSON_UTF8);
+
         try {
-            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
+            mockMvc.perform(request).andExpect(status().isOk())
+                                    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                                    .andDo(this.document)
+                                    .andDo(this.document.document(
+                                            responseFields(
+                                                    fieldWithPath("[].id").description("ServiceTemplate ID"),
+                                                    fieldWithPath("[].name").description("Имя ServiceTemplate"),
+                                                    fieldWithPath("[].switchedOn").description("Статус ServiceTemplate"),
+                                                    fieldWithPath("[].configTemplates").description("Список СonfigTemplates для ServiceTemplate")
+                                            )
+                                    ));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -105,14 +142,23 @@ public class ServiceTemplateRestControllerTest {
     public void readOneAndCheckObjectFields() {
         ServiceTemplate serviceTemplate = serviceTemplates.get(0);
         String testedServiceTemplateId = serviceTemplate.getId();
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + applicationName
-                                                + "/" + resourceName + "/" + testedServiceTemplateId)
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testedServiceTemplateId)
                                                 .accept(MediaType.APPLICATION_JSON_UTF8);
+
         try {
             mockMvc.perform(request).andExpect(jsonPath("name").value(serviceTemplate.getName()))
                     .andExpect(jsonPath("id").value(serviceTemplate.getId()))
                     .andExpect(jsonPath("switchedOn").value(serviceTemplate.getSwitchedOn()))
-                    .andExpect(jsonPath("configTemplates.[0]").value(serviceTemplate.getConfigTemplateIds().get(0)));
+                    .andExpect(jsonPath("configTemplates.[0].id").value(serviceTemplate.getConfigTemplateIds().get(0)))
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                            responseFields(
+                                    fieldWithPath("id").description("ServiceTemplate ID"),
+                                    fieldWithPath("name").description("Имя ServiceTemplate"),
+                                    fieldWithPath("switchedOn").description("Статус ServiceTemplate"),
+                                    fieldWithPath("configTemplates").description("Список СonfigTemplates для ServiceTemplate")
+                            )
+                    ));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -123,12 +169,11 @@ public class ServiceTemplateRestControllerTest {
     public void create() {
         ServiceTemplate serviceTemplate = serviceTemplates.get(0);
         serviceTemplate.setId(null);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + applicationName +
-                                                "/" + resourceName + "/")
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + resourceName + "/")
                                                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                                                 .content(serviceTemplate.toJson());
         try {
-            mockMvc.perform(request).andExpect(status().isCreated());
+            mockMvc.perform(request).andExpect(status().isCreated()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -138,12 +183,11 @@ public class ServiceTemplateRestControllerTest {
     @Test
     public void update() {
         ServiceTemplate serviceTemplate = serviceTemplates.get(0);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + applicationName
-                                                + "/" + resourceName + "/" + serviceTemplate.getId())
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + resourceName + "/" + serviceTemplate.getId())
                                                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                                                 .content(serviceTemplate.toJson());
         try {
-            mockMvc.perform(request).andExpect(status().isOk());
+            mockMvc.perform(request).andExpect(status().isOk()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -153,12 +197,11 @@ public class ServiceTemplateRestControllerTest {
     @Test
     public void updateNotExistingResource() {
         ServiceTemplate serviceTemplate = serviceTemplates.get(0);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + applicationName
-                                                + "/" + resourceName + "/" + ObjectId.get().toString())
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + resourceName + "/" + ObjectId.get().toString())
                                                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                                                 .content(serviceTemplate.toJson());
         try {
-            mockMvc.perform(request).andExpect(status().isNotFound());
+            mockMvc.perform(request).andExpect(status().isNotFound()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -168,11 +211,10 @@ public class ServiceTemplateRestControllerTest {
     @Test
     public void delete() {
         ServiceTemplate serviceTemplate = serviceTemplates.get(0);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + applicationName
-                                                + "/" + resourceName + "/" + serviceTemplate.getId())
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + resourceName + "/" + serviceTemplate.getId())
                                                 .accept(MediaType.APPLICATION_JSON_UTF8);
         try {
-            mockMvc.perform(request).andExpect(status().isOk());
+            mockMvc.perform(request).andExpect(status().isOk()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -182,11 +224,10 @@ public class ServiceTemplateRestControllerTest {
     @Test
     public void deleteNotExisting() {
         String unknownServiceTemplateId = ObjectId.get().toString();
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + applicationName
-                                                + "/" + resourceName + "/" + unknownServiceTemplateId)
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + resourceName + "/" + unknownServiceTemplateId)
                                                 .accept(MediaType.APPLICATION_JSON_UTF8);
         try {
-            mockMvc.perform(request).andExpect(status().isNotFound());
+            mockMvc.perform(request).andExpect(status().isNotFound()).andDo(this.document);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();

@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.resources.Resource;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
@@ -12,11 +13,13 @@ import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.repositories.StorageRepository;
 import ru.majordomo.hms.rc.staff.resources.Storage;
 
+import java.util.List;
+
 @Service
 public class GovernorOfStorage extends LordOfResources {
 
-    StorageRepository repository;
-    Cleaner cleaner;
+    private StorageRepository repository;
+    private Cleaner cleaner;
 
     @Autowired
     public void setCleaner(Cleaner cleaner) {
@@ -51,7 +54,7 @@ public class GovernorOfStorage extends LordOfResources {
             storage.setCapacity(capacity);
             storage.setCapacityUsed(capacityUsed);
 
-            repository.save(storage);
+            save(storage);
         } catch (ClassCastException e){
             throw new ParameterValidateException("один из параметров указан неверно:" + e.getMessage());
         }
@@ -78,4 +81,29 @@ public class GovernorOfStorage extends LordOfResources {
             throw new ParameterValidateException("capacityUsed не может быть больше capacity");
         }
     }
+
+    @Override
+    public Resource build(String resourceId) throws ResourceNotFoundException {
+        Storage storage = repository.findOne(resourceId);
+        if (storage == null) {
+            throw new ResourceNotFoundException("Storage с ID:" + resourceId + " не найден");
+        }
+        return storage;
+    }
+
+    @Override
+    public List<Storage> build() {
+        return repository.findAll();
+    }
+
+    @Override
+    public void save(Resource resource) {
+        repository.save((Storage) resource);
+    }
+
+    @Override
+    public void delete(String resourceId) {
+        repository.delete(resourceId);
+    }
+
 }

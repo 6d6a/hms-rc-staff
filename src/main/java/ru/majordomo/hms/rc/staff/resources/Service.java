@@ -26,32 +26,30 @@ public class Service extends Resource {
         switchedOn = !switchedOn;
     }
 
-    @JsonGetter(value = "serviceTemplate")
+    @JsonIgnore
     public String getServiceTemplateId() {
         return serviceTemplateId;
     }
 
-    @JsonSetter(value = "serviceTemplate")
+    @JsonIgnore
     public void setServiceTemplateId(String serviceTemplateId) {
         this.serviceTemplateId = serviceTemplateId;
     }
 
-    @JsonGetter(value = "serviceSockets")
+    @JsonIgnore
     public List<String> getServiceSocketIds() {
         return serviceSocketIds;
     }
 
-    @JsonSetter(value = "serviceSockets")
+    @JsonIgnore
     public void setServiceSocketIds(List<String> serviceSocketIds) {
         this.serviceSocketIds = serviceSocketIds;
     }
 
-    @JsonIgnore
     public ServiceTemplate getServiceTemplate() {
         return serviceTemplate;
     }
 
-    @JsonIgnore
     public void setServiceTemplate(ServiceTemplate serviceTemplate) {
         try {
             this.serviceTemplateId = serviceTemplate.getId();
@@ -59,12 +57,10 @@ public class Service extends Resource {
         this.serviceTemplate = serviceTemplate;
     }
 
-    @JsonIgnore
     public List<ServiceSocket> getServiceSockets() {
         return serviceSockets;
     }
 
-    @JsonIgnore
     public void setServiceSockets(List<ServiceSocket> serviceSockets) {
         List<String> ids = new ArrayList<>();
         for (ServiceSocket serviceSocket: serviceSockets) {
@@ -75,11 +71,32 @@ public class Service extends Resource {
     }
 
     public void addServiceSocket(ServiceSocket serviceSocket) {
-        this.serviceSocketIds.add(serviceSocket.getId());
+        String serviceSocketId = serviceSocket.getId();
         this.serviceSockets.add(serviceSocket);
+        if (serviceSocketIds.contains(serviceSocketId) == false) {
+            this.serviceSocketIds.add(serviceSocket.getId());
+        }
     }
 
     public void addServiceSocketId(String serviceSocketId) {
         this.serviceSocketIds.add(serviceSocketId);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        Service service = (Service) o;
+
+        if (getServiceTemplate() != null ? !getServiceTemplate().equals(service.getServiceTemplate()) : service.getServiceTemplate() != null)
+            return false;
+        if (getServiceSockets() != null ? !getServiceSockets().equals(service.getServiceSockets()) : service.getServiceSockets() != null)
+            return false;
+        if (getServiceTemplateId() != null ? !getServiceTemplateId().equals(service.getServiceTemplateId()) : service.getServiceTemplateId() != null)
+            return false;
+        return getServiceSocketIds() != null ? getServiceSocketIds().equals(service.getServiceSocketIds()) : service.getServiceSocketIds() == null;
+
     }
 }

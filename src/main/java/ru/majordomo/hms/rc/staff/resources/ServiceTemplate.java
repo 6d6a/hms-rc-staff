@@ -22,17 +22,16 @@ public class ServiceTemplate extends Resource {
         switchedOn = !switchedOn;
     }
 
-    @JsonIgnore
     public List<ConfigTemplate> getConfigTemplates() {
         return configTemplates;
     }
 
-    @JsonGetter(value = "configTemplates")
+    @JsonIgnore
     public List<String> getConfigTemplateIds() {
         return configTemplateIds;
     }
 
-    @JsonSetter(value = "configTemplates")
+    @JsonIgnore
     public void setConfigTemplateIds(List<String> configTemplateIds) {
         this.configTemplateIds = configTemplateIds;
     }
@@ -45,7 +44,24 @@ public class ServiceTemplate extends Resource {
     }
 
     public void addConfigTemplate(ConfigTemplate configTemplate) {
+        String configTemplateId = configTemplate.getId();
         this.configTemplates.add(configTemplate);
-        this.configTemplateIds.add(configTemplate.getId());
+        if (configTemplateIds.contains(configTemplateId) == false) {
+            this.configTemplateIds.add(configTemplate.getId());
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        ServiceTemplate that = (ServiceTemplate) o;
+
+        if (getConfigTemplateIds() != null ? !getConfigTemplateIds().equals(that.getConfigTemplateIds()) : that.getConfigTemplateIds() != null)
+            return false;
+        return getConfigTemplates() != null ? getConfigTemplates().equals(that.getConfigTemplates()) : that.getConfigTemplates() == null;
+
     }
 }

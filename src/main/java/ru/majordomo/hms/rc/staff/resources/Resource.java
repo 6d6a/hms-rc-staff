@@ -6,7 +6,7 @@ import org.springframework.data.annotation.Id;
 
 import java.io.IOException;
 
-public abstract class Resource {
+public abstract class Resource extends Object {
     @Id
     private String id;
     private String name;
@@ -50,5 +50,18 @@ public abstract class Resource {
 //            logger.error("Невозможно конвертировать в JSON" + ex.toString());
         }
         return jsonData;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Resource resource = (Resource) o;
+
+        if (getId() != null ? !getId().equals(resource.getId()) : resource.getId() != null) return false;
+        if (getName() != null ? !getName().equals(resource.getName()) : resource.getName() != null) return false;
+        return getSwitchedOn() != null ? getSwitchedOn().equals(resource.getSwitchedOn()) : resource.getSwitchedOn() == null;
+
     }
 }

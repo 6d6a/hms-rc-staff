@@ -13,42 +13,55 @@ import java.util.List;
 @Document
 public class ServerRole extends Resource {
 
+    private List<String> serviceTemplateIds = new ArrayList<>();
     @Transient
     private List<ServiceTemplate> serviceTemplates = new ArrayList<>();
-    private List<String> serviceTemplateIds = new ArrayList<>();
 
     @Override
     public void switchResource() {
         switchedOn = !switchedOn;
     }
 
-    @JsonIgnore
     public List<ServiceTemplate> getServiceTemplates() {
         return serviceTemplates;
     }
 
-    @JsonIgnore
     public void setServiceTemplates(List<ServiceTemplate> serviceTemplates) {
-        List<String> serviceTemplateIdList = new ArrayList<>();
         for (ServiceTemplate serviceTemplate: serviceTemplates) {
-            serviceTemplateIdList.add(serviceTemplate.getId());
+            this.serviceTemplateIds.add(serviceTemplate.getId());
         }
-        this.serviceTemplateIds = serviceTemplateIdList;
         this.serviceTemplates = serviceTemplates;
     }
 
-    @JsonGetter(value = "serviceTemplates")
+    @JsonIgnore
     public List<String> getServiceTemplateIds() {
         return serviceTemplateIds;
     }
 
-    @JsonSetter(value = "serviceTemplates")
+    @JsonIgnore
     public void setServiceTemplateIds(List<String> serviceTemplateIds) {
         this.serviceTemplateIds = serviceTemplateIds;
     }
 
     public void addServiceTemplate(ServiceTemplate serviceTemplate) {
+        String serviceTemplateId = serviceTemplate.getId();
         this.serviceTemplates.add(serviceTemplate);
-        this.serviceTemplateIds.add(serviceTemplate.getId());
+        if (serviceTemplateIds.contains(serviceTemplateId) == false) {
+            this.serviceTemplateIds.add(serviceTemplate.getId());
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        ServerRole that = (ServerRole) o;
+
+        if (getServiceTemplateIds() != null ? !getServiceTemplateIds().equals(that.getServiceTemplateIds()) : that.getServiceTemplateIds() != null)
+            return false;
+        return getServiceTemplates() != null ? getServiceTemplates().equals(that.getServiceTemplates()) : that.getServiceTemplates() == null;
+
     }
 }

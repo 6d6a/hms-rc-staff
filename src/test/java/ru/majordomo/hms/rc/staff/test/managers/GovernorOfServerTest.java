@@ -11,14 +11,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfServer;
-import ru.majordomo.hms.rc.staff.repositories.ServerRepository;
-import ru.majordomo.hms.rc.staff.repositories.ServerRoleRepository;
-import ru.majordomo.hms.rc.staff.repositories.ServiceRepository;
-import ru.majordomo.hms.rc.staff.repositories.StorageRepository;
-import ru.majordomo.hms.rc.staff.resources.Server;
-import ru.majordomo.hms.rc.staff.resources.ServerRole;
-import ru.majordomo.hms.rc.staff.resources.Service;
-import ru.majordomo.hms.rc.staff.resources.Storage;
+import ru.majordomo.hms.rc.staff.repositories.*;
+import ru.majordomo.hms.rc.staff.resources.*;
 import ru.majordomo.hms.rc.staff.test.config.EmbeddedServltetContainerConfig;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
 import ru.majordomo.hms.rc.staff.test.config.ServerServicesConfig;
@@ -41,18 +35,24 @@ public class GovernorOfServerTest {
     private ServiceRepository serviceRepository;
     @Autowired
     private StorageRepository storageRepository;
+    @Autowired
+    private ServiceSocketRepository serviceSocketRepository;
+    @Autowired
+    private ServiceTemplateRepository serviceTemplateRepository;
+    @Autowired
+    private ConfigTemplateRepository configTemplateRepository;
 
     private ServiceMessage testServiceMessage;
     private Server testServer;
 
     private ServiceMessage generateServiceMessage(String name, Boolean switchedOn,
-                                                  List<String> serviceIds, String serverRoleId, List<String> storageIds) {
+                                                  List<Service> services, ServerRole serverRole, List<Storage> storages) {
         ServiceMessage serviceMessage = new ServiceMessage();
         serviceMessage.addParam("name", name);
         serviceMessage.addParam("switchedOn", switchedOn);
-        serviceMessage.addParam("serviceIds", serviceIds);
-        serviceMessage.addParam("serverRoleId", serverRoleId);
-        serviceMessage.addParam("storageIds", storageIds);
+        serviceMessage.addParam("services", services);
+        serviceMessage.addParam("serverRole", serverRole);
+        serviceMessage.addParam("storages", storages);
 
         return serviceMessage;
     }
@@ -71,11 +71,25 @@ public class GovernorOfServerTest {
 
     @Before
     public void setUp() {
-        ServerRole serverRole = new ServerRole();
-        serverRoleRepository.save(serverRole);
+
+        ServiceSocket serviceSocket = new ServiceSocket();
+        serviceSocketRepository.save(serviceSocket);
+
+        ConfigTemplate configTemplate = new ConfigTemplate();
+        configTemplateRepository.save(configTemplate);
+
+        ServiceTemplate serviceTemplate = new ServiceTemplate();
+        serviceTemplate.addConfigTemplate(configTemplate);
+        serviceTemplateRepository.save(serviceTemplate);
 
         Service service = new Service();
+        service.addServiceSocket(serviceSocket);
+        service.setServiceTemplate(serviceTemplate);
         serviceRepository.save(service);
+
+        ServerRole serverRole = new ServerRole();
+        serverRole.addServiceTemplate(serviceTemplate);
+        serverRoleRepository.save(serverRole);
 
         Storage storage = new Storage();
         storageRepository.save(storage);
@@ -85,17 +99,13 @@ public class GovernorOfServerTest {
         Boolean switchedOn = Boolean.TRUE;
 
         List<Service> services = new ArrayList<>();
-        List<String> serviceIds = new ArrayList<>();
         services.add(service);
-        serviceIds.add(service.getId());
 
         List<Storage> storages = new ArrayList<>();
-        List<String> storageIds = new ArrayList<>();
         storages.add(storage);
-        storageIds.add(storage.getId());
 
         this.testServer = generateServer(name, switchedOn, services, serverRole, storages);
-        this.testServiceMessage = generateServiceMessage(name, switchedOn, serviceIds, serverRole.getId(), storageIds);
+        this.testServiceMessage = generateServiceMessage(name, switchedOn, services, serverRole, storages);
     }
 
     @Test
@@ -104,11 +114,50 @@ public class GovernorOfServerTest {
             Server createdServer = (Server) governor.createResource(testServiceMessage);
             Assert.assertEquals("Имя не совпадает с ожидаемым", testServer.getName(), createdServer.getName());
             Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testServer.getSwitchedOn(), createdServer.getSwitchedOn());
-            Assert.assertTrue(testServer.getServices().size() == createdServer.getServices().size());
+            Assert.assertTrue(testServer.getServices().equals(createdServer.getServices()));
             Assert.assertTrue(testServer.getServiceIds().containsAll(createdServer.getServiceIds()));
-            Assert.assertTrue(testServer.getStorages().size() == createdServer.getStorages().size());
+            Assert.assertTrue(testServer.getStorages().equals(createdServer.getStorages()));
             Assert.assertTrue(testServer.getStorageIds().containsAll(createdServer.getStorageIds()));
+            Assert.assertTrue(testServer.getServerRole().equals(createdServer.getServerRole()));
             Assert.assertTrue(testServer.getServerRoleId().equals(createdServer.getServerRoleId()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void build() {
+        serverRepository.save(testServer);
+        Server buildedServer = (Server) governor.build(testServer.getId());
+        try {
+            Assert.assertEquals("Имя не совпадает с ожидаемым", testServer.getName(), buildedServer.getName());
+            Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testServer.getSwitchedOn(), buildedServer.getSwitchedOn());
+            Assert.assertTrue(testServer.getServices().equals(buildedServer.getServices()));
+            Assert.assertTrue(testServer.getServiceIds().containsAll(buildedServer.getServiceIds()));
+            Assert.assertTrue(testServer.getStorages().equals(buildedServer.getStorages()));
+            Assert.assertTrue(testServer.getStorageIds().containsAll(buildedServer.getStorageIds()));
+            Assert.assertTrue(testServer.getServerRole().equals(buildedServer.getServerRole()));
+            Assert.assertTrue(testServer.getServerRoleId().equals(buildedServer.getServerRoleId()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void buildAll() {
+        serverRepository.save(testServer);
+        List<Server> buildedServers = governor.build();
+        try {
+            Assert.assertEquals("Имя не совпадает с ожидаемым", testServer.getName(), buildedServers.get(buildedServers.size()-1).getName());
+            Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testServer.getSwitchedOn(), buildedServers.get(buildedServers.size()-1).getSwitchedOn());
+            Assert.assertTrue(testServer.getServices().equals(buildedServers.get(buildedServers.size()-1).getServices()));
+            Assert.assertTrue(testServer.getServiceIds().containsAll(buildedServers.get(buildedServers.size()-1).getServiceIds()));
+            Assert.assertTrue(testServer.getStorages().equals(buildedServers.get(buildedServers.size()-1).getStorages()));
+            Assert.assertTrue(testServer.getStorageIds().containsAll(buildedServers.get(buildedServers.size()-1).getStorageIds()));
+            Assert.assertTrue(testServer.getServerRoleId().equals(buildedServers.get(buildedServers.size()-1).getServerRoleId()));
+            Assert.assertTrue(testServer.getServerRole().equals(buildedServers.get(buildedServers.size()-1).getServerRole()));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -119,7 +168,7 @@ public class GovernorOfServerTest {
     public void createWithUnknownService() throws ParameterValidateException {
         List<String> unknownService = new ArrayList<>();
         unknownService.add(ObjectId.get().toString());
-        testServiceMessage.addParam("serviceIds", unknownService);
+        testServiceMessage.addParam("services", unknownService);
         governor.createResource(testServiceMessage);
     }
 
@@ -134,7 +183,7 @@ public class GovernorOfServerTest {
     public void createWithUnknownStorage() throws ParameterValidateException {
         List<String> unknownStorage = new ArrayList<>();
         unknownStorage.add(ObjectId.get().toString());
-        testServiceMessage.addParam("storageIds", unknownStorage);
+        testServiceMessage.addParam("storages", unknownStorage);
         governor.createResource(testServiceMessage);
     }
 
@@ -148,7 +197,7 @@ public class GovernorOfServerTest {
     @Test(expected = ParameterValidateException.class)
     public void createWithUnknownServerRole() throws ParameterValidateException {
         String serverRoleId = ObjectId.get().toString();
-        testServiceMessage.addParam("serverRoleId", serverRoleId);
+        testServiceMessage.addParam("serverRole", serverRoleId);
         governor.createResource(testServiceMessage);
     }
 
