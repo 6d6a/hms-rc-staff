@@ -128,19 +128,19 @@ public class ServerRestControllerTest {
     public void readOne() {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testServers.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
 
-        this.document.snippets(
-                responseFields(
-                        fieldWithPath("id").description("Server ID"),
-                        fieldWithPath("name").description("Имя Server"),
-                        fieldWithPath("switchedOn").description("Статус Server"),
-                        fieldWithPath("services").description("Список Service для Server"),
-                        fieldWithPath("serverRole").description("ServerRole для Server"),
-                        fieldWithPath("storages").description("Список Storages для Server")
-                )
-        );
-
         try {
-            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8)).andDo(this.document);
+            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                    responseFields(
+                            fieldWithPath("id").description("Server ID"),
+                            fieldWithPath("name").description("Имя Server"),
+                            fieldWithPath("switchedOn").description("Статус Server"),
+                            fieldWithPath("services").description("Список Service для Server"),
+                            fieldWithPath("serverRole").description("ServerRole для Server"),
+                            fieldWithPath("storages").description("Список Storages для Server")
+                    )
+            ));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -151,22 +151,21 @@ public class ServerRestControllerTest {
     public void readAll() {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName ).accept(MediaType.APPLICATION_JSON_UTF8);
 
-        this.document.snippets(
-                responseFields(
-                        fieldWithPath("[].id").description("Server ID"),
-                        fieldWithPath("[].name").description("Имя Server"),
-                        fieldWithPath("[].switchedOn").description("Статус Server"),
-                        fieldWithPath("[].services").description("Список Service для Server"),
-                        fieldWithPath("[].serverRole").description("ServerRole для Server"),
-                        fieldWithPath("[].storages").description("Список Storages для Server")
-                )
-        );
-
         try {
             mockMvc.perform(request).andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                     .andExpect(jsonPath("$").isArray())
-                    .andDo(this.document);
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                            responseFields(
+                                    fieldWithPath("[].id").description("Server ID"),
+                                    fieldWithPath("[].name").description("Имя Server"),
+                                    fieldWithPath("[].switchedOn").description("Статус Server"),
+                                    fieldWithPath("[].services").description("Список Service для Server"),
+                                    fieldWithPath("[].serverRole").description("ServerRole для Server"),
+                                    fieldWithPath("[].storages").description("Список Storages для Server")
+                            )
+                    ));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -178,17 +177,6 @@ public class ServerRestControllerTest {
         Server testingServer = testServers.get(0);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testingServer.getId()).accept(MediaType.APPLICATION_JSON_UTF8);
 
-        this.document.snippets(
-                responseFields(
-                        fieldWithPath("id").description("Server ID"),
-                        fieldWithPath("name").description("Имя Server"),
-                        fieldWithPath("switchedOn").description("Статус Server"),
-                        fieldWithPath("services").description("Список Service для Server"),
-                        fieldWithPath("serverRole").description("ServerRole для Server"),
-                        fieldWithPath("storages").description("Список Storages для Server")
-                )
-        );
-
         try {
             mockMvc.perform(request).andExpect(jsonPath("id").value(testingServer.getId()))
                     .andExpect(jsonPath("name").value(testingServer.getName()))
@@ -198,7 +186,17 @@ public class ServerRestControllerTest {
                     .andExpect(jsonPath("services.[0].id").value(testingServer.getServices().get(0).getId()))
                     .andExpect(jsonPath("storages").isArray())
                     .andExpect(jsonPath("storages.[0].id").value(testingServer.getStorages().get(0).getId()))
-                    .andDo(this.document);
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                            responseFields(
+                                    fieldWithPath("id").description("Server ID"),
+                                    fieldWithPath("name").description("Имя Server"),
+                                    fieldWithPath("switchedOn").description("Статус Server"),
+                                    fieldWithPath("services").description("Список Service для Server"),
+                                    fieldWithPath("serverRole").description("ServerRole для Server"),
+                                    fieldWithPath("storages").description("Список Storages для Server")
+                            )
+                    ));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();

@@ -88,19 +88,18 @@ public class ConfigTemplateRestControllerTest {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + configTemplates.get(0).getId())
                 .accept(MediaType.APPLICATION_JSON_UTF8);
 
-        this.document.snippets(
-                responseFields(
-                        fieldWithPath("id").description("ConfigTemplate ID"),
-                        fieldWithPath("name").description("Имя ConfigTemplate"),
-                        fieldWithPath("switchedOn").description("Статус ConfigTemplate"),
-                        fieldWithPath("fileLink").description("Ссылка на файл")
-                )
-        );
-
         try {
             mockMvc.perform(request).andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                    .andDo(this.document);
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                            responseFields(
+                                fieldWithPath("id").description("ConfigTemplate ID"),
+                                fieldWithPath("name").description("Имя ConfigTemplate"),
+                                fieldWithPath("switchedOn").description("Статус ConfigTemplate"),
+                                fieldWithPath("fileLink").description("Ссылка на файл")
+                            )
+                    ));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -111,19 +110,18 @@ public class ConfigTemplateRestControllerTest {
     public void readAll() {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/").accept(MediaType.APPLICATION_JSON_UTF8);
 
-        this.document.snippets(
-                responseFields(
-                        fieldWithPath("[].id").description("ConfigTemplate ID"),
-                        fieldWithPath("[].name").description("Имя ConfigTemplate"),
-                        fieldWithPath("[].switchedOn").description("Статус ConfigTemplate"),
-                        fieldWithPath("[].fileLink").description("Ссылка на файл")
-                )
-        );
-
         try {
             mockMvc.perform(request).andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                    .andDo(this.document);
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                            responseFields(
+                                    fieldWithPath("[].id").description("ConfigTemplate ID"),
+                                    fieldWithPath("[].name").description("Имя ConfigTemplate"),
+                                    fieldWithPath("[].switchedOn").description("Статус ConfigTemplate"),
+                                    fieldWithPath("[].fileLink").description("Ссылка на файл")
+                            )
+                    ));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -135,20 +133,19 @@ public class ConfigTemplateRestControllerTest {
         ConfigTemplate configTemplate = configTemplates.get(0);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + configTemplate.getId()).accept(MediaType.APPLICATION_JSON_UTF8);
 
-        this.document.snippets(
-                responseFields(
-                        fieldWithPath("id").description("ConfigTemplate ID"),
-                        fieldWithPath("name").description("Имя ConfigTemplate"),
-                        fieldWithPath("switchedOn").description("Статус ConfigTemplate"),
-                        fieldWithPath("fileLink").description("Ссылка на файл")
-                )
-        );
-
         try {
             mockMvc.perform(request).andExpect(jsonPath("name").value(configTemplate.getName()))
                     .andExpect(jsonPath("switchedOn").value(configTemplate.getSwitchedOn()))
                     .andExpect(jsonPath("fileLink").value(configTemplate.getFileLink()))
-                    .andDo(this.document);
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                            responseFields(
+                                    fieldWithPath("id").description("ConfigTemplate ID"),
+                                    fieldWithPath("name").description("Имя ConfigTemplate"),
+                                    fieldWithPath("switchedOn").description("Статус ConfigTemplate"),
+                                    fieldWithPath("fileLink").description("Ссылка на файл")
+                            )
+                    ));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();

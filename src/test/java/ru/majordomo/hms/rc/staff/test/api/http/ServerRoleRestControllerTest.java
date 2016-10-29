@@ -104,18 +104,17 @@ public class ServerRoleRestControllerTest {
     public void readOne() {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testServerRoles.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
 
-        this.document.snippets(
-                responseFields(
-                        fieldWithPath("id").description("ServerRole ID"),
-                        fieldWithPath("name").description("Имя ServerRole"),
-                        fieldWithPath("switchedOn").description("Статус ServerRole"),
-                        fieldWithPath("serviceTemplates").description("Список ServiceTemplates для ServerRole")
-                )
-        );
-
         try {
             mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                    .andDo(this.document);
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                            responseFields(
+                                    fieldWithPath("id").description("ServerRole ID"),
+                                    fieldWithPath("name").description("Имя ServerRole"),
+                                    fieldWithPath("switchedOn").description("Статус ServerRole"),
+                                    fieldWithPath("serviceTemplates").description("Список ServiceTemplates для ServerRole")
+                            )
+                    ));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -126,19 +125,19 @@ public class ServerRoleRestControllerTest {
     public void readAll() {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName).accept(MediaType.APPLICATION_JSON_UTF8);
 
-        this.document.snippets(
-                responseFields(
-                        fieldWithPath("[].id").description("ServerRole ID"),
-                        fieldWithPath("[].name").description("Имя ServerRole"),
-                        fieldWithPath("[].switchedOn").description("Статус ServerRole"),
-                        fieldWithPath("[].serviceTemplates").description("Список ServiceTemplates для ServerRole")
-                )
-        );
-
         try {
             mockMvc.perform(request).andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                    .andExpect(jsonPath("$").isArray()).andDo(this.document);
+                    .andExpect(jsonPath("$").isArray())
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                    responseFields(
+                            fieldWithPath("[].id").description("ServerRole ID"),
+                            fieldWithPath("[].name").description("Имя ServerRole"),
+                            fieldWithPath("[].switchedOn").description("Статус ServerRole"),
+                            fieldWithPath("[].serviceTemplates").description("Список ServiceTemplates для ServerRole")
+                    )
+            ));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -150,22 +149,21 @@ public class ServerRoleRestControllerTest {
         ServerRole testingServerRole = testServerRoles.get(0);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testingServerRole.getId()).accept(MediaType.APPLICATION_JSON_UTF8);
 
-        this.document.snippets(
-                responseFields(
-                        fieldWithPath("id").description("ServerRole ID"),
-                        fieldWithPath("name").description("Имя ServerRole"),
-                        fieldWithPath("switchedOn").description("Статус ServerRole"),
-                        fieldWithPath("serviceTemplates").description("Список ServiceTemplates для ServerRole")
-                )
-        );
-
         try {
             mockMvc.perform(request).andExpect(jsonPath("id").value(testingServerRole.getId()))
                     .andExpect(jsonPath("name").value(testingServerRole.getName()))
                     .andExpect(jsonPath("switchedOn").value(testingServerRole.getSwitchedOn()))
                     .andExpect(jsonPath("serviceTemplates").isArray())
                     .andExpect(jsonPath("serviceTemplates.[0].id").value(testingServerRole.getServiceTemplates().get(0).getId()))
-                    .andDo(this.document);
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                            responseFields(
+                                    fieldWithPath("id").description("ServerRole ID"),
+                                    fieldWithPath("name").description("Имя ServerRole"),
+                                    fieldWithPath("switchedOn").description("Статус ServerRole"),
+                                    fieldWithPath("serviceTemplates").description("Список ServiceTemplates для ServerRole")
+                            )
+                    ));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();

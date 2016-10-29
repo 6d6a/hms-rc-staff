@@ -103,20 +103,20 @@ public class NetworkRestControllerTest {
     public void readOne() {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + networks.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
 
-        this.document.snippets(
-                responseFields(
-                        fieldWithPath("id").description("Network ID"),
-                        fieldWithPath("name").description("Имя Network"),
-                        fieldWithPath("switchedOn").description("Статус Network"),
-                        fieldWithPath("address").description("IP-адрес"),
-                        fieldWithPath("mask").description("Маска"),
-                        fieldWithPath("gatewayAddress").description("Шлюз"),
-                        fieldWithPath("vlanNumber").description("Номер сети")
-                )
-        );
-
         try {
-            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8)).andDo(this.document);
+            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                    responseFields(
+                            fieldWithPath("id").description("Network ID"),
+                            fieldWithPath("name").description("Имя Network"),
+                            fieldWithPath("switchedOn").description("Статус Network"),
+                            fieldWithPath("address").description("IP-адрес"),
+                            fieldWithPath("mask").description("Маска"),
+                            fieldWithPath("gatewayAddress").description("Шлюз"),
+                            fieldWithPath("vlanNumber").description("Номер сети")
+                    )
+            ));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -127,20 +127,20 @@ public class NetworkRestControllerTest {
     public void readAll() {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName).accept(MediaType.APPLICATION_JSON_UTF8);
 
-        this.document.snippets(
-                responseFields(
-                        fieldWithPath("[].id").description("Network ID"),
-                        fieldWithPath("[].name").description("Имя Network"),
-                        fieldWithPath("[].switchedOn").description("Статус Network"),
-                        fieldWithPath("[].address").description("IP-адрес"),
-                        fieldWithPath("[].mask").description("Маска"),
-                        fieldWithPath("[].gatewayAddress").description("Шлюз"),
-                        fieldWithPath("[].vlanNumber").description("Номер сети")
-                )
-        );
-
         try {
-            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8)).andDo(this.document);
+            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                    responseFields(
+                            fieldWithPath("[].id").description("Network ID"),
+                            fieldWithPath("[].name").description("Имя Network"),
+                            fieldWithPath("[].switchedOn").description("Статус Network"),
+                            fieldWithPath("[].address").description("IP-адрес"),
+                            fieldWithPath("[].mask").description("Маска"),
+                            fieldWithPath("[].gatewayAddress").description("Шлюз"),
+                            fieldWithPath("[].vlanNumber").description("Номер сети")
+                    )
+            ));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -151,18 +151,6 @@ public class NetworkRestControllerTest {
     public void readOneAndCheckObjectFields() {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + networks.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
 
-        this.document.snippets(
-                responseFields(
-                        fieldWithPath("id").description("Network ID"),
-                        fieldWithPath("name").description("Имя Network"),
-                        fieldWithPath("switchedOn").description("Статус Network"),
-                        fieldWithPath("address").description("IP-адрес"),
-                        fieldWithPath("mask").description("Маска"),
-                        fieldWithPath("gatewayAddress").description("Шлюз"),
-                        fieldWithPath("vlanNumber").description("Номер сети")
-                )
-        );
-
         try {
             Network testingNetwork = networks.get(0);
             mockMvc.perform(request).andExpect(jsonPath("gatewayAddress").value(testingNetwork.getGatewayAddressAsString()))
@@ -172,7 +160,18 @@ public class NetworkRestControllerTest {
                     .andExpect(jsonPath("mask").value(testingNetwork.getMask()))
                     .andExpect(jsonPath("name").value(testingNetwork.getName()))
                     .andExpect(jsonPath("id").value(testingNetwork.getId()))
-                    .andDo(this.document);
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                            responseFields(
+                                    fieldWithPath("id").description("Network ID"),
+                                    fieldWithPath("name").description("Имя Network"),
+                                    fieldWithPath("switchedOn").description("Статус Network"),
+                                    fieldWithPath("address").description("IP-адрес"),
+                                    fieldWithPath("mask").description("Маска"),
+                                    fieldWithPath("gatewayAddress").description("Шлюз"),
+                                    fieldWithPath("vlanNumber").description("Номер сети")
+                            )
+                    ));
         } catch (Exception ex) {
             ex.printStackTrace();
             Assert.fail();

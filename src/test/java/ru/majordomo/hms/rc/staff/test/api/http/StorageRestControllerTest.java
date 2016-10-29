@@ -90,18 +90,18 @@ public class StorageRestControllerTest {
     public void readOne() {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + storages.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
 
-        this.document.snippets(
-                responseFields(
-                        fieldWithPath("id").description("Storage ID"),
-                        fieldWithPath("name").description("Имя Storage"),
-                        fieldWithPath("switchedOn").description("Статус Storage"),
-                        fieldWithPath("capacity").description("Объем хранилища"),
-                        fieldWithPath("capacityUsed").description("Занятый объем хранилища")
-                )
-        );
-
         try {
-            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8)).andDo(this.document);
+            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                    responseFields(
+                            fieldWithPath("id").description("Storage ID"),
+                            fieldWithPath("name").description("Имя Storage"),
+                            fieldWithPath("switchedOn").description("Статус Storage"),
+                            fieldWithPath("capacity").description("Объем хранилища"),
+                            fieldWithPath("capacityUsed").description("Занятый объем хранилища")
+                    )
+            ));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -112,18 +112,18 @@ public class StorageRestControllerTest {
     public void readAll() {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/").accept(MediaType.APPLICATION_JSON_UTF8);
 
-        this.document.snippets(
-                responseFields(
-                        fieldWithPath("[].id").description("Storage ID"),
-                        fieldWithPath("[].name").description("Имя Storage"),
-                        fieldWithPath("[].switchedOn").description("Статус Storage"),
-                        fieldWithPath("[].capacity").description("Объем хранилища"),
-                        fieldWithPath("[].capacityUsed").description("Занятый объем хранилища")
-                )
-        );
-
         try {
-            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8)).andDo(this.document);
+            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                    responseFields(
+                            fieldWithPath("[].id").description("Storage ID"),
+                            fieldWithPath("[].name").description("Имя Storage"),
+                            fieldWithPath("[].switchedOn").description("Статус Storage"),
+                            fieldWithPath("[].capacity").description("Объем хранилища"),
+                            fieldWithPath("[].capacityUsed").description("Занятый объем хранилища")
+                    )
+            ));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -135,23 +135,22 @@ public class StorageRestControllerTest {
         Storage testingStorage = storages.get(0);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testingStorage.getId()).accept(MediaType.APPLICATION_JSON_UTF8);
 
-        this.document.snippets(
-                responseFields(
-                        fieldWithPath("id").description("Storage ID"),
-                        fieldWithPath("name").description("Имя Storage"),
-                        fieldWithPath("switchedOn").description("Статус Storage"),
-                        fieldWithPath("capacity").description("Объем хранилища"),
-                        fieldWithPath("capacityUsed").description("Занятый объем хранилища")
-                )
-        );
-
         try {
             mockMvc.perform(request).andExpect(jsonPath("name").value(testingStorage.getName()))
                     .andExpect(jsonPath("id").value(testingStorage.getId()))
                     .andExpect(jsonPath("switchedOn").value(testingStorage.getSwitchedOn()))
                     .andExpect(jsonPath("capacity").value(testingStorage.getCapacity()))
                     .andExpect(jsonPath("capacityUsed").value(testingStorage.getCapacityUsed()))
-                    .andDo(this.document);
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                            responseFields(
+                                    fieldWithPath("id").description("Storage ID"),
+                                    fieldWithPath("name").description("Имя Storage"),
+                                    fieldWithPath("switchedOn").description("Статус Storage"),
+                                    fieldWithPath("capacity").description("Объем хранилища"),
+                                    fieldWithPath("capacityUsed").description("Занятый объем хранилища")
+                            )
+                    ));
         } catch (Exception e){
             e.printStackTrace();
             Assert.fail();

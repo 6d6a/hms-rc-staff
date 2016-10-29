@@ -113,18 +113,18 @@ public class ServiceRestControllerTest {
     public void readOne() {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testServices.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
 
-        this.document.snippets(
-                responseFields(
-                        fieldWithPath("id").description("Service ID"),
-                        fieldWithPath("name").description("Имя Service"),
-                        fieldWithPath("switchedOn").description("Статус Service"),
-                        fieldWithPath("serviceSockets").description("Список serviceSockets для Service"),
-                        fieldWithPath("serviceTemplate").description("serviceTemplate для Service")
-                )
-        );
-
         try {
-            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8)).andDo(this.document);
+            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                    responseFields(
+                            fieldWithPath("id").description("Service ID"),
+                            fieldWithPath("name").description("Имя Service"),
+                            fieldWithPath("switchedOn").description("Статус Service"),
+                            fieldWithPath("serviceSockets").description("Список serviceSockets для Service"),
+                            fieldWithPath("serviceTemplate").description("serviceTemplate для Service")
+                    )
+            ));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -135,20 +135,20 @@ public class ServiceRestControllerTest {
     public void readAll() {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/").accept(MediaType.APPLICATION_JSON_UTF8);
 
-        this.document.snippets(
-                responseFields(
-                        fieldWithPath("[].id").description("Service ID"),
-                        fieldWithPath("[].name").description("Имя Service"),
-                        fieldWithPath("[].switchedOn").description("Статус Service"),
-                        fieldWithPath("[].serviceSockets").description("Список serviceSockets для Service"),
-                        fieldWithPath("[].serviceTemplate").description("serviceTemplate для Service")
-                )
-        );
-
         try {
             mockMvc.perform(request).andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                    .andExpect(jsonPath("$").isArray()).andDo(this.document);
+                    .andExpect(jsonPath("$").isArray())
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                    responseFields(
+                            fieldWithPath("[].id").description("Service ID"),
+                            fieldWithPath("[].name").description("Имя Service"),
+                            fieldWithPath("[].switchedOn").description("Статус Service"),
+                            fieldWithPath("[].serviceSockets").description("Список serviceSockets для Service"),
+                            fieldWithPath("[].serviceTemplate").description("serviceTemplate для Service")
+                    )
+            ));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -160,16 +160,6 @@ public class ServiceRestControllerTest {
         Service testingService = testServices.get(0);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testingService.getId()).accept(MediaType.APPLICATION_JSON_UTF8);
 
-        this.document.snippets(
-                responseFields(
-                        fieldWithPath("id").description("Service ID"),
-                        fieldWithPath("name").description("Имя Service"),
-                        fieldWithPath("switchedOn").description("Статус Service"),
-                        fieldWithPath("serviceSockets").description("Список serviceSockets для Service"),
-                        fieldWithPath("serviceTemplate").description("serviceTemplate для Service")
-                )
-        );
-
         try {
             mockMvc.perform(request).andExpect(jsonPath("id").value(testingService.getId()))
                     .andExpect(jsonPath("id").value(testingService.getId()))
@@ -177,7 +167,16 @@ public class ServiceRestControllerTest {
                     .andExpect(jsonPath("switchedOn").value(testingService.getSwitchedOn()))
                     .andExpect(jsonPath("serviceTemplate.id").value(testingService.getServiceTemplateId()))
                     .andExpect(jsonPath("serviceSockets.[0].id").value(testingService.getServiceSocketIds().get(0)))
-                    .andDo(this.document);
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                            responseFields(
+                                    fieldWithPath("id").description("Service ID"),
+                                    fieldWithPath("name").description("Имя Service"),
+                                    fieldWithPath("switchedOn").description("Статус Service"),
+                                    fieldWithPath("serviceSockets").description("Список serviceSockets для Service"),
+                                    fieldWithPath("serviceTemplate").description("serviceTemplate для Service")
+                            )
+                    ));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
