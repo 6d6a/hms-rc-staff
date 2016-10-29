@@ -72,7 +72,7 @@ public class ServiceTemplateRestControllerTest {
             ConfigTemplate configTemplate = new ConfigTemplate();
             configTemplateRepository.save(configTemplate);
             ServiceTemplate serviceTemplate = new ServiceTemplate();
-            serviceTemplate.setName(namePattern);
+            serviceTemplate.setName(name);
             serviceTemplate.setSwitchedOn(switchedOn);
             serviceTemplate.addConfigTemplate(configTemplate);
             serviceTempalteRepository.save(serviceTemplate);
