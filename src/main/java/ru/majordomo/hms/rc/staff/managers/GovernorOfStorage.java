@@ -13,7 +13,6 @@ import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.repositories.StorageRepository;
 import ru.majordomo.hms.rc.staff.resources.Storage;
 
-import javafx.util.Pair;
 import java.util.List;
 
 @Service

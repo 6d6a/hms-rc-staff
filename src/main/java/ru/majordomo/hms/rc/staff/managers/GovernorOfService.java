@@ -3,7 +3,6 @@ package ru.majordomo.hms.rc.staff.managers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javafx.util.Pair;
 import java.util.ArrayList;
 import java.util.List;
 

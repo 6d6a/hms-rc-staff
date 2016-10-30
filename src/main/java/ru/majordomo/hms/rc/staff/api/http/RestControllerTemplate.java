@@ -8,7 +8,6 @@ import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.LordOfResources;
 import ru.majordomo.hms.rc.staff.resources.Resource;
 
-import javafx.util.Pair;
 import java.util.Collection;
 
 abstract public class RestControllerTemplate {

@@ -14,7 +14,6 @@ import ru.majordomo.hms.rc.staff.resources.Service;
 import ru.majordomo.hms.rc.staff.resources.Storage;
 import ru.majordomo.hms.rc.staff.resources.Resource;
 
-import javafx.util.Pair;
 import java.util.ArrayList;
 import java.util.List;
 

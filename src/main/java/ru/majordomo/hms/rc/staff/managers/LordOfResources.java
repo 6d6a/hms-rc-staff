@@ -1,6 +1,5 @@
 package ru.majordomo.hms.rc.staff.managers;
 
-import javafx.util.Pair;
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.resources.Resource;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
