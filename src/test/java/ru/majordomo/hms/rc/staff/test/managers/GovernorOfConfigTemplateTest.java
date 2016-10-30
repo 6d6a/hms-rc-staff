@@ -17,7 +17,6 @@ import ru.majordomo.hms.rc.staff.managers.GovernorOfConfigTemplate;
 import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -82,7 +81,7 @@ public class GovernorOfConfigTemplateTest {
         configTemplate.setSwitchedOn(switchedOn);
         configTemplateRepository.save(configTemplate);
 
-        List<ConfigTemplate> buildedConfigTemplates = governorOfConfigTemplate.build();
+        List<ConfigTemplate> buildedConfigTemplates = governorOfConfigTemplate.buildAll("");
         try {
             Assert.assertEquals("name соответствует ожидаемому", fileName, buildedConfigTemplates.get(buildedConfigTemplates.size()-1).getName());
             Assert.assertEquals("switchedOn соответствует ожидаемомему", switchedOn, buildedConfigTemplates.get(buildedConfigTemplates.size()-1).getSwitchedOn());

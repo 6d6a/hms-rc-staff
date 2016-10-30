@@ -8,4 +8,5 @@ import ru.majordomo.hms.rc.staff.resources.Network;
 
 public interface NetworkRepository extends MongoRepository<Network, String> {
     List<Network> findAll();
+    List<Network> findByName(String name);
 }

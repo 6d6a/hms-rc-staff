@@ -3,6 +3,7 @@ package ru.majordomo.hms.rc.staff.managers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javafx.util.Pair;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -95,12 +96,22 @@ public class GovernorOfServerRole extends LordOfResources{
     }
 
     @Override
-    public List<ServerRole> build() {
+    public List<ServerRole> buildAll(String key) {
         List<ServerRole> buildedServerRoles = new ArrayList<>();
-        for (ServerRole serverRole : serverRoleRepository.findAll()) {
-            buildedServerRoles.add((ServerRole) build(serverRole.getId()));
+        switch (key) {
+            case "": {
+                for (ServerRole serverRole : serverRoleRepository.findAll()) {
+                    buildedServerRoles.add((ServerRole) build(serverRole.getId()));
+                }
+                return buildedServerRoles;
+            }
+            default: {
+                for (ServerRole serverRole : serverRoleRepository.findByName(key)) {
+                    buildedServerRoles.add((ServerRole) build(serverRole.getId()));
+                }
+                return buildedServerRoles;
+            }
         }
-        return buildedServerRoles;
     }
 
     @Override

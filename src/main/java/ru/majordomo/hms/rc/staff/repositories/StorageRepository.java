@@ -11,4 +11,5 @@ import ru.majordomo.hms.rc.staff.resources.Storage;
 @Repository
 public interface StorageRepository extends MongoRepository<Storage,String> {
     List<Storage> findAll();
+    List<Storage> findByName(String name);
 }

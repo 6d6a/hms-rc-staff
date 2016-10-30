@@ -6,7 +6,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
@@ -93,7 +92,7 @@ public class GovernorOfStorageTest {
     @Test
     public void buildAll() {
         storageRepository.save(testStorage);
-        List<Storage> buildedStorage = governor.build();
+        List<Storage> buildedStorage = governor.buildAll("");
         try {
             Assert.assertEquals("Имя не совпадает с ожидаемым", testStorage.getName(), buildedStorage.get(buildedStorage.size()-1).getName());
             Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testStorage.getSwitchedOn(), buildedStorage.get(buildedStorage.size()-1).getSwitchedOn());

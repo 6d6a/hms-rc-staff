@@ -3,18 +3,16 @@ package ru.majordomo.hms.rc.staff.managers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javafx.util.Pair;
 import java.util.ArrayList;
 import java.util.List;
 
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
-import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
 import ru.majordomo.hms.rc.staff.resources.*;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.repositories.ServiceRepository;
-import ru.majordomo.hms.rc.staff.repositories.ServiceSocketRepository;
-import ru.majordomo.hms.rc.staff.repositories.ServiceTemplateRepository;
 
 @Component
 public class GovernorOfService extends LordOfResources{
@@ -115,12 +113,22 @@ public class GovernorOfService extends LordOfResources{
     }
 
     @Override
-    public List<Service> build() {
+    public List<Service> buildAll(String key) {
         List<Service> buildedServices = new ArrayList<>();
-        for (Service service : repository.findAll()) {
-            buildedServices.add((Service) build(service.getId()));
+        switch (key) {
+            case "": {
+                for (Service service : repository.findAll()) {
+                    buildedServices.add((Service) build(service.getId()));
+                }
+                return buildedServices;
+            }
+            default: {
+                for (Service service : repository.findByName(key)) {
+                    buildedServices.add((Service) build(service.getId()));
+                }
+                return buildedServices;
+            }
         }
-        return buildedServices;
     }
 
     @Override

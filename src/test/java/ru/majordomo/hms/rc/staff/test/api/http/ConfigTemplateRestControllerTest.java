@@ -1,10 +1,7 @@
 package ru.majordomo.hms.rc.staff.test.api.http;
 
 import org.bson.types.ObjectId;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -129,6 +126,28 @@ public class ConfigTemplateRestControllerTest {
     }
 
     @Test
+    public void readAllByName() {
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/").param("name", configTemplates.get(2).getName()).accept(MediaType.APPLICATION_JSON_UTF8);
+
+        try {
+            mockMvc.perform(request).andExpect(status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                            responseFields(
+                                    fieldWithPath("[].id").description("ConfigTemplate ID"),
+                                    fieldWithPath("[].name").description("Имя ConfigTemplate"),
+                                    fieldWithPath("[].switchedOn").description("Статус ConfigTemplate"),
+                                    fieldWithPath("[].fileLink").description("Ссылка на файл")
+                            )
+                    ));
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
     public void readOneAndCheckObjectFields() {
         ConfigTemplate configTemplate = configTemplates.get(0);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + configTemplate.getId()).accept(MediaType.APPLICATION_JSON_UTF8);
@@ -218,5 +237,10 @@ public class ConfigTemplateRestControllerTest {
             e.printStackTrace();
             Assert.fail();
         }
+    }
+
+    @After
+    public void cleanAll() {
+        configTemplateRepository.deleteAll();
     }
 }

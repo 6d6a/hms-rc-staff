@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -32,8 +33,8 @@ public class NetworkRestController extends RestControllerTemplate {
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
-    public Collection<? extends Resource> readAll() {
-        return processReadAllQuery();
+    public Collection<? extends Resource> readAll(@RequestParam(required=false, defaultValue="") String name) {
+        return processReadAllQuery(name);
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Collection;
 
@@ -30,8 +31,8 @@ public class ServiceRestController extends RestControllerTemplate {
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
-    public Collection<? extends Resource> readAll() {
-        return processReadAllQuery();
+    public Collection<? extends Resource> readAll(@RequestParam(required=false, defaultValue="") String name) {
+        return processReadAllQuery(name);
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)

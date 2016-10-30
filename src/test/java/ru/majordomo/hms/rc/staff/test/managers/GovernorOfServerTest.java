@@ -148,7 +148,7 @@ public class GovernorOfServerTest {
     @Test
     public void buildAll() {
         serverRepository.save(testServer);
-        List<Server> buildedServers = governor.build();
+        List<Server> buildedServers = governor.buildAll("");
         try {
             Assert.assertEquals("Имя не совпадает с ожидаемым", testServer.getName(), buildedServers.get(buildedServers.size()-1).getName());
             Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testServer.getSwitchedOn(), buildedServers.get(buildedServers.size()-1).getSwitchedOn());

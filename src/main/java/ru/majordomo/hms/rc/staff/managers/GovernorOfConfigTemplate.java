@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javafx.util.Pair;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
@@ -72,8 +73,15 @@ public class GovernorOfConfigTemplate extends LordOfResources {
     }
 
     @Override
-    public List<ConfigTemplate> build() {
-        return configTemplateRepository.findAll();
+    public List<ConfigTemplate> buildAll(String key) {
+        switch (key) {
+            case "": {
+                return configTemplateRepository.findAll();
+            }
+            default: {
+                return configTemplateRepository.findByName(key);
+            }
+        }
     }
 
     @Override

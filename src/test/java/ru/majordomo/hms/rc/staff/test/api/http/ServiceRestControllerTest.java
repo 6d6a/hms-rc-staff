@@ -1,10 +1,7 @@
 package ru.majordomo.hms.rc.staff.test.api.http;
 
 import org.bson.types.ObjectId;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -156,6 +153,30 @@ public class ServiceRestControllerTest {
     }
 
     @Test
+    public void readAllByName() {
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/").param("name", testServices.get(2).getName()).accept(MediaType.APPLICATION_JSON_UTF8);
+
+        try {
+            mockMvc.perform(request).andExpect(status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                    .andExpect(jsonPath("$").isArray())
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                            responseFields(
+                                    fieldWithPath("[].id").description("Service ID"),
+                                    fieldWithPath("[].name").description("Имя Service"),
+                                    fieldWithPath("[].switchedOn").description("Статус Service"),
+                                    fieldWithPath("[].serviceSockets").description("Список serviceSockets для Service"),
+                                    fieldWithPath("[].serviceTemplate").description("serviceTemplate для Service")
+                            )
+                    ));
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
     public void readOneAndCheckObjectFields() {
         Service testingService = testServices.get(0);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testingService.getId()).accept(MediaType.APPLICATION_JSON_UTF8);
@@ -250,5 +271,10 @@ public class ServiceRestControllerTest {
             e.printStackTrace();
             Assert.fail();
         }
+    }
+
+    @After
+    public void cleanAll() {
+        serviceRepository.deleteAll();
     }
 }

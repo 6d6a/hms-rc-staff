@@ -13,6 +13,7 @@ import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.repositories.StorageRepository;
 import ru.majordomo.hms.rc.staff.resources.Storage;
 
+import javafx.util.Pair;
 import java.util.List;
 
 @Service
@@ -92,8 +93,15 @@ public class GovernorOfStorage extends LordOfResources {
     }
 
     @Override
-    public List<Storage> build() {
-        return repository.findAll();
+    public List<Storage> buildAll(String key) {
+        switch (key) {
+            case "": {
+                return repository.findAll();
+            }
+            default: {
+                return repository.findByName(key);
+            }
+        }
     }
 
     @Override

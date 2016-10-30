@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javafx.util.Pair;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -93,12 +94,22 @@ public class GovernorOfServiceTemplate extends LordOfResources {
     }
 
     @Override
-    public List<ServiceTemplate> build() {
+    public List<ServiceTemplate> buildAll(String key) {
         List<ServiceTemplate> buildedServiceTemplates = new ArrayList<>();
-        for (ServiceTemplate serviceTemplate : serviceTemplateRepository.findAll()) {
-            buildedServiceTemplates.add((ServiceTemplate) build(serviceTemplate.getId()));
+        switch (key) {
+            case "": {
+                for (ServiceTemplate serviceTemplate : serviceTemplateRepository.findAll()) {
+                    buildedServiceTemplates.add((ServiceTemplate) build(serviceTemplate.getId()));
+                }
+                return buildedServiceTemplates;
+            }
+            default: {
+                for (ServiceTemplate serviceTemplate : serviceTemplateRepository.findByName(key)) {
+                    buildedServiceTemplates.add((ServiceTemplate) build(serviceTemplate.getId()));
+                }
+                return buildedServiceTemplates;
+            }
         }
-        return buildedServiceTemplates;
     }
 
     @Override

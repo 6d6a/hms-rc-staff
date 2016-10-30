@@ -11,4 +11,5 @@ import ru.majordomo.hms.rc.staff.resources.Service;
 @Repository
 public interface ServiceRepository extends MongoRepository<Service, String> {
     List<Service> findAll();
+    List<Service> findByName(String name);
 }

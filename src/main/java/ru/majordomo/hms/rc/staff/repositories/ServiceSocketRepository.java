@@ -10,4 +10,5 @@ import ru.majordomo.hms.rc.staff.resources.ServiceSocket;
 @Repository
 public interface ServiceSocketRepository extends MongoRepository<ServiceSocket,String> {
     List<ServiceSocket> findAll();
+    List<ServiceSocket> findByName(String name);
 }

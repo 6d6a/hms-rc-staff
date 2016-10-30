@@ -1,10 +1,7 @@
 package ru.majordomo.hms.rc.staff.test.api.http;
 
 import org.bson.types.ObjectId;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,6 +142,29 @@ public class ServerRoleRestControllerTest {
     }
 
     @Test
+    public void readAllByName() {
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName).param("name", testServerRoles.get(2).getName()).accept(MediaType.APPLICATION_JSON_UTF8);
+
+        try {
+            mockMvc.perform(request).andExpect(status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                    .andExpect(jsonPath("$").isArray())
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                            responseFields(
+                                    fieldWithPath("[].id").description("ServerRole ID"),
+                                    fieldWithPath("[].name").description("Имя ServerRole"),
+                                    fieldWithPath("[].switchedOn").description("Статус ServerRole"),
+                                    fieldWithPath("[].serviceTemplates").description("Список ServiceTemplates для ServerRole")
+                            )
+                    ));
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
     public void readOneAndCheckObjectFields() {
         ServerRole testingServerRole = testServerRoles.get(0);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testingServerRole.getId()).accept(MediaType.APPLICATION_JSON_UTF8);
@@ -236,5 +256,10 @@ public class ServerRoleRestControllerTest {
             e.printStackTrace();
             Assert.fail();
         }
+    }
+
+    @After
+    public void cleanAll() {
+        serverRoleRepository.deleteAll();
     }
 }

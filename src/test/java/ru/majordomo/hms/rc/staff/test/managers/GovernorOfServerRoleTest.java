@@ -19,7 +19,6 @@ import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServerRoleRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceTemplateRepository;
 import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
-import ru.majordomo.hms.rc.staff.resources.Server;
 import ru.majordomo.hms.rc.staff.resources.ServerRole;
 import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 import ru.majordomo.hms.rc.staff.test.config.EmbeddedServltetContainerConfig;
@@ -114,7 +113,7 @@ public class GovernorOfServerRoleTest {
     @Test
     public void buildAll() {
         serverRoleRepository.save(testServerRole);
-        List<ServerRole> buildedServerRoles = governor.build();
+        List<ServerRole> buildedServerRoles = governor.buildAll("");
         try {
             Assert.assertEquals("Имя не совпадает с ожидаемым", testServerRole.getName(), buildedServerRoles.get(buildedServerRoles.size()-1).getName());
             Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testServerRole.getSwitchedOn(), buildedServerRoles.get(buildedServerRoles.size()-1).getSwitchedOn());

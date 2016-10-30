@@ -10,4 +10,5 @@ import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 @Repository
 public interface ServiceTemplateRepository extends MongoRepository<ServiceTemplate,String> {
     List<ServiceTemplate> findAll();
+    List<ServiceTemplate> findByName(String name);
 }

@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javafx.util.Pair;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,8 +97,15 @@ public class GovernorOfServiceSocket extends LordOfResources {
     }
 
     @Override
-    public List<ServiceSocket> build() {
-        return serviceSocketRepository.findAll();
+    public List<ServiceSocket> buildAll(String key) {
+        switch (key) {
+            case "": {
+                return serviceSocketRepository.findAll();
+            }
+            default: {
+                return serviceSocketRepository.findByName(key);
+            }
+        }
     }
 
     @Override

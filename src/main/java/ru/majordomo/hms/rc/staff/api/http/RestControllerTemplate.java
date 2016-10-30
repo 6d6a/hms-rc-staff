@@ -8,6 +8,7 @@ import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.LordOfResources;
 import ru.majordomo.hms.rc.staff.resources.Resource;
 
+import javafx.util.Pair;
 import java.util.Collection;
 
 abstract public class RestControllerTemplate {
@@ -18,8 +19,8 @@ abstract public class RestControllerTemplate {
         return governor.build(resourceId);
     }
 
-    protected Collection<? extends Resource> processReadAllQuery() {
-        return governor.build();
+    protected Collection<? extends Resource> processReadAllQuery(String key) {
+        return governor.buildAll(key);
     }
 
     protected ResponseEntity<?> processCreateQuery(Resource resource) throws ParameterValidateException {

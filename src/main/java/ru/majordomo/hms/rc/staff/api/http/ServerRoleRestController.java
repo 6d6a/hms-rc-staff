@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfServerRole;
 import ru.majordomo.hms.rc.staff.resources.Resource;
@@ -30,8 +31,8 @@ public class ServerRoleRestController extends RestControllerTemplate {
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
-    public Collection<? extends Resource> readAll() {
-        return processReadAllQuery();
+    public Collection<? extends Resource> readAll(@RequestParam(required=false, defaultValue="") String name) {
+        return processReadAllQuery(name);
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)

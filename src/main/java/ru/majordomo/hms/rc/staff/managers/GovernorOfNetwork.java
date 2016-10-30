@@ -6,8 +6,7 @@ import org.apache.commons.net.util.SubnetUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.net.InetAddress;
-import java.util.ArrayList;
+import javafx.util.Pair;
 import java.util.List;
 
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
@@ -106,8 +105,15 @@ public class GovernorOfNetwork extends LordOfResources {
     }
 
     @Override
-    public List<Network> build() {
-        return networkRepository.findAll();
+    public List<Network> buildAll(String key) {
+        switch (key) {
+            case "": {
+                return networkRepository.findAll();
+            }
+            default: {
+                return networkRepository.findByName(key);
+            }
+        }
     }
 
     @Override

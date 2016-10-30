@@ -14,6 +14,7 @@ import ru.majordomo.hms.rc.staff.resources.Service;
 import ru.majordomo.hms.rc.staff.resources.Storage;
 import ru.majordomo.hms.rc.staff.resources.Resource;
 
+import javafx.util.Pair;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -146,12 +147,22 @@ public class GovernorOfServer extends LordOfResources{
     }
 
     @Override
-    public List<Server> build() {
+    public List<Server> buildAll(String key) {
         List<Server> buildedServers = new ArrayList<>();
-        for (Server server : serverRepository.findAll()) {
-            buildedServers.add((Server) build(server.getId()));
+        switch (key) {
+            case "": {
+                for (Server server : serverRepository.findAll()) {
+                    buildedServers.add((Server) build(server.getId()));
+                }
+                return buildedServers;
+            }
+            default: {
+                for (Server server : serverRepository.findByName(key)) {
+                    buildedServers.add((Server) build(server.getId()));
+                }
+                return buildedServers;
+            }
         }
-        return buildedServers;
     }
 
     @Override
