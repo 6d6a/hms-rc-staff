@@ -7,7 +7,9 @@ import org.springframework.stereotype.Component;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.resources.Resource;
@@ -69,6 +71,32 @@ public class GovernorOfConfigTemplate extends LordOfResources {
             throw new ResourceNotFoundException("ConfigTemplate с ID:" + resourceId + " не найден");
         }
         return configTemplate;
+    }
+
+    @Override
+    public List<ConfigTemplate> build(Map<String, String> keyValue) {
+
+        List<ConfigTemplate> buildedConfigTemplates = new ArrayList<>();
+
+        Boolean byName = false;
+
+        for (Map.Entry<String, String> entry : keyValue.entrySet()) {
+            if (entry.getKey().equals("name")) {
+                byName = true;
+            }
+        }
+
+        if (byName) {
+            for (ConfigTemplate configTemplate : configTemplateRepository.findByName(keyValue.get("name"))) {
+                buildedConfigTemplates.add((ConfigTemplate) build(configTemplate.getId()));
+            }
+        } else {
+            for (ConfigTemplate configTemplate : configTemplateRepository.findAll()) {
+                buildedConfigTemplates.add((ConfigTemplate) build(configTemplate.getId()));
+            }
+        }
+
+        return buildedConfigTemplates;
     }
 
     @Override

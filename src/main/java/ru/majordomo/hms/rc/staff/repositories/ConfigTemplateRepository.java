@@ -10,4 +10,5 @@ import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
 @Repository
 public interface ConfigTemplateRepository extends MongoRepository<ConfigTemplate,String> {
     List<ConfigTemplate> findAll();
+    List<ConfigTemplate> findByName(String name);
 }

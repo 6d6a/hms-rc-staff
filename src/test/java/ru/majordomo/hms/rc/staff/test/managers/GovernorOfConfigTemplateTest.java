@@ -17,7 +17,6 @@ import ru.majordomo.hms.rc.staff.managers.GovernorOfConfigTemplate;
 import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)

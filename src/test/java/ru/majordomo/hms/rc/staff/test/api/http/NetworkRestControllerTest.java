@@ -148,6 +148,30 @@ public class NetworkRestControllerTest {
     }
 
     @Test
+    public void readAllByName() {
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName).param("name", networks.get(2).getName()).accept(MediaType.APPLICATION_JSON_UTF8);
+
+        try {
+            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                            responseFields(
+                                    fieldWithPath("[].id").description("Network ID"),
+                                    fieldWithPath("[].name").description("Имя Network"),
+                                    fieldWithPath("[].switchedOn").description("Статус Network"),
+                                    fieldWithPath("[].address").description("IP-адрес"),
+                                    fieldWithPath("[].mask").description("Маска"),
+                                    fieldWithPath("[].gatewayAddress").description("Шлюз"),
+                                    fieldWithPath("[].vlanNumber").description("Номер сети")
+                            )
+                    ));
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
     public void readOneAndCheckObjectFields() {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + networks.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
 

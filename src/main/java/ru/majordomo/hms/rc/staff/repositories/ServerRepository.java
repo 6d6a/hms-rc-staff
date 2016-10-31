@@ -8,6 +8,7 @@ import java.util.List;
 import ru.majordomo.hms.rc.staff.resources.Server;
 
 @Repository
-public interface ServerRepository extends MongoRepository<Server, String>{
+public interface ServerRepository extends MongoRepository<Server, String> {
     List<Server> findAll();
+    List<Server> findByName(String name);
 }

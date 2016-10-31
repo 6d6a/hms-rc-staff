@@ -126,6 +126,7 @@ public class GovernorOfServiceTest {
     @Test
     public void buildAll() {
         serviceRepository.save(testService);
+        String emptyString = "";
         List<Service> buildedServices =  governor.build();
         try {
             Assert.assertEquals("name не совпадает с ожидаемым", testService.getName(), buildedServices.get(buildedServices.size()-1).getName());

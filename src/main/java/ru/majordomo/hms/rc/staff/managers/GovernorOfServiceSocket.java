@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.resources.Resource;
@@ -93,6 +94,32 @@ public class GovernorOfServiceSocket extends LordOfResources {
             throw new ResourceNotFoundException("ServiceSocket с ID:" + resourceId + " не найден");
         }
         return serviceSocket;
+    }
+
+    @Override
+    public List<ServiceSocket> build(Map<String, String> keyValue) {
+
+        List<ServiceSocket> buildedServiceSockets = new ArrayList<>();
+
+        Boolean byName = false;
+
+        for (Map.Entry<String, String> entry : keyValue.entrySet()) {
+            if (entry.getKey().equals("name")) {
+                byName = true;
+            }
+        }
+
+        if (byName) {
+            for (ServiceSocket serviceSocket : serviceSocketRepository.findByName(keyValue.get("name"))) {
+                buildedServiceSockets.add((ServiceSocket) build(serviceSocket.getId()));
+            }
+        } else {
+            for (ServiceSocket serviceSocket : serviceSocketRepository.findAll()) {
+                buildedServiceSockets.add((ServiceSocket) build(serviceSocket.getId()));
+            }
+        }
+
+        return buildedServiceSockets;
     }
 
     @Override

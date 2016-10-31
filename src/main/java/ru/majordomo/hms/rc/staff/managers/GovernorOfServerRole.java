@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.resources.Resource;
@@ -92,6 +93,32 @@ public class GovernorOfServerRole extends LordOfResources{
             serverRole.addServiceTemplate(serviceTemplate);
         }
         return serverRole;
+    }
+
+    @Override
+    public List<ServerRole> build(Map<String, String> keyValue) {
+
+        List<ServerRole> buildedServerRoles = new ArrayList<>();
+
+        Boolean byName = false;
+
+        for (Map.Entry<String, String> entry : keyValue.entrySet()) {
+            if (entry.getKey().equals("name")) {
+                byName = true;
+            }
+        }
+
+        if (byName) {
+            for (ServerRole serverRole : serverRoleRepository.findByName(keyValue.get("name"))) {
+                buildedServerRoles.add((ServerRole) build(serverRole.getId()));
+            }
+        } else {
+            for (ServerRole serverRole : serverRoleRepository.findAll()) {
+                buildedServerRoles.add((ServerRole) build(serverRole.getId()));
+            }
+        }
+
+        return buildedServerRoles;
     }
 
     @Override

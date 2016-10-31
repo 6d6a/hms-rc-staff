@@ -1,10 +1,7 @@
 package ru.majordomo.hms.rc.staff.test.api.http;
 
 import org.bson.types.ObjectId;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -149,6 +146,28 @@ public class ServiceSocketRestControllerTest {
     }
 
     @Test
+    public void readAllByName() {
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/").param("name", serviceSocketList.get(2).getName()).accept(MediaType.APPLICATION_JSON_UTF8);
+
+        try {
+            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                            responseFields(
+                                    fieldWithPath("[].id").description("ServiceSocket ID"),
+                                    fieldWithPath("[].name").description("Имя ServiceSocket"),
+                                    fieldWithPath("[].switchedOn").description("Статус ServiceSocket"),
+                                    fieldWithPath("[].port").description("Порт"),
+                                    fieldWithPath("[].address").description("IP")
+                            )
+                    ));
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
     public void readOneAndCheckObjectFields() {
 
         try {
@@ -262,5 +281,10 @@ public class ServiceSocketRestControllerTest {
             Assert.fail();
         }
 
+    }
+
+    @After
+    public void cleanAll() {
+        serviceSocketRepository.deleteAll();
     }
 }

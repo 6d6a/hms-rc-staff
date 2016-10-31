@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.resources.Resource;
@@ -90,6 +91,32 @@ public class GovernorOfServiceTemplate extends LordOfResources {
             serviceTemplate.addConfigTemplate(configTemplate);
         }
         return serviceTemplate;
+    }
+
+    @Override
+    public List<ServiceTemplate> build(Map<String, String> keyValue) {
+
+        List<ServiceTemplate> buildedServiceTemplates = new ArrayList<>();
+
+        Boolean byName = false;
+
+        for (Map.Entry<String, String> entry : keyValue.entrySet()) {
+            if (entry.getKey().equals("name")) {
+                byName = true;
+            }
+        }
+
+        if (byName) {
+            for (ServiceTemplate serviceTemplate : serviceTemplateRepository.findByName(keyValue.get("name"))) {
+                buildedServiceTemplates.add((ServiceTemplate) build(serviceTemplate.getId()));
+            }
+        } else {
+            for (ServiceTemplate serviceTemplate : serviceTemplateRepository.findAll()) {
+                buildedServiceTemplates.add((ServiceTemplate) build(serviceTemplate.getId()));
+            }
+        }
+
+        return buildedServiceTemplates;
     }
 
     @Override

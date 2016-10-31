@@ -6,9 +6,9 @@ import org.apache.commons.net.util.SubnetUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.resources.Resource;
@@ -103,6 +103,32 @@ public class GovernorOfNetwork extends LordOfResources {
             throw new ResourceNotFoundException("Network с ID:" + resourceId + " не найден");
         }
         return network;
+    }
+
+    @Override
+    public List<Network> build(Map<String, String> keyValue) {
+
+        List<Network> buildedNetworks = new ArrayList<>();
+
+        Boolean byName = false;
+
+        for (Map.Entry<String, String> entry : keyValue.entrySet()) {
+            if (entry.getKey().equals("name")) {
+                byName = true;
+            }
+        }
+
+        if (byName) {
+            for (Network network : networkRepository.findByName(keyValue.get("name"))) {
+                buildedNetworks.add((Network) build(network.getId()));
+            }
+        } else {
+            for (Network network : networkRepository.findAll()) {
+                buildedNetworks.add((Network) build(network.getId()));
+            }
+        }
+
+        return buildedNetworks;
     }
 
     @Override

@@ -5,16 +5,14 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
-import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
 import ru.majordomo.hms.rc.staff.resources.*;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.repositories.ServiceRepository;
-import ru.majordomo.hms.rc.staff.repositories.ServiceSocketRepository;
-import ru.majordomo.hms.rc.staff.repositories.ServiceTemplateRepository;
 
 @Component
 public class GovernorOfService extends LordOfResources{
@@ -112,6 +110,32 @@ public class GovernorOfService extends LordOfResources{
         service.setServiceTemplate(serviceTemplate);
 
         return service;
+    }
+
+    @Override
+    public List<Service> build(Map<String, String> keyValue) {
+
+        List<Service> buildedServices = new ArrayList<>();
+
+        Boolean byName = false;
+
+        for (Map.Entry<String, String> entry : keyValue.entrySet()) {
+            if (entry.getKey().equals("name")) {
+                byName = true;
+            }
+        }
+
+        if (byName) {
+            for (Service service : repository.findByName(keyValue.get("name"))) {
+                buildedServices.add((Service) build(service.getId()));
+            }
+        } else {
+            for (Service service : repository.findAll()) {
+                buildedServices.add((Service) build(service.getId()));
+            }
+        }
+
+        return buildedServices;
     }
 
     @Override
