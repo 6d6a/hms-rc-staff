@@ -67,6 +67,9 @@ public class ServiceTemplateRestControllerTest {
         for (int i = 1; i < 6; i++) {
             String name = namePattern + i;
             ConfigTemplate configTemplate = new ConfigTemplate();
+            configTemplate.setName("Шаблон конфигурационного файла " + i);
+            configTemplate.setSwitchedOn(true);
+            configTemplate.setFileLink("http://storage/" + ObjectId.get().toString());
             configTemplateRepository.save(configTemplate);
             ServiceTemplate serviceTemplate = new ServiceTemplate();
             serviceTemplate.setName(name);
