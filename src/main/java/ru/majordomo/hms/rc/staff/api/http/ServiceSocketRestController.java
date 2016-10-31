@@ -17,7 +17,6 @@ import ru.majordomo.hms.rc.staff.resources.Resource;
 import ru.majordomo.hms.rc.staff.resources.ServiceSocket;
 
 @RestController
-@CrossOrigin("*")
 @RequestMapping("/service-socket")
 public class ServiceSocketRestController extends RestControllerTemplate {
 

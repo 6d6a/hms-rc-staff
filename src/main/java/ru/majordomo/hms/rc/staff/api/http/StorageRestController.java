@@ -18,7 +18,6 @@ import ru.majordomo.hms.rc.staff.resources.Storage;
 
 @RestController
 @RequestMapping("/storage")
-@CrossOrigin("*")
 public class StorageRestController extends RestControllerTemplate {
 
     @Autowired

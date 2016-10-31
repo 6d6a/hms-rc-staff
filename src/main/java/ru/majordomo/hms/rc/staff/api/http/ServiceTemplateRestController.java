@@ -17,7 +17,6 @@ import ru.majordomo.hms.rc.staff.resources.Resource;
 import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 
 @RestController
-@CrossOrigin
 @RequestMapping("/service-template")
 public class ServiceTemplateRestController extends RestControllerTemplate {
 

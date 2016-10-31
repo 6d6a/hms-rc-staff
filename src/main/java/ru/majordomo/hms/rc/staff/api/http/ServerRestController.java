@@ -17,7 +17,6 @@ import ru.majordomo.hms.rc.staff.resources.Resource;
 import ru.majordomo.hms.rc.staff.resources.Server;
 
 @RestController
-@CrossOrigin("*")
 @RequestMapping(value = "/server")
 public class ServerRestController extends RestControllerTemplate {
 
