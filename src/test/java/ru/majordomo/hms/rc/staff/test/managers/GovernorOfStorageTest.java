@@ -92,7 +92,7 @@ public class GovernorOfStorageTest {
     @Test
     public void buildAll() {
         storageRepository.save(testStorage);
-        List<Storage> buildedStorage = governor.buildAll("");
+        List<Storage> buildedStorage = governor.build(null, null);
         try {
             Assert.assertEquals("Имя не совпадает с ожидаемым", testStorage.getName(), buildedStorage.get(buildedStorage.size()-1).getName());
             Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testStorage.getSwitchedOn(), buildedStorage.get(buildedStorage.size()-1).getSwitchedOn());

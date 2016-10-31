@@ -112,17 +112,17 @@ public class GovernorOfService extends LordOfResources{
     }
 
     @Override
-    public List<Service> buildAll(String key) {
+    public List<Service> build(String key, String value) {
         List<Service> buildedServices = new ArrayList<>();
-        switch (key) {
-            case "": {
-                for (Service service : repository.findAll()) {
+        switch ((key != null ? key : "")) {
+            case "name": {
+                for (Service service : repository.findByName(value)) {
                     buildedServices.add((Service) build(service.getId()));
                 }
                 return buildedServices;
             }
             default: {
-                for (Service service : repository.findByName(key)) {
+                for (Service service : repository.findAll()) {
                     buildedServices.add((Service) build(service.getId()));
                 }
                 return buildedServices;

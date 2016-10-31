@@ -18,8 +18,8 @@ abstract public class RestControllerTemplate {
         return governor.build(resourceId);
     }
 
-    protected Collection<? extends Resource> processReadAllQuery(String key) {
-        return governor.buildAll(key);
+    protected Collection<? extends Resource> processReadAllQuery(String key, String value) {
+        return governor.build(key, value);
     }
 
     protected ResponseEntity<?> processCreateQuery(Resource resource) throws ParameterValidateException {

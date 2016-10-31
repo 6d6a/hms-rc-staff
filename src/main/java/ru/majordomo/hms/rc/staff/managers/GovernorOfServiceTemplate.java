@@ -93,17 +93,17 @@ public class GovernorOfServiceTemplate extends LordOfResources {
     }
 
     @Override
-    public List<ServiceTemplate> buildAll(String key) {
+    public List<ServiceTemplate> build(String key, String value) {
         List<ServiceTemplate> buildedServiceTemplates = new ArrayList<>();
-        switch (key) {
-            case "": {
-                for (ServiceTemplate serviceTemplate : serviceTemplateRepository.findAll()) {
+        switch ((key != null ? key : "")) {
+            case "name": {
+                for (ServiceTemplate serviceTemplate : serviceTemplateRepository.findByName(value)) {
                     buildedServiceTemplates.add((ServiceTemplate) build(serviceTemplate.getId()));
                 }
                 return buildedServiceTemplates;
             }
             default: {
-                for (ServiceTemplate serviceTemplate : serviceTemplateRepository.findByName(key)) {
+                for (ServiceTemplate serviceTemplate : serviceTemplateRepository.findAll()) {
                     buildedServiceTemplates.add((ServiceTemplate) build(serviceTemplate.getId()));
                 }
                 return buildedServiceTemplates;

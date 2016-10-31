@@ -146,17 +146,17 @@ public class GovernorOfServer extends LordOfResources{
     }
 
     @Override
-    public List<Server> buildAll(String key) {
+    public List<Server> build(String key, String value) {
         List<Server> buildedServers = new ArrayList<>();
-        switch (key) {
-            case "": {
-                for (Server server : serverRepository.findAll()) {
+        switch ((key != null ? key : "")) {
+            case "name": {
+                for (Server server : serverRepository.findByName(value)) {
                     buildedServers.add((Server) build(server.getId()));
                 }
                 return buildedServers;
             }
             default: {
-                for (Server server : serverRepository.findByName(key)) {
+                for (Server server : serverRepository.findAll()) {
                     buildedServers.add((Server) build(server.getId()));
                 }
                 return buildedServers;

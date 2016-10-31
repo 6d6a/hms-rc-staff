@@ -92,13 +92,13 @@ public class GovernorOfStorage extends LordOfResources {
     }
 
     @Override
-    public List<Storage> buildAll(String key) {
-        switch (key) {
-            case "": {
-                return repository.findAll();
+    public List<Storage> build(String key, String value) {
+        switch ((key != null ? key : "")) {
+            case "name": {
+                return repository.findByName(value);
             }
             default: {
-                return repository.findByName(key);
+                return repository.findAll();
             }
         }
     }

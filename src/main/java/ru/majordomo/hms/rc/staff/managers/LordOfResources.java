@@ -12,7 +12,7 @@ public abstract class LordOfResources {
     public abstract Resource createResource(ServiceMessage serviceMessage) throws ParameterValidateException;
     public abstract void isValid(Resource resource) throws ParameterValidateException;
     public abstract Resource build(String resourceId) throws ResourceNotFoundException;
-    public abstract List<? extends Resource> buildAll(String key);
+    public abstract List<? extends Resource> build(String key, String value);
     public abstract void save(Resource resource);
     public abstract void delete(String resourceId);
     public static Resource setResourceParams(Resource resource, ServiceMessage serviceMessage, Cleaner cleaner) throws ClassCastException{

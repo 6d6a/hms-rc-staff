@@ -95,17 +95,17 @@ public class GovernorOfServerRole extends LordOfResources{
     }
 
     @Override
-    public List<ServerRole> buildAll(String key) {
+    public List<ServerRole> build(String key, String value) {
         List<ServerRole> buildedServerRoles = new ArrayList<>();
-        switch (key) {
-            case "": {
-                for (ServerRole serverRole : serverRoleRepository.findAll()) {
+        switch ((key != null ? key : "")) {
+            case "name": {
+                for (ServerRole serverRole : serverRoleRepository.findByName(value)) {
                     buildedServerRoles.add((ServerRole) build(serverRole.getId()));
                 }
                 return buildedServerRoles;
             }
             default: {
-                for (ServerRole serverRole : serverRoleRepository.findByName(key)) {
+                for (ServerRole serverRole : serverRoleRepository.findAll()) {
                     buildedServerRoles.add((ServerRole) build(serverRole.getId()));
                 }
                 return buildedServerRoles;

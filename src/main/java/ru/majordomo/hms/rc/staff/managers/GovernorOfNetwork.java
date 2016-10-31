@@ -104,13 +104,13 @@ public class GovernorOfNetwork extends LordOfResources {
     }
 
     @Override
-    public List<Network> buildAll(String key) {
-        switch (key) {
-            case "": {
-                return networkRepository.findAll();
+    public List<Network> build(String key, String value) {
+        switch ((key != null ? key : "")) {
+            case "name": {
+                return networkRepository.findByName(value);
             }
             default: {
-                return networkRepository.findByName(key);
+                return networkRepository.findAll();
             }
         }
     }

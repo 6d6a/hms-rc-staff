@@ -96,13 +96,13 @@ public class GovernorOfServiceSocket extends LordOfResources {
     }
 
     @Override
-    public List<ServiceSocket> buildAll(String key) {
-        switch (key) {
-            case "": {
-                return serviceSocketRepository.findAll();
+    public List<ServiceSocket> build(String key, String value) {
+        switch ((key != null ? key : "")) {
+            case "name": {
+                return serviceSocketRepository.findByName(value);
             }
             default: {
-                return serviceSocketRepository.findByName(key);
+                return serviceSocketRepository.findAll();
             }
         }
     }

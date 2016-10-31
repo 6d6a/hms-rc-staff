@@ -34,7 +34,11 @@ public class ServiceSocketRestController extends RestControllerTemplate {
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
     public Collection<? extends Resource> readAll(@RequestParam(required=false, defaultValue="") String name) {
-        return processReadAllQuery(name);
+        if (!name.isEmpty()) {
+            return processReadAllQuery("name", name);
+        } else {
+            return processReadAllQuery(null, null);
+        }
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)

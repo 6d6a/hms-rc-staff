@@ -72,13 +72,13 @@ public class GovernorOfConfigTemplate extends LordOfResources {
     }
 
     @Override
-    public List<ConfigTemplate> buildAll(String key) {
-        switch (key) {
-            case "": {
-                return configTemplateRepository.findAll();
+    public List<ConfigTemplate> build(String key, String value) {
+        switch ((key != null ? key : "")) {
+            case "name": {
+                return configTemplateRepository.findByName(value);
             }
             default: {
-                return configTemplateRepository.findByName(key);
+                return configTemplateRepository.findAll();
             }
         }
     }

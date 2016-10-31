@@ -91,7 +91,7 @@ public class GovernorOfServiceTemplateTest {
         serviceTemplate.setName("Тестовый service template");
         serviceTemplate.setSwitchedOn(Boolean.TRUE);
         serviceTemplateRepository.save(serviceTemplate);
-        List<ServiceTemplate> buildedServiceTemplates = governorOfServiceTemplate.buildAll("");
+        List<ServiceTemplate> buildedServiceTemplates = governorOfServiceTemplate.build(null, null);
         try {
             Assert.assertEquals("Имя сервиса установлено неверно", "Тестовый service template", buildedServiceTemplates.get(buildedServiceTemplates.size()-1).getName());
             Assert.assertTrue("configTemplates указаны неверно", configTemplates.equals(buildedServiceTemplates.get(buildedServiceTemplates.size()-1).getConfigTemplates()));
