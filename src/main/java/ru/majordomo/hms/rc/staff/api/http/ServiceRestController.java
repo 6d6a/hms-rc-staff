@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfService;
@@ -32,10 +34,14 @@ public class ServiceRestController extends RestControllerTemplate {
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
     public Collection<? extends Resource> readAll(@RequestParam(required=false, defaultValue="") String name) {
+        Map<String, String> keyValue = new HashMap<>();
         if (!name.isEmpty()) {
-            return processReadAllQuery("name", name);
+            keyValue.put("name", name);
+        }
+        if (!keyValue.isEmpty()) {
+            return processReadAllWithParamsQuery(keyValue);
         } else {
-            return processReadAllQuery(null, null);
+            return processReadAllQuery();
         }
     }
 

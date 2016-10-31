@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.resources.*;
@@ -112,22 +113,38 @@ public class GovernorOfService extends LordOfResources{
     }
 
     @Override
-    public List<Service> build(String key, String value) {
+    public List<Service> build(Map<String, String> keyValue) {
+
         List<Service> buildedServices = new ArrayList<>();
-        switch ((key != null ? key : "")) {
-            case "name": {
-                for (Service service : repository.findByName(value)) {
-                    buildedServices.add((Service) build(service.getId()));
-                }
-                return buildedServices;
-            }
-            default: {
-                for (Service service : repository.findAll()) {
-                    buildedServices.add((Service) build(service.getId()));
-                }
-                return buildedServices;
+
+        Boolean byName = false;
+
+        for (Map.Entry<String, String> entry : keyValue.entrySet()) {
+            if (entry.getKey().equals("name")) {
+                byName = true;
             }
         }
+
+        if (byName) {
+            for (Service service : repository.findByName(keyValue.get("name"))) {
+                buildedServices.add((Service) build(service.getId()));
+            }
+        } else {
+            for (Service service : repository.findAll()) {
+                buildedServices.add((Service) build(service.getId()));
+            }
+        }
+
+        return buildedServices;
+    }
+
+    @Override
+    public List<Service> build() {
+        List<Service> buildedServices = new ArrayList<>();
+        for (Service service : repository.findAll()) {
+            buildedServices.add((Service) build(service.getId()));
+        }
+        return buildedServices;
     }
 
     @Override

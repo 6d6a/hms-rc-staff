@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,10 +36,14 @@ public class ServerRestController extends RestControllerTemplate {
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
     public Collection<? extends Resource> readAll(@RequestParam(required=false, defaultValue="") String name) {
+        Map<String, String> keyValue = new HashMap<>();
         if (!name.isEmpty()) {
-            return processReadAllQuery("name", name);
+            keyValue.put("name", name);
+        }
+        if (!keyValue.isEmpty()) {
+            return processReadAllWithParamsQuery(keyValue);
         } else {
-            return processReadAllQuery(null, null);
+            return processReadAllQuery();
         }
     }
 

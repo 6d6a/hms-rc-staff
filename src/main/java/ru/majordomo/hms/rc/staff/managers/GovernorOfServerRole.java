@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.resources.Resource;
@@ -95,22 +96,38 @@ public class GovernorOfServerRole extends LordOfResources{
     }
 
     @Override
-    public List<ServerRole> build(String key, String value) {
+    public List<ServerRole> build(Map<String, String> keyValue) {
+
         List<ServerRole> buildedServerRoles = new ArrayList<>();
-        switch ((key != null ? key : "")) {
-            case "name": {
-                for (ServerRole serverRole : serverRoleRepository.findByName(value)) {
-                    buildedServerRoles.add((ServerRole) build(serverRole.getId()));
-                }
-                return buildedServerRoles;
-            }
-            default: {
-                for (ServerRole serverRole : serverRoleRepository.findAll()) {
-                    buildedServerRoles.add((ServerRole) build(serverRole.getId()));
-                }
-                return buildedServerRoles;
+
+        Boolean byName = false;
+
+        for (Map.Entry<String, String> entry : keyValue.entrySet()) {
+            if (entry.getKey().equals("name")) {
+                byName = true;
             }
         }
+
+        if (byName) {
+            for (ServerRole serverRole : serverRoleRepository.findByName(keyValue.get("name"))) {
+                buildedServerRoles.add((ServerRole) build(serverRole.getId()));
+            }
+        } else {
+            for (ServerRole serverRole : serverRoleRepository.findAll()) {
+                buildedServerRoles.add((ServerRole) build(serverRole.getId()));
+            }
+        }
+
+        return buildedServerRoles;
+    }
+
+    @Override
+    public List<ServerRole> build() {
+        List<ServerRole> buildedServerRoles = new ArrayList<>();
+        for (ServerRole serverRole : serverRoleRepository.findAll()) {
+            buildedServerRoles.add((ServerRole) build(serverRole.getId()));
+        }
+        return buildedServerRoles;
     }
 
     @Override

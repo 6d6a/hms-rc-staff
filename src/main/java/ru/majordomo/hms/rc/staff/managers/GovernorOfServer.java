@@ -14,8 +14,11 @@ import ru.majordomo.hms.rc.staff.resources.Service;
 import ru.majordomo.hms.rc.staff.resources.Storage;
 import ru.majordomo.hms.rc.staff.resources.Resource;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class GovernorOfServer extends LordOfResources{
@@ -146,22 +149,38 @@ public class GovernorOfServer extends LordOfResources{
     }
 
     @Override
-    public List<Server> build(String key, String value) {
+    public List<Server> build(Map<String, String> keyValue) {
+
         List<Server> buildedServers = new ArrayList<>();
-        switch ((key != null ? key : "")) {
-            case "name": {
-                for (Server server : serverRepository.findByName(value)) {
-                    buildedServers.add((Server) build(server.getId()));
-                }
-                return buildedServers;
-            }
-            default: {
-                for (Server server : serverRepository.findAll()) {
-                    buildedServers.add((Server) build(server.getId()));
-                }
-                return buildedServers;
+
+        Boolean byName = false;
+
+        for (Map.Entry<String, String> entry : keyValue.entrySet()) {
+            if (entry.getKey().equals("name")) {
+                byName = true;
             }
         }
+
+        if (byName) {
+            for (Server server : serverRepository.findByName(keyValue.get("name"))) {
+                buildedServers.add((Server) build(server.getId()));
+            }
+        } else {
+            for (Server server : serverRepository.findAll()) {
+                buildedServers.add((Server) build(server.getId()));
+            }
+        }
+
+        return buildedServers;
+    }
+
+    @Override
+    public List<Server> build() {
+        List<Server> buildedServers = new ArrayList<>();
+        for (Server server : serverRepository.findAll()) {
+            buildedServers.add((Server) build(server.getId()));
+        }
+        return buildedServers;
     }
 
     @Override

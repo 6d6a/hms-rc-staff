@@ -105,7 +105,7 @@ public class GovernorOfServiceSocketTest {
     @Test
     public void buildAll() {
         repository.save(testServiceSocket);
-        List<ServiceSocket> buildedServiceSockets = governor.build(null, null);
+        List<ServiceSocket> buildedServiceSockets = governor.build();
         try {
             Assert.assertEquals("Имя не совпадает с ожидаемым", testServiceSocket.getName(), buildedServiceSockets.get(buildedServiceSockets.size()-1).getName());
             Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testServiceSocket.getName(), buildedServiceSockets.get(buildedServiceSockets.size()-1).getName());

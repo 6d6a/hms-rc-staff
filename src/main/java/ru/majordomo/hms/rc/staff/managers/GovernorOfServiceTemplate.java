@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.resources.Resource;
@@ -93,22 +94,38 @@ public class GovernorOfServiceTemplate extends LordOfResources {
     }
 
     @Override
-    public List<ServiceTemplate> build(String key, String value) {
+    public List<ServiceTemplate> build(Map<String, String> keyValue) {
+
         List<ServiceTemplate> buildedServiceTemplates = new ArrayList<>();
-        switch ((key != null ? key : "")) {
-            case "name": {
-                for (ServiceTemplate serviceTemplate : serviceTemplateRepository.findByName(value)) {
-                    buildedServiceTemplates.add((ServiceTemplate) build(serviceTemplate.getId()));
-                }
-                return buildedServiceTemplates;
-            }
-            default: {
-                for (ServiceTemplate serviceTemplate : serviceTemplateRepository.findAll()) {
-                    buildedServiceTemplates.add((ServiceTemplate) build(serviceTemplate.getId()));
-                }
-                return buildedServiceTemplates;
+
+        Boolean byName = false;
+
+        for (Map.Entry<String, String> entry : keyValue.entrySet()) {
+            if (entry.getKey().equals("name")) {
+                byName = true;
             }
         }
+
+        if (byName) {
+            for (ServiceTemplate serviceTemplate : serviceTemplateRepository.findByName(keyValue.get("name"))) {
+                buildedServiceTemplates.add((ServiceTemplate) build(serviceTemplate.getId()));
+            }
+        } else {
+            for (ServiceTemplate serviceTemplate : serviceTemplateRepository.findAll()) {
+                buildedServiceTemplates.add((ServiceTemplate) build(serviceTemplate.getId()));
+            }
+        }
+
+        return buildedServiceTemplates;
+    }
+
+    @Override
+    public List<ServiceTemplate> build() {
+        List<ServiceTemplate> buildedServiceTemplates = new ArrayList<>();
+        for (ServiceTemplate serviceTemplate : serviceTemplateRepository.findAll()) {
+            buildedServiceTemplates.add((ServiceTemplate) build(serviceTemplate.getId()));
+        }
+        return buildedServiceTemplates;
     }
 
     @Override

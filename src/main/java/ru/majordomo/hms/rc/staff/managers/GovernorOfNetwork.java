@@ -6,7 +6,9 @@ import org.apache.commons.net.util.SubnetUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.resources.Resource;
@@ -104,15 +106,34 @@ public class GovernorOfNetwork extends LordOfResources {
     }
 
     @Override
-    public List<Network> build(String key, String value) {
-        switch ((key != null ? key : "")) {
-            case "name": {
-                return networkRepository.findByName(value);
-            }
-            default: {
-                return networkRepository.findAll();
+    public List<Network> build(Map<String, String> keyValue) {
+
+        List<Network> buildedNetworks = new ArrayList<>();
+
+        Boolean byName = false;
+
+        for (Map.Entry<String, String> entry : keyValue.entrySet()) {
+            if (entry.getKey().equals("name")) {
+                byName = true;
             }
         }
+
+        if (byName) {
+            for (Network network : networkRepository.findByName(keyValue.get("name"))) {
+                buildedNetworks.add((Network) build(network.getId()));
+            }
+        } else {
+            for (Network network : networkRepository.findAll()) {
+                buildedNetworks.add((Network) build(network.getId()));
+            }
+        }
+
+        return buildedNetworks;
+    }
+
+    @Override
+    public List<Network> build() {
+        return networkRepository.findAll();
     }
 
     @Override
