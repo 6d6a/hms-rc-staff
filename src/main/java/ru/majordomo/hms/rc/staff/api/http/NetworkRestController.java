@@ -17,7 +17,6 @@ import ru.majordomo.hms.rc.staff.resources.Network;
 import ru.majordomo.hms.rc.staff.resources.Resource;
 
 @RestController
-@CrossOrigin("*")
 @RequestMapping("/network")
 public class NetworkRestController extends RestControllerTemplate {
 

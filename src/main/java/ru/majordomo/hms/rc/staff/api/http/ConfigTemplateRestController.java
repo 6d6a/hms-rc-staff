@@ -17,7 +17,6 @@ import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
 import ru.majordomo.hms.rc.staff.resources.Resource;
 
 @RestController
-@CrossOrigin("*")
 @RequestMapping("/config-template")
 public class ConfigTemplateRestController extends RestControllerTemplate {
 
