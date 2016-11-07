@@ -173,19 +173,14 @@ public class GovernorOfServer extends LordOfResources{
         return server;
     }
 
-    @Override
-    public List<Server> build(Map<String, String> keyValue) {
+    public Resource build(Map<String, String> keyValue) throws ResourceNotFoundException {
 
-        List<Server> buildedServers = new ArrayList<>();
+        Server server = new Server();
 
-        Boolean byName = false;
         Boolean byActive = false;
         Boolean byServerRole = false;
 
         for (Map.Entry<String, String> entry : keyValue.entrySet()) {
-            if (entry.getKey().equals("name")) {
-                byName = true;
-            }
             if (entry.getKey().equals("state")) {
                 byActive = true;
             }
@@ -194,17 +189,13 @@ public class GovernorOfServer extends LordOfResources{
             }
         }
 
-        if (byName && !byActive && !byServerRole) {
-            for (Server server : serverRepository.findByName(keyValue.get("name"))) {
-                buildedServers.add((Server) build(server.getId()));
-            }
-        } else if (!byName && byActive && byServerRole) {
+        if (byActive && byServerRole) {
             if (!(keyValue.get("state").equals("active"))) {
-                throw new ParameterValidateException("State указан некорректно.");
+                throw new ResourceNotFoundException("State указан некорректно.");
             }
-            List<ServerRole> serverRole = serverRoleRepository.findByName(keyValue.get("server-role"));
-            if (serverRole.isEmpty()) {
-                throw new ParameterValidateException("ServerRole с именем: " + keyValue.get("server-role") + " не найдена");
+            ServerRole serverRole = serverRoleRepository.findByName(keyValue.get("server-role"));
+            if (serverRole == null) {
+                throw new ResourceNotFoundException("ServerRole с именем: " + keyValue.get("server-role") + " не найдена");
             }
 
             String activeServerName;
@@ -219,14 +210,30 @@ public class GovernorOfServer extends LordOfResources{
                     activeServerName = activeDatabaseServerName;
                     break;
                 default:
-                    throw new ParameterValidateException("По ServerRole: " + keyValue.get("server-role") + " отсутствует фильтр");
+                    throw new ResourceNotFoundException("По ServerRole: " + keyValue.get("server-role") + " отсутствует фильтр");
             }
-
-            Server server = serverRepository.findByServerRoleIdAndName(serverRole.get(0).getId(), activeServerName);
-            buildedServers.add((Server) build(server.getId()));
-
+            server = serverRepository.findByServerRoleIdAndName(serverRole.getId(), activeServerName);
         }
-        else {
+        return server;
+    }
+
+    @Override
+    public List<Server> buildAll(Map<String, String> keyValue) {
+        List<Server> buildedServers = new ArrayList<>();
+
+        Boolean byName = false;
+
+        for (Map.Entry<String, String> entry : keyValue.entrySet()) {
+            if (entry.getKey().equals("name")) {
+                byName = true;
+            }
+        }
+
+        if (byName) {
+            for (Server server : serverRepository.findByName(keyValue.get("name"))) {
+                buildedServers.add((Server) build(server.getId()));
+            }
+        } else {
             for (Server server : serverRepository.findAll()) {
                 buildedServers.add((Server) build(server.getId()));
             }
@@ -236,7 +243,7 @@ public class GovernorOfServer extends LordOfResources{
     }
 
     @Override
-    public List<Server> build() {
+    public List<Server> buildAll() {
         List<Server> buildedServers = new ArrayList<>();
         for (Server server : serverRepository.findAll()) {
             buildedServers.add((Server) build(server.getId()));

@@ -74,7 +74,12 @@ public class GovernorOfConfigTemplate extends LordOfResources {
     }
 
     @Override
-    public List<ConfigTemplate> build(Map<String, String> keyValue) {
+    public Resource build(Map<String, String> keyValue) throws ResourceNotFoundException {
+        return null;
+    }
+
+    @Override
+    public List<ConfigTemplate> buildAll(Map<String, String> keyValue) {
 
         List<ConfigTemplate> buildedConfigTemplates = new ArrayList<>();
 
@@ -100,7 +105,7 @@ public class GovernorOfConfigTemplate extends LordOfResources {
     }
 
     @Override
-    public List<ConfigTemplate> build() {
+    public List<ConfigTemplate> buildAll() {
         return configTemplateRepository.findAll();
     }
 

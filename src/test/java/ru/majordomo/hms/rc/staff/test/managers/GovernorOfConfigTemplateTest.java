@@ -81,7 +81,7 @@ public class GovernorOfConfigTemplateTest {
         configTemplate.setSwitchedOn(switchedOn);
         configTemplateRepository.save(configTemplate);
 
-        List<ConfigTemplate> buildedConfigTemplates = governorOfConfigTemplate.build();
+        List<ConfigTemplate> buildedConfigTemplates = governorOfConfigTemplate.buildAll();
         try {
             Assert.assertEquals("name соответствует ожидаемому", fileName, buildedConfigTemplates.get(buildedConfigTemplates.size()-1).getName());
             Assert.assertEquals("switchedOn соответствует ожидаемомему", switchedOn, buildedConfigTemplates.get(buildedConfigTemplates.size()-1).getSwitchedOn());

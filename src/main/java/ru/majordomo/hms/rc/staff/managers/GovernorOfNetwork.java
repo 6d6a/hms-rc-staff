@@ -106,7 +106,12 @@ public class GovernorOfNetwork extends LordOfResources {
     }
 
     @Override
-    public List<Network> build(Map<String, String> keyValue) {
+    public Resource build(Map<String, String> keyValue) throws ResourceNotFoundException {
+        return null;
+    }
+
+    @Override
+    public List<Network> buildAll(Map<String, String> keyValue) {
 
         List<Network> buildedNetworks = new ArrayList<>();
 
@@ -132,7 +137,7 @@ public class GovernorOfNetwork extends LordOfResources {
     }
 
     @Override
-    public List<Network> build() {
+    public List<Network> buildAll() {
         return networkRepository.findAll();
     }
 

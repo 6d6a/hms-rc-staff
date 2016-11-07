@@ -94,7 +94,12 @@ public class GovernorOfServiceTemplate extends LordOfResources {
     }
 
     @Override
-    public List<ServiceTemplate> build(Map<String, String> keyValue) {
+    public Resource build(Map<String, String> keyValue) throws ResourceNotFoundException {
+        return null;
+    }
+
+    @Override
+    public List<ServiceTemplate> buildAll(Map<String, String> keyValue) {
 
         List<ServiceTemplate> buildedServiceTemplates = new ArrayList<>();
 
@@ -120,7 +125,7 @@ public class GovernorOfServiceTemplate extends LordOfResources {
     }
 
     @Override
-    public List<ServiceTemplate> build() {
+    public List<ServiceTemplate> buildAll() {
         List<ServiceTemplate> buildedServiceTemplates = new ArrayList<>();
         for (ServiceTemplate serviceTemplate : serviceTemplateRepository.findAll()) {
             buildedServiceTemplates.add((ServiceTemplate) build(serviceTemplate.getId()));

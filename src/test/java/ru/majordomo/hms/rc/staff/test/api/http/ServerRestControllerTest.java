@@ -218,23 +218,21 @@ public class ServerRestControllerTest {
         keyValue.set("server-role", "shared-hosting");
         keyValue.set("state", "active");
 
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName ).params(keyValue).accept(MediaType.APPLICATION_JSON_UTF8);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/filter" ).params(keyValue).accept(MediaType.APPLICATION_JSON_UTF8);
 
         try {
-            mockMvc.perform(request).andExpect(status().isOk())
-                    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                    .andExpect(jsonPath("$").isArray())
+            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                     .andDo(this.document)
                     .andDo(this.document.document(
                             responseFields(
-                                    fieldWithPath("[].id").description("Server ID"),
-                                    fieldWithPath("[].name").description("Имя Server"),
-                                    fieldWithPath("[].switchedOn").description("Статус Server"),
-                                    fieldWithPath("[].services").description("Список Service для Server"),
-                                    fieldWithPath("[].serverRole").description("ServerRole для Server"),
-                                    fieldWithPath("[].storages").description("Список Storages для Server")
+                                    fieldWithPath("id").description("Server ID"),
+                                    fieldWithPath("name").description("Имя Server"),
+                                    fieldWithPath("switchedOn").description("Статус Server"),
+                                    fieldWithPath("services").description("Список Service для Server"),
+                                    fieldWithPath("serverRole").description("ServerRole для Server"),
+                                    fieldWithPath("storages").description("Список Storages для Server")
                             )
-                    )).andDo(print());
+                    ));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();

@@ -97,7 +97,12 @@ public class GovernorOfServiceSocket extends LordOfResources {
     }
 
     @Override
-    public List<ServiceSocket> build(Map<String, String> keyValue) {
+    public Resource build(Map<String, String> keyValue) throws ResourceNotFoundException {
+        return null;
+    }
+
+    @Override
+    public List<ServiceSocket> buildAll(Map<String, String> keyValue) {
 
         List<ServiceSocket> buildedServiceSockets = new ArrayList<>();
 
@@ -123,7 +128,7 @@ public class GovernorOfServiceSocket extends LordOfResources {
     }
 
     @Override
-    public List<ServiceSocket> build() {
+    public List<ServiceSocket> buildAll() {
         return serviceSocketRepository.findAll();
     }
 

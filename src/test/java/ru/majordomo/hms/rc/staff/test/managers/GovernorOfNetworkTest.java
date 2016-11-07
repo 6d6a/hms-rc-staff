@@ -114,7 +114,7 @@ public class GovernorOfNetworkTest {
         network.setVlanNumber(vlanNumber);
         networkRepository.save(network);
 
-        List<Network> buildedNetworks = governorOfNetwork.build();
+        List<Network> buildedNetworks = governorOfNetwork.buildAll();
         try {
             Assert.assertEquals("Имя сети, полученное из базы не совпадает с ожидаемым", name, buildedNetworks.get(buildedNetworks.size()-1).getName());
             Assert.assertEquals("Флаг switchedOn не совпадает с ожидаемым", switchedOn, buildedNetworks.get(buildedNetworks.size()-1).getSwitchedOn());

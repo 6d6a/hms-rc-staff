@@ -9,7 +9,7 @@ import ru.majordomo.hms.rc.staff.managers.LordOfResources;
 import ru.majordomo.hms.rc.staff.resources.Resource;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 abstract public class RestControllerTemplate {
@@ -21,10 +21,14 @@ abstract public class RestControllerTemplate {
     }
 
     protected Collection<? extends Resource> processReadAllQuery() {
-        return governor.build();
+        return governor.buildAll();
     }
 
     protected Collection<? extends Resource> processReadAllWithParamsQuery(Map<String, String> keyValue) {
+        return governor.buildAll(keyValue);
+    }
+
+    protected Resource processReadOneWithParamsQuery(Map<String, String> keyValue) {
         return governor.build(keyValue);
     }
 

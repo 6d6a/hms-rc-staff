@@ -94,7 +94,12 @@ public class GovernorOfStorage extends LordOfResources {
     }
 
     @Override
-    public List<Storage> build(Map<String, String> keyValue) {
+    public Resource build(Map<String, String> keyValue) throws ResourceNotFoundException {
+        return null;
+    }
+
+    @Override
+    public List<Storage> buildAll(Map<String, String> keyValue) {
 
         List<Storage> buildedStorages = new ArrayList<>();
 
@@ -120,7 +125,7 @@ public class GovernorOfStorage extends LordOfResources {
     }
 
     @Override
-    public List<Storage> build() {
+    public List<Storage> buildAll() {
         return repository.findAll();
     }
 
