@@ -1,5 +1,6 @@
 package ru.majordomo.hms.rc.staff.managers;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -106,7 +107,7 @@ public class GovernorOfServerRole extends LordOfResources{
 
     @Override
     public Resource build(Map<String, String> keyValue) throws ResourceNotFoundException {
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
