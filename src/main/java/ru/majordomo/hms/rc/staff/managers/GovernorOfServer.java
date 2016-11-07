@@ -214,7 +214,7 @@ public class GovernorOfServer extends LordOfResources{
             }
             server = serverRepository.findByServerRoleIdAndName(serverRole.getId(), activeServerName);
         }
-        return server;
+        return build(server.getId());
     }
 
     @Override

@@ -42,7 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {RepositoriesConfig.class, EmbeddedServltetContainerConfig.class, ServerServicesConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = {RepositoriesConfig.class, EmbeddedServltetContainerConfig.class, ServerServicesConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {"server.active.name.shared-hosting:web99"})
 public class ServerRestControllerTest {
     @Rule
     public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("build/generated-snippets");
@@ -222,17 +222,14 @@ public class ServerRestControllerTest {
 
         try {
             mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                    .andDo(this.document)
-                    .andDo(this.document.document(
-                            responseFields(
-                                    fieldWithPath("id").description("Server ID"),
-                                    fieldWithPath("name").description("Имя Server"),
-                                    fieldWithPath("switchedOn").description("Статус Server"),
-                                    fieldWithPath("services").description("Список Service для Server"),
-                                    fieldWithPath("serverRole").description("ServerRole для Server"),
-                                    fieldWithPath("storages").description("Список Storages для Server")
-                            )
-                    ));
+                    .andExpect(jsonPath("name").value(testServers.get(0).getName()))
+                    .andExpect(jsonPath("name").value(activeSharedHostingName))
+                    .andExpect(jsonPath("switchedOn").value(testServers.get(0).getSwitchedOn()))
+                    .andExpect(jsonPath("serverRole.id").value(testServers.get(0).getServerRoleId()))
+                    .andExpect(jsonPath("services").isArray())
+                    .andExpect(jsonPath("services.[0].id").value(testServers.get(0).getServices().get(0).getId()))
+                    .andExpect(jsonPath("storages").isArray())
+                    .andExpect(jsonPath("storages.[0].id").value(testServers.get(0).getStorages().get(0).getId()));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
