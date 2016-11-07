@@ -121,6 +121,7 @@ dependencies {
 
 dependencyManagement {
     imports {
+        mavenBom "org.springframework.cloud:spring-cloud-bus:1.2.2.BUILD-SNAPSHOT"
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:Brixton.SR3"
     }
 }
