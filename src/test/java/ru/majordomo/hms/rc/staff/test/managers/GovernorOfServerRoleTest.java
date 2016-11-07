@@ -1,6 +1,7 @@
 package ru.majordomo.hms.rc.staff.test.managers;
 
 import org.bson.types.ObjectId;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -113,7 +114,7 @@ public class GovernorOfServerRoleTest {
     @Test
     public void buildAll() {
         serverRoleRepository.save(testServerRole);
-        List<ServerRole> buildedServerRoles = governor.build();
+        List<ServerRole> buildedServerRoles = governor.buildAll();
         try {
             Assert.assertEquals("Имя не совпадает с ожидаемым", testServerRole.getName(), buildedServerRoles.get(buildedServerRoles.size()-1).getName());
             Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testServerRole.getSwitchedOn(), buildedServerRoles.get(buildedServerRoles.size()-1).getSwitchedOn());
@@ -138,5 +139,12 @@ public class GovernorOfServerRoleTest {
         List<ServiceTemplate> emptyServiceTemplates = new ArrayList<>();
         testServerRole.setServiceTemplates(emptyServiceTemplates);
         governor.isValid(testServerRole);
+    }
+
+    @After
+    public void cleanAll() {
+        serverRoleRepository.deleteAll();
+        configTemplateRepository.deleteAll();
+        serviceTemplateRepository.deleteAll();
     }
 }

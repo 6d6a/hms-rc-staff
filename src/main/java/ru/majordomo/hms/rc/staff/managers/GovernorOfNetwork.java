@@ -2,6 +2,7 @@ package ru.majordomo.hms.rc.staff.managers;
 
 import com.google.common.net.InetAddresses;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.net.util.SubnetUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -106,7 +107,12 @@ public class GovernorOfNetwork extends LordOfResources {
     }
 
     @Override
-    public List<Network> build(Map<String, String> keyValue) {
+    public Resource build(Map<String, String> keyValue) throws NotImplementedException {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public List<Network> buildAll(Map<String, String> keyValue) {
 
         List<Network> buildedNetworks = new ArrayList<>();
 
@@ -132,7 +138,7 @@ public class GovernorOfNetwork extends LordOfResources {
     }
 
     @Override
-    public List<Network> build() {
+    public List<Network> buildAll() {
         return networkRepository.findAll();
     }
 
