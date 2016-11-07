@@ -66,15 +66,12 @@ public class ServerRestControllerTest {
 
     private RestDocumentationResultHandler document;
 
-    private String activeSharedHostingName;
-
     @Value("${server.active.name.shared-hosting}")
-    public void setActiveSharedHostingName(String activeSharedHostingName) {
-        this.activeSharedHostingName = activeSharedHostingName;
-    }
+    private String activeSharedHostingName;
 
     @Value("${spring.application.name}")
     private String applicationName;
+
     private String resourceName = "server";
     private List<Server> testServers = new ArrayList<>();
     private MockMvc mockMvc;
@@ -216,7 +213,7 @@ public class ServerRestControllerTest {
     }
 
     @Test
-    public void readAllByServerRoleIdAndActive() {
+    public void readByServerRoleIdAndActive() {
         MultiValueMap<String, String> keyValue = new LinkedMultiValueMap<>();
         keyValue.set("server-role", "shared-hosting");
         keyValue.set("state", "active");
@@ -346,5 +343,10 @@ public class ServerRestControllerTest {
     @After
     public void cleanAll() {
         serverRepository.deleteAll();
+        configTemplateRepository.deleteAll();
+        serviceTemplateRepository.deleteAll();
+        serverRoleRepository.deleteAll();
+        serviceSocketRepository.deleteAll();
+        serviceRepository.deleteAll();
     }
 }

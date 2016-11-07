@@ -32,8 +32,6 @@ public class GovernorOfServer extends LordOfResources{
     private String activeSharedHostingName;
     private String activeMailStorageName;
     private String activeDatabaseServerName;
-    private String activeMailExchangerName;
-    private String activeMailCheckerName;
 
     @Value("${server.active.name.shared-hosting}")
     public void setActiveSharedHostingName(String activeSharedHostingName) {
@@ -48,16 +46,6 @@ public class GovernorOfServer extends LordOfResources{
     @Value("${server.active.name.database-server}")
     public void setActiveDatabaseServerName(String activeDatabaseServerName) {
         this.activeDatabaseServerName = activeDatabaseServerName;
-    }
-
-    @Value("${server.active.name.mail-exchanger}")
-    public void setActiveMailExchangerName(String activeMailExchangerName) {
-        this.activeMailExchangerName = activeMailExchangerName;
-    }
-
-    @Value("${server.active.name.mail-checker}")
-    public void setActiveMailCheckerName(String activeMailCheckerName) {
-        this.activeMailCheckerName = activeMailCheckerName;
     }
 
 

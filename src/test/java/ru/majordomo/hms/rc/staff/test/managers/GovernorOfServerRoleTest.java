@@ -1,6 +1,7 @@
 package ru.majordomo.hms.rc.staff.test.managers;
 
 import org.bson.types.ObjectId;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -138,5 +139,12 @@ public class GovernorOfServerRoleTest {
         List<ServiceTemplate> emptyServiceTemplates = new ArrayList<>();
         testServerRole.setServiceTemplates(emptyServiceTemplates);
         governor.isValid(testServerRole);
+    }
+
+    @After
+    public void cleanAll() {
+        serverRoleRepository.deleteAll();
+        configTemplateRepository.deleteAll();
+        serviceTemplateRepository.deleteAll();
     }
 }
