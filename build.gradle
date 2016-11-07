@@ -103,6 +103,9 @@ repositories {
     maven {
         url 'http://maven.intr'
     }
+    maven {
+        url 'https://repo.spring.io/libs-snapshot'
+    }
 }
 
 dependencies {
