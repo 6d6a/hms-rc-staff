@@ -106,7 +106,7 @@ public class GovernorOfServerRole extends LordOfResources{
     }
 
     @Override
-    public Resource build(Map<String, String> keyValue) throws ResourceNotFoundException {
+    public Resource build(Map<String, String> keyValue) throws NotImplementedException {
         throw new NotImplementedException();
     }
 
