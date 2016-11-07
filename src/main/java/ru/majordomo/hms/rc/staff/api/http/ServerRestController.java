@@ -34,13 +34,9 @@ public class ServerRestController extends RestControllerTemplate {
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
-    public Collection<? extends Resource> readAll(@RequestParam(required=false, defaultValue="") String name) {
-        Map<String, String> keyValue = new HashMap<>();
-        if (!name.isEmpty()) {
-            keyValue.put("name", name);
-        }
-        if (!keyValue.isEmpty()) {
-            return processReadAllWithParamsQuery(keyValue);
+    public Collection<? extends Resource> readAll(@RequestParam(required=false) Map<String,String> requestParams) {
+        if (!requestParams.isEmpty()) {
+            return processReadAllWithParamsQuery(requestParams);
         } else {
             return processReadAllQuery();
         }

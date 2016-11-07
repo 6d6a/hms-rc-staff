@@ -1,6 +1,7 @@
 package ru.majordomo.hms.rc.staff.managers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
@@ -8,15 +9,14 @@ import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.repositories.ServerRepository;
+import ru.majordomo.hms.rc.staff.repositories.ServerRoleRepository;
 import ru.majordomo.hms.rc.staff.resources.Server;
 import ru.majordomo.hms.rc.staff.resources.ServerRole;
 import ru.majordomo.hms.rc.staff.resources.Service;
 import ru.majordomo.hms.rc.staff.resources.Storage;
 import ru.majordomo.hms.rc.staff.resources.Resource;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,14 +24,51 @@ import java.util.Map;
 public class GovernorOfServer extends LordOfResources{
 
     private ServerRepository serverRepository;
+    private ServerRoleRepository serverRoleRepository;
     private GovernorOfServerRole governorOfServerRole;
     private GovernorOfService governorOfService;
     private GovernorOfStorage governorOfStorage;
     private Cleaner cleaner;
+    private String activeSharedHostingName;
+    private String activeMailStorageName;
+    private String activeDatabaseServerName;
+    private String activeMailExchangerName;
+    private String activeMailCheckerName;
+
+    @Value("${server.active.name.shared-hosting}")
+    public void setActiveSharedHostingName(String activeSharedHostingName) {
+        this.activeSharedHostingName = activeSharedHostingName;
+    }
+
+    @Value("${server.active.name.mail-storage}")
+    public void setActiveMailStorageName(String activeMailStorageName) {
+        this.activeMailStorageName = activeMailStorageName;
+    }
+
+    @Value("${server.active.name.database-server}")
+    public void setActiveDatabaseServerName(String activeDatabaseServerName) {
+        this.activeDatabaseServerName = activeDatabaseServerName;
+    }
+
+    @Value("${server.active.name.mail-exchanger}")
+    public void setActiveMailExchangerName(String activeMailExchangerName) {
+        this.activeMailExchangerName = activeMailExchangerName;
+    }
+
+    @Value("${server.active.name.mail-checker}")
+    public void setActiveMailCheckerName(String activeMailCheckerName) {
+        this.activeMailCheckerName = activeMailCheckerName;
+    }
+
 
     @Autowired
     public void setRepository(ServerRepository repository) {
         this.serverRepository = repository;
+    }
+
+    @Autowired
+    public void setRepository(ServerRoleRepository repository) {
+        this.serverRoleRepository = repository;
     }
 
     @Autowired
@@ -154,18 +191,54 @@ public class GovernorOfServer extends LordOfResources{
         List<Server> buildedServers = new ArrayList<>();
 
         Boolean byName = false;
+        Boolean byActive = false;
+        Boolean byServerRole = false;
 
         for (Map.Entry<String, String> entry : keyValue.entrySet()) {
             if (entry.getKey().equals("name")) {
                 byName = true;
             }
+            if (entry.getKey().equals("state")) {
+                byActive = true;
+            }
+            if (entry.getKey().equals("server-role")) {
+                byServerRole = true;
+            }
         }
 
-        if (byName) {
+        if (byName && !byActive && !byServerRole) {
             for (Server server : serverRepository.findByName(keyValue.get("name"))) {
                 buildedServers.add((Server) build(server.getId()));
             }
-        } else {
+        } else if (!byName && byActive && byServerRole) {
+            if (!(keyValue.get("state").equals("active"))) {
+                throw new ParameterValidateException("State указан некорректно.");
+            }
+            List<ServerRole> serverRole = serverRoleRepository.findByName(keyValue.get("server-role"));
+            if (serverRole.isEmpty()) {
+                throw new ParameterValidateException("ServerRole с именем: " + keyValue.get("server-role") + " не найдена");
+            }
+
+            String activeServerName;
+            switch (keyValue.get("server-role")) {
+                case "shared-hosting":
+                    activeServerName = activeSharedHostingName;
+                    break;
+                case "mail-storage":
+                    activeServerName = activeMailStorageName;
+                    break;
+                case "database-server":
+                    activeServerName = activeDatabaseServerName;
+                    break;
+                default:
+                    throw new ParameterValidateException("По ServerRole: " + keyValue.get("server-role") + " отсутствует фильтр");
+            }
+
+            Server server = serverRepository.findByServerRoleIdAndName(serverRole.get(0).getId(), activeServerName);
+            buildedServers.add((Server) build(server.getId()));
+
+        }
+        else {
             for (Server server : serverRepository.findAll()) {
                 buildedServers.add((Server) build(server.getId()));
             }

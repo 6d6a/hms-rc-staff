@@ -14,10 +14,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import ru.majordomo.hms.rc.staff.repositories.*;
 import ru.majordomo.hms.rc.staff.resources.*;
@@ -62,6 +66,13 @@ public class ServerRestControllerTest {
 
     private RestDocumentationResultHandler document;
 
+    private String activeSharedHostingName;
+
+    @Value("${server.active.name.shared-hosting}")
+    public void setActiveSharedHostingName(String activeSharedHostingName) {
+        this.activeSharedHostingName = activeSharedHostingName;
+    }
+
     @Value("${spring.application.name}")
     private String applicationName;
     private String resourceName = "server";
@@ -80,6 +91,11 @@ public class ServerRestControllerTest {
 
             ServerRole serverRole = new ServerRole();
             serverRole.addServiceTemplate(serviceTemplate);
+            if (i == 1) {
+                serverRole.setName("shared-hosting");
+            } else {
+                serverRole.setName("Серверная роль " + i);
+            }
             serverRoleRepository.save(serverRole);
 
             List<Service> services = new ArrayList<>();
@@ -97,7 +113,12 @@ public class ServerRestControllerTest {
             storages.add(storage);
             storageRepository.save(storages);
 
-            String name = "Сервер " + i;
+            String name;
+            if (i == 1) {
+                name = activeSharedHostingName;
+            } else {
+                name = "Сервер " + i;
+            }
             Boolean switchedOn = Boolean.TRUE;
 
             Server server = new Server();
@@ -188,6 +209,35 @@ public class ServerRestControllerTest {
                                     fieldWithPath("[].storages").description("Список Storages для Server")
                             )
                     ));
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void readAllByServerRoleIdAndActive() {
+        MultiValueMap<String, String> keyValue = new LinkedMultiValueMap<>();
+        keyValue.set("server-role", "shared-hosting");
+        keyValue.set("state", "active");
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName ).params(keyValue).accept(MediaType.APPLICATION_JSON_UTF8);
+
+        try {
+            mockMvc.perform(request).andExpect(status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                    .andExpect(jsonPath("$").isArray())
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                            responseFields(
+                                    fieldWithPath("[].id").description("Server ID"),
+                                    fieldWithPath("[].name").description("Имя Server"),
+                                    fieldWithPath("[].switchedOn").description("Статус Server"),
+                                    fieldWithPath("[].services").description("Список Service для Server"),
+                                    fieldWithPath("[].serverRole").description("ServerRole для Server"),
+                                    fieldWithPath("[].storages").description("Список Storages для Server")
+                            )
+                    )).andDo(print());
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();

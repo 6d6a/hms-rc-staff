@@ -50,6 +50,15 @@ public class GovernorOfServerRole extends LordOfResources{
             if (serverRole.getServiceTemplates().isEmpty()) {
                 throw new ParameterValidateException("Должен быть задан хотя бы один service template");
             }
+
+            //Имя сервереной роли должно быть уникально
+            List<ServerRole> existedServerRoles = build();
+            for (ServerRole existedServerRole: existedServerRoles) {
+                if (existedServerRole.getName().equals(serverRole.getName())) {
+                    throw new ParameterValidateException("Server Role c именем: " + serverRole.getName() + " уже существует");
+                }
+            }
+
             save(serverRole);
 
         } catch (ClassCastException e) {
