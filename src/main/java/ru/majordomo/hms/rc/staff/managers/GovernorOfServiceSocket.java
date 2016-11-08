@@ -1,5 +1,6 @@
 package ru.majordomo.hms.rc.staff.managers;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,7 +98,12 @@ public class GovernorOfServiceSocket extends LordOfResources {
     }
 
     @Override
-    public List<ServiceSocket> build(Map<String, String> keyValue) {
+    public Resource build(Map<String, String> keyValue) throws NotImplementedException {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public List<ServiceSocket> buildAll(Map<String, String> keyValue) {
 
         List<ServiceSocket> buildedServiceSockets = new ArrayList<>();
 
@@ -123,7 +129,7 @@ public class GovernorOfServiceSocket extends LordOfResources {
     }
 
     @Override
-    public List<ServiceSocket> build() {
+    public List<ServiceSocket> buildAll() {
         return serviceSocketRepository.findAll();
     }
 

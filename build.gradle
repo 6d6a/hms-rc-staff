@@ -103,9 +103,6 @@ repositories {
     maven {
         url 'http://maven.intr'
     }
-    maven {
-        url 'https://repo.spring.io/libs-snapshot'
-    }
 }
 
 dependencies {
@@ -123,7 +120,6 @@ dependencies {
 
 dependencyManagement {
     imports {
-        mavenBom "org.springframework.cloud:spring-cloud-bus:1.2.2.BUILD-SNAPSHOT"
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:Brixton.SR3"
     }
 }
