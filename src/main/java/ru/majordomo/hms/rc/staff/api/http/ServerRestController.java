@@ -4,8 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,17 +34,16 @@ public class ServerRestController extends RestControllerTemplate {
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
-    public Collection<? extends Resource> readAll(@RequestParam(required=false) Map<String,String> requestParams) {
-        if (!requestParams.isEmpty()) {
-            return processReadAllWithParamsQuery(requestParams);
+    public Collection<? extends Resource> readAll(@RequestParam(required=false, defaultValue="") String name) {
+        Map<String, String> keyValue = new HashMap<>();
+        if (!name.isEmpty()) {
+            keyValue.put("name", name);
+        }
+        if (!keyValue.isEmpty()) {
+            return processReadAllWithParamsQuery(keyValue);
         } else {
             return processReadAllQuery();
         }
-    }
-
-    @RequestMapping(value = {"/filter"}, method = RequestMethod.GET)
-    public Server readOneFilter(@RequestParam() Map<String,String> requestParams) {
-        return (Server) processReadOneWithParamsQuery(requestParams);
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)

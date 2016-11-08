@@ -1,6 +1,5 @@
 package ru.majordomo.hms.rc.staff.managers;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -51,15 +50,6 @@ public class GovernorOfServerRole extends LordOfResources{
             if (serverRole.getServiceTemplates().isEmpty()) {
                 throw new ParameterValidateException("Должен быть задан хотя бы один service template");
             }
-
-            //Имя сервереной роли должно быть уникально
-            List<ServerRole> existedServerRoles = buildAll();
-            for (ServerRole existedServerRole: existedServerRoles) {
-                if (existedServerRole.getName().equals(serverRole.getName())) {
-                    throw new ParameterValidateException("Server Role c именем: " + serverRole.getName() + " уже существует");
-                }
-            }
-
             save(serverRole);
 
         } catch (ClassCastException e) {
@@ -106,12 +96,7 @@ public class GovernorOfServerRole extends LordOfResources{
     }
 
     @Override
-    public Resource build(Map<String, String> keyValue) throws NotImplementedException {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public List<ServerRole> buildAll(Map<String, String> keyValue) {
+    public List<ServerRole> build(Map<String, String> keyValue) {
 
         List<ServerRole> buildedServerRoles = new ArrayList<>();
 
@@ -124,19 +109,20 @@ public class GovernorOfServerRole extends LordOfResources{
         }
 
         if (byName) {
-            ServerRole serverRole = serverRoleRepository.findByName(keyValue.get("name"));
-            buildedServerRoles.add((ServerRole) build(serverRole.getId()));
-
+            for (ServerRole serverRole : serverRoleRepository.findByName(keyValue.get("name"))) {
+                buildedServerRoles.add((ServerRole) build(serverRole.getId()));
+            }
         } else {
-            ServerRole serverRole = serverRoleRepository.findByName(keyValue.get("name"));
-            buildedServerRoles.add((ServerRole) build(serverRole.getId()));
+            for (ServerRole serverRole : serverRoleRepository.findAll()) {
+                buildedServerRoles.add((ServerRole) build(serverRole.getId()));
+            }
         }
 
         return buildedServerRoles;
     }
 
     @Override
-    public List<ServerRole> buildAll() {
+    public List<ServerRole> build() {
         List<ServerRole> buildedServerRoles = new ArrayList<>();
         for (ServerRole serverRole : serverRoleRepository.findAll()) {
             buildedServerRoles.add((ServerRole) build(serverRole.getId()));

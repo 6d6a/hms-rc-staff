@@ -1,6 +1,5 @@
 package ru.majordomo.hms.rc.staff.managers;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,12 +94,7 @@ public class GovernorOfStorage extends LordOfResources {
     }
 
     @Override
-    public Resource build(Map<String, String> keyValue) throws NotImplementedException {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public List<Storage> buildAll(Map<String, String> keyValue) {
+    public List<Storage> build(Map<String, String> keyValue) {
 
         List<Storage> buildedStorages = new ArrayList<>();
 
@@ -126,7 +120,7 @@ public class GovernorOfStorage extends LordOfResources {
     }
 
     @Override
-    public List<Storage> buildAll() {
+    public List<Storage> build() {
         return repository.findAll();
     }
 

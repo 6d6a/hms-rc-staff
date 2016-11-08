@@ -14,14 +14,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import ru.majordomo.hms.rc.staff.repositories.*;
 import ru.majordomo.hms.rc.staff.resources.*;
@@ -42,8 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {RepositoriesConfig.class, EmbeddedServltetContainerConfig.class, ServerServicesConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = {"server.active.name.shared-hosting:web99", "server.active.name.mail-storage:pop99", "server.active.name.database-server:mdb99"})
+@SpringBootTest(classes = {RepositoriesConfig.class, EmbeddedServltetContainerConfig.class, ServerServicesConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ServerRestControllerTest {
     @Rule
     public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("build/generated-snippets");
@@ -67,24 +62,14 @@ public class ServerRestControllerTest {
 
     private RestDocumentationResultHandler document;
 
-    @Value("${server.active.name.shared-hosting}")
-    private String activeSharedHostingName;
-
-    @Value("${server.active.name.mail-storage}")
-    private String activeMailStorageName;
-
-    @Value("${server.active.name.database-server}")
-    private String activeDatabaseServerName;
-
     @Value("${spring.application.name}")
     private String applicationName;
-
     private String resourceName = "server";
     private List<Server> testServers = new ArrayList<>();
     private MockMvc mockMvc;
 
     private void generateBatchOfServers() {
-        for (int i = 1; i < 10; i++) {
+        for (int i = 1; i < 6; i++) {
 
             ConfigTemplate configTemplate = new ConfigTemplate();
             configTemplateRepository.save(configTemplate);
@@ -95,20 +80,6 @@ public class ServerRestControllerTest {
 
             ServerRole serverRole = new ServerRole();
             serverRole.addServiceTemplate(serviceTemplate);
-            switch (i) {
-                case 1:
-                    serverRole.setName("shared-hosting");
-                    break;
-                case 2:
-                    serverRole.setName("mail-storage");
-                    break;
-                case 3:
-                    serverRole.setName("database-server");
-                    break;
-                default:
-                    serverRole.setName("Серверная роль " + i);
-                    break;
-            }
             serverRoleRepository.save(serverRole);
 
             List<Service> services = new ArrayList<>();
@@ -126,21 +97,7 @@ public class ServerRestControllerTest {
             storages.add(storage);
             storageRepository.save(storages);
 
-            String name;
-            switch (i) {
-                case 1:
-                    name = activeSharedHostingName;
-                    break;
-                case 2:
-                    name = activeMailStorageName;
-                    break;
-                case 3:
-                    name = activeDatabaseServerName;
-                    break;
-                default:
-                    name = "Сервер " + i;
-                    break;
-            }
+            String name = "Сервер " + i;
             Boolean switchedOn = Boolean.TRUE;
 
             Server server = new Server();
@@ -231,78 +188,6 @@ public class ServerRestControllerTest {
                                     fieldWithPath("[].storages").description("Список Storages для Server")
                             )
                     ));
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail();
-        }
-    }
-
-    @Test
-    public void readByServerRoleIdAndActiveSharedHosting() {
-        MultiValueMap<String, String> keyValue = new LinkedMultiValueMap<>();
-        keyValue.set("server-role", "shared-hosting");
-        keyValue.set("state", "active");
-
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/filter" ).params(keyValue).accept(MediaType.APPLICATION_JSON_UTF8);
-
-        try {
-            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                    .andExpect(jsonPath("name").value(testServers.get(0).getName()))
-                    .andExpect(jsonPath("name").value(activeSharedHostingName))
-                    .andExpect(jsonPath("switchedOn").value(testServers.get(0).getSwitchedOn()))
-                    .andExpect(jsonPath("serverRole.id").value(testServers.get(0).getServerRoleId()))
-                    .andExpect(jsonPath("services").isArray())
-                    .andExpect(jsonPath("services.[0].id").value(testServers.get(0).getServices().get(0).getId()))
-                    .andExpect(jsonPath("storages").isArray())
-                    .andExpect(jsonPath("storages.[0].id").value(testServers.get(0).getStorages().get(0).getId()));
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail();
-        }
-    }
-
-    @Test
-    public void readByServerRoleIdAndActiveMailStorage() {
-        MultiValueMap<String, String> keyValue = new LinkedMultiValueMap<>();
-        keyValue.set("server-role", "mail-storage");
-        keyValue.set("state", "active");
-
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/filter" ).params(keyValue).accept(MediaType.APPLICATION_JSON_UTF8);
-
-        try {
-            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                    .andExpect(jsonPath("name").value(testServers.get(1).getName()))
-                    .andExpect(jsonPath("name").value(activeMailStorageName))
-                    .andExpect(jsonPath("switchedOn").value(testServers.get(1).getSwitchedOn()))
-                    .andExpect(jsonPath("serverRole.id").value(testServers.get(1).getServerRoleId()))
-                    .andExpect(jsonPath("services").isArray())
-                    .andExpect(jsonPath("services.[0].id").value(testServers.get(1).getServices().get(0).getId()))
-                    .andExpect(jsonPath("storages").isArray())
-                    .andExpect(jsonPath("storages.[0].id").value(testServers.get(1).getStorages().get(0).getId()));
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail();
-        }
-    }
-
-    @Test
-    public void readByServerRoleIdAndActiveDatabaseServer() {
-        MultiValueMap<String, String> keyValue = new LinkedMultiValueMap<>();
-        keyValue.set("server-role", "database-server");
-        keyValue.set("state", "active");
-
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/filter" ).params(keyValue).accept(MediaType.APPLICATION_JSON_UTF8);
-
-        try {
-            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                    .andExpect(jsonPath("name").value(testServers.get(2).getName()))
-                    .andExpect(jsonPath("name").value(activeDatabaseServerName))
-                    .andExpect(jsonPath("switchedOn").value(testServers.get(2).getSwitchedOn()))
-                    .andExpect(jsonPath("serverRole.id").value(testServers.get(2).getServerRoleId()))
-                    .andExpect(jsonPath("services").isArray())
-                    .andExpect(jsonPath("services.[0].id").value(testServers.get(2).getServices().get(0).getId()))
-                    .andExpect(jsonPath("storages").isArray())
-                    .andExpect(jsonPath("storages.[0].id").value(testServers.get(2).getStorages().get(0).getId()));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -411,10 +296,5 @@ public class ServerRestControllerTest {
     @After
     public void cleanAll() {
         serverRepository.deleteAll();
-        configTemplateRepository.deleteAll();
-        serviceTemplateRepository.deleteAll();
-        serverRoleRepository.deleteAll();
-        serviceSocketRepository.deleteAll();
-        serviceRepository.deleteAll();
     }
 }

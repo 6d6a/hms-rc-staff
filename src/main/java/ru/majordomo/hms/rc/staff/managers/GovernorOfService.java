@@ -1,6 +1,5 @@
 package ru.majordomo.hms.rc.staff.managers;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -114,12 +113,7 @@ public class GovernorOfService extends LordOfResources{
     }
 
     @Override
-    public Resource build(Map<String, String> keyValue) throws NotImplementedException {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public List<Service> buildAll(Map<String, String> keyValue) {
+    public List<Service> build(Map<String, String> keyValue) {
 
         List<Service> buildedServices = new ArrayList<>();
 
@@ -145,7 +139,7 @@ public class GovernorOfService extends LordOfResources{
     }
 
     @Override
-    public List<Service> buildAll() {
+    public List<Service> build() {
         List<Service> buildedServices = new ArrayList<>();
         for (Service service : repository.findAll()) {
             buildedServices.add((Service) build(service.getId()));

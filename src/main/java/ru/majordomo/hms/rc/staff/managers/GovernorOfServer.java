@@ -1,7 +1,6 @@
 package ru.majordomo.hms.rc.staff.managers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
@@ -9,14 +8,15 @@ import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.repositories.ServerRepository;
-import ru.majordomo.hms.rc.staff.repositories.ServerRoleRepository;
 import ru.majordomo.hms.rc.staff.resources.Server;
 import ru.majordomo.hms.rc.staff.resources.ServerRole;
 import ru.majordomo.hms.rc.staff.resources.Service;
 import ru.majordomo.hms.rc.staff.resources.Storage;
 import ru.majordomo.hms.rc.staff.resources.Resource;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,39 +24,14 @@ import java.util.Map;
 public class GovernorOfServer extends LordOfResources{
 
     private ServerRepository serverRepository;
-    private ServerRoleRepository serverRoleRepository;
     private GovernorOfServerRole governorOfServerRole;
     private GovernorOfService governorOfService;
     private GovernorOfStorage governorOfStorage;
     private Cleaner cleaner;
-    private String activeSharedHostingName;
-    private String activeMailStorageName;
-    private String activeDatabaseServerName;
-
-    @Value("${server.active.name.shared-hosting}")
-    public void setActiveSharedHostingName(String activeSharedHostingName) {
-        this.activeSharedHostingName = activeSharedHostingName;
-    }
-
-    @Value("${server.active.name.mail-storage}")
-    public void setActiveMailStorageName(String activeMailStorageName) {
-        this.activeMailStorageName = activeMailStorageName;
-    }
-
-    @Value("${server.active.name.database-server}")
-    public void setActiveDatabaseServerName(String activeDatabaseServerName) {
-        this.activeDatabaseServerName = activeDatabaseServerName;
-    }
-
 
     @Autowired
     public void setRepository(ServerRepository repository) {
         this.serverRepository = repository;
-    }
-
-    @Autowired
-    public void setRepository(ServerRoleRepository repository) {
-        this.serverRoleRepository = repository;
     }
 
     @Autowired
@@ -173,52 +148,9 @@ public class GovernorOfServer extends LordOfResources{
         return server;
     }
 
-    public Resource build(Map<String, String> keyValue) throws ResourceNotFoundException {
-
-        Server server = new Server();
-
-        Boolean byActive = false;
-        Boolean byServerRole = false;
-
-        for (Map.Entry<String, String> entry : keyValue.entrySet()) {
-            if (entry.getKey().equals("state")) {
-                byActive = true;
-            }
-            if (entry.getKey().equals("server-role")) {
-                byServerRole = true;
-            }
-        }
-
-        if (byActive && byServerRole) {
-            if (!(keyValue.get("state").equals("active"))) {
-                throw new ResourceNotFoundException("State указан некорректно.");
-            }
-            ServerRole serverRole = serverRoleRepository.findByName(keyValue.get("server-role"));
-            if (serverRole == null) {
-                throw new ResourceNotFoundException("ServerRole с именем: " + keyValue.get("server-role") + " не найдена");
-            }
-
-            String activeServerName;
-            switch (keyValue.get("server-role")) {
-                case "shared-hosting":
-                    activeServerName = activeSharedHostingName;
-                    break;
-                case "mail-storage":
-                    activeServerName = activeMailStorageName;
-                    break;
-                case "database-server":
-                    activeServerName = activeDatabaseServerName;
-                    break;
-                default:
-                    throw new ResourceNotFoundException("По ServerRole: " + keyValue.get("server-role") + " отсутствует фильтр");
-            }
-            server = serverRepository.findByServerRoleIdAndName(serverRole.getId(), activeServerName);
-        }
-        return build(server.getId());
-    }
-
     @Override
-    public List<Server> buildAll(Map<String, String> keyValue) {
+    public List<Server> build(Map<String, String> keyValue) {
+
         List<Server> buildedServers = new ArrayList<>();
 
         Boolean byName = false;
@@ -243,7 +175,7 @@ public class GovernorOfServer extends LordOfResources{
     }
 
     @Override
-    public List<Server> buildAll() {
+    public List<Server> build() {
         List<Server> buildedServers = new ArrayList<>();
         for (Server server : serverRepository.findAll()) {
             buildedServers.add((Server) build(server.getId()));
