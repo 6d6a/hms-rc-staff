@@ -2,7 +2,6 @@ package ru.majordomo.hms.rc.staff.api.http;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +20,7 @@ import ru.majordomo.hms.rc.staff.resources.ServiceSocket;
 
 @RestController
 @RequestMapping("/service-socket")
-public class ServiceSocketRestController extends RestControllerTemplate {
+public class ServiceSocketRestController extends TemplateRestController {
 
     @Autowired
     public void setGovernor(GovernorOfServiceSocket governor) {

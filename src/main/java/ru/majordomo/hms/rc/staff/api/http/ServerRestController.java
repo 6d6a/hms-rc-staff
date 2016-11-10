@@ -3,9 +3,7 @@ package ru.majordomo.hms.rc.staff.api.http;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,11 +16,10 @@ import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfServer;
 import ru.majordomo.hms.rc.staff.resources.Resource;
 import ru.majordomo.hms.rc.staff.resources.Server;
-import ru.majordomo.hms.rc.staff.resources.Service;
 
 @RestController
 @RequestMapping(value = "/server")
-public class ServerRestController extends RestControllerTemplate {
+public class ServerRestController extends TemplateRestController {
 
     @Autowired
     public void setGovernor(GovernorOfServer governor) {

@@ -119,10 +119,10 @@ public class ServerRestControllerTest {
             ServiceType serviceType = new ServiceType();
             switch (i) {
                 case 1:
-                    serviceType.setName("database_mysql");
+                    serviceType.setName("DATABASE_MYSQL");
                     break;
                 case 2:
-                    serviceType.setName("website_apache_php53_hardened");
+                    serviceType.setName("WEBSITE_APACHE_PHP53_HARDENED");
                     break;
             }
             service.setServiceType(serviceType);

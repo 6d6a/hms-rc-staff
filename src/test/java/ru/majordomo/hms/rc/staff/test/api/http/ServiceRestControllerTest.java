@@ -84,7 +84,7 @@ public class ServiceRestControllerTest {
             // Создать сервис и добавить в него сокет и сервис темплейт
             Service service = new Service();
             ServiceType serviceType = new ServiceType();
-            serviceType.setName("database_mysql");
+            serviceType.setName("DATABASE_MYSQL");
             serviceTypeRepository.save(serviceType);
 
             service.setServiceType(serviceType);

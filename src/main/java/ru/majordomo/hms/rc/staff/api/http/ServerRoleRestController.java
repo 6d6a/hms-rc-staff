@@ -20,7 +20,7 @@ import ru.majordomo.hms.rc.staff.resources.ServerRole;
 
 @RestController
 @RequestMapping(value = "/server-role")
-public class ServerRoleRestController extends RestControllerTemplate {
+public class ServerRoleRestController extends TemplateRestController {
 
     @Autowired
     public void setGovernor(GovernorOfServerRole governor) {

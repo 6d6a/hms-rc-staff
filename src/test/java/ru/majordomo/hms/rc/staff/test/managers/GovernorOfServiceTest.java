@@ -83,7 +83,7 @@ public class GovernorOfServiceTest {
         serviceTemplateRepository.save(serviceTemplate);
 
         ServiceType serviceType = new ServiceType();
-        serviceType.setName("database_mysql");
+        serviceType.setName("DATABASE_MYSQL");
         serviceTypeRepository.save(serviceType);
 
         // Создать сервис и сервисное сообщение

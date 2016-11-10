@@ -30,7 +30,7 @@ public class GovernorOfServiceTypeTest {
 
     @Before
     public void setUp() {
-        String name0 = "database_mysql";
+        String name0 = "DATABASE_MYSQL";
         ServiceType serviceType = new ServiceType();
         serviceType.setName(name0);
         testServiceType = serviceType;
@@ -61,10 +61,18 @@ public class GovernorOfServiceTypeTest {
     }
 
     @Test(expected = ParameterValidateException.class)
+    public void validateWithDuplicateName() throws ParameterValidateException {
+        serviceTypeRepository.save(testServiceType);
+        ServiceType serviceType = new ServiceType();
+        serviceType.setName("DATABASE_MYSQL");
+        governor.isValid(serviceType);
+    }
+
+    @Test(expected = ParameterValidateException.class)
     public void validateWithInvalidName() throws ParameterValidateException {
         serviceTypeRepository.save(testServiceType);
         ServiceType serviceType = new ServiceType();
-        serviceType.setName("database_mysql");
+        serviceType.setName("WRONG_BASE");
         governor.isValid(serviceType);
     }
 

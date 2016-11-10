@@ -44,9 +44,9 @@ public class ServiceTypeRestControllerTest {
     private List<ServiceType> testServiceTypes = new ArrayList<>();
 
     private void generateBatchOfServiceTypes() {
-        String name0 = "database_mysql";
-        String name1 = "database_postgresql";
-        String name2 = "website_apache_php53_hardned";
+        String name0 = "DATABASE_MYSQL";
+        String name1 = "DATABASE_POSTGRESQL";
+        String name2 = "WEBSITE_APACHE_PHP53_HARDENED";
         for (int i = 0; i < 3; i++) {
             ServiceType serviceType = new ServiceType();
             switch (i) {
@@ -111,7 +111,7 @@ public class ServiceTypeRestControllerTest {
     @Test
     public void create() {
         ServiceType serviceType = new ServiceType();
-        serviceType.setName("website_apache_php56_default");
+        serviceType.setName("WEBSITE_APAHCE_PHP56_DEFAULT");
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + resourceName)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(serviceType.toJson());
