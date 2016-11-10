@@ -9,10 +9,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import ru.majordomo.hms.rc.staff.api.http.ServiceRestController;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
-import ru.majordomo.hms.rc.staff.managers.GovernorOfConfigTemplate;
-import ru.majordomo.hms.rc.staff.managers.GovernorOfService;
-import ru.majordomo.hms.rc.staff.managers.GovernorOfServiceSocket;
-import ru.majordomo.hms.rc.staff.managers.GovernorOfServiceTemplate;
+import ru.majordomo.hms.rc.staff.managers.*;
 
 @Configuration
 @EnableWebMvc
@@ -45,5 +42,10 @@ public class ServiceServicesConfig {
     @Bean
     public GovernorOfServiceSocket governorOfServiceSocket() {
         return new GovernorOfServiceSocket();
+    }
+
+    @Bean
+    public GovernorOfServiceType governorOfServiceType() {
+        return new GovernorOfServiceType();
     }
 }

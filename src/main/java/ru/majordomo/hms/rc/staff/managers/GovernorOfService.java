@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
+import ru.majordomo.hms.rc.staff.repositories.ServiceTypeRepository;
 import ru.majordomo.hms.rc.staff.resources.*;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
@@ -21,6 +22,7 @@ public class GovernorOfService extends LordOfResources{
     private ServiceRepository repository;
     private GovernorOfServiceTemplate governorOfServiceTemplate;
     private GovernorOfServiceSocket governorOfServiceSocket;
+    private GovernorOfServiceType governorOfServiceType;
     private Cleaner cleaner;
 
     @Autowired
@@ -39,6 +41,11 @@ public class GovernorOfService extends LordOfResources{
     }
 
     @Autowired
+    public void setGovernorOfServiceType(GovernorOfServiceType governorOfServiceType) {
+        this.governorOfServiceType = governorOfServiceType;
+    }
+
+    @Autowired
     public void setCleaner(Cleaner cleaner) {
         this.cleaner = cleaner;
     }
@@ -50,8 +57,10 @@ public class GovernorOfService extends LordOfResources{
             LordOfResources.setResourceParams(service, serviceMessage, cleaner);
             ServiceTemplate serviceTemplate = (ServiceTemplate) serviceMessage.getParam("serviceTemplate");
             List<ServiceSocket> serviceSockets = (List<ServiceSocket>) serviceMessage.getParam("serviceSockets");
+            ServiceType serviceType = (ServiceType) serviceMessage.getParam("serviceType");
             service.setServiceTemplate(serviceTemplate);
             service.setServiceSockets(serviceSockets);
+            service.setServiceType(serviceType);
             isValid(service);
             save(service);
         } catch (ClassCastException e) {
@@ -71,6 +80,9 @@ public class GovernorOfService extends LordOfResources{
         }
         if (service.getServiceSockets().isEmpty() || service.getServiceSocketIds().isEmpty()) {
             throw new ParameterValidateException("Не найден ни один ServiceSocket");
+        }
+        if (service.getServiceType() == null) {
+            throw new ParameterValidateException("Отсутствует ServiceType");
         }
 
         //Валидация ServiceTemplate
@@ -93,6 +105,14 @@ public class GovernorOfService extends LordOfResources{
                 throw new ParameterValidateException("ServiceSocket с ID: " + serviceSocketToValidate.getId() + " задан некорректно");
             }
         }
+
+        //Валидация ServiceType
+        try {
+            governorOfServiceType.build(service.getServiceType().getName());
+        } catch (ResourceNotFoundException e)  {
+            throw new ParameterValidateException("ServiceType с именем: " + service.getServiceType().getName() + " не найден");
+        }
+
     }
 
     @Override

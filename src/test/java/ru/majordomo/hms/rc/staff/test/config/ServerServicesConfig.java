@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import ru.majordomo.hms.rc.staff.api.http.ServerRestController;
+import ru.majordomo.hms.rc.staff.api.http.ServiceTypeRestController;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.managers.*;
 
@@ -54,5 +55,15 @@ public class ServerServicesConfig {
     @Bean
     public GovernorOfStorage governorOfStorage() {
         return new GovernorOfStorage();
+    }
+
+    @Bean
+    public ServiceTypeRestController serviceTypeRestController() {
+        return new ServiceTypeRestController();
+    }
+
+    @Bean
+    public GovernorOfServiceType governorOfServiceType() {
+        return new GovernorOfServiceType();
     }
 }

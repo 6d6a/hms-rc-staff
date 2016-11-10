@@ -19,10 +19,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
-import ru.majordomo.hms.rc.staff.repositories.ServiceRepository;
-import ru.majordomo.hms.rc.staff.repositories.ServiceSocketRepository;
-import ru.majordomo.hms.rc.staff.repositories.ServiceTemplateRepository;
+import ru.majordomo.hms.rc.staff.repositories.*;
 import ru.majordomo.hms.rc.staff.resources.*;
 import ru.majordomo.hms.rc.staff.test.config.EmbeddedServltetContainerConfig;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
@@ -56,6 +53,8 @@ public class ServiceRestControllerTest {
     private ServiceTemplateRepository serviceTemplateRepository;
     @Autowired
     private ConfigTemplateRepository configTemplateRepository;
+    @Autowired
+    private ServiceTypeRepository serviceTypeRepository;
 
     @Value("${spring.application.name}")
     private String applicationName;
@@ -85,6 +84,9 @@ public class ServiceRestControllerTest {
             // Создать сервис и добавить в него сокет и сервис темплейт
             Service service = new Service();
             ServiceType serviceType = new ServiceType();
+            serviceType.setName("database_mysql");
+            serviceTypeRepository.save(serviceType);
+
             service.setServiceType(serviceType);
             service.setName("Сервис " + i);
             service.setSwitchedOn(Boolean.TRUE);
