@@ -20,7 +20,7 @@ import ru.majordomo.hms.rc.staff.resources.ServiceSocket;
 
 @RestController
 @RequestMapping("/service-socket")
-public class ServiceSocketRestController extends TemplateRestController {
+public class ServiceSocketRestController extends RestControllerTemplate {
 
     @Autowired
     public void setGovernor(GovernorOfServiceSocket governor) {

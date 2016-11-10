@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-abstract public class TemplateRestController {
+abstract public class RestControllerTemplate {
 
     protected LordOfResources governor;
 

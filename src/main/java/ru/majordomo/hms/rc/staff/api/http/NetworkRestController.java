@@ -20,7 +20,7 @@ import ru.majordomo.hms.rc.staff.resources.Resource;
 
 @RestController
 @RequestMapping("/network")
-public class NetworkRestController extends TemplateRestController {
+public class NetworkRestController extends RestControllerTemplate {
 
     @Autowired
     public void setGovernor(GovernorOfNetwork governor) {

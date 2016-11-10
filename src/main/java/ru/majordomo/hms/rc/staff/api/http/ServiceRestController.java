@@ -20,7 +20,7 @@ import ru.majordomo.hms.rc.staff.resources.Service;
 
 @RestController
 @RequestMapping("/service")
-public class ServiceRestController extends TemplateRestController {
+public class ServiceRestController extends RestControllerTemplate {
 
     @Autowired
     public void setGovernor(GovernorOfService governor) {

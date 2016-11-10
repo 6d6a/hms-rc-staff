@@ -20,7 +20,7 @@ import ru.majordomo.hms.rc.staff.resources.Resource;
 
 @RestController
 @RequestMapping("/config-template")
-public class ConfigTemplateRestController extends TemplateRestController {
+public class ConfigTemplateRestController extends RestControllerTemplate {
 
     @Autowired
     public void setGovernor(GovernorOfConfigTemplate governor) {

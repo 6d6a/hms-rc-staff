@@ -20,7 +20,7 @@ import ru.majordomo.hms.rc.staff.resources.Storage;
 
 @RestController
 @RequestMapping("/storage")
-public class StorageRestController extends TemplateRestController {
+public class StorageRestController extends RestControllerTemplate {
 
     @Autowired
     public void setGovernor(GovernorOfStorage governor) {

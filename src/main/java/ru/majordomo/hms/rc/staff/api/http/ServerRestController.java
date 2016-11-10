@@ -19,7 +19,7 @@ import ru.majordomo.hms.rc.staff.resources.Server;
 
 @RestController
 @RequestMapping(value = "/server")
-public class ServerRestController extends TemplateRestController {
+public class ServerRestController extends RestControllerTemplate {
 
     @Autowired
     public void setGovernor(GovernorOfServer governor) {
