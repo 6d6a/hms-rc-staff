@@ -218,14 +218,22 @@ public class GovernorOfServer extends LordOfResources{
     }
 
     @Override
-    public List<Server> buildAll(Map<String, String> keyValue) {
+    public List<? extends Resource> buildAll(Map<String, String> keyValue) {
         List<Server> buildedServers = new ArrayList<>();
 
         Boolean byName = false;
+        Boolean byServerId = false;
+        Boolean ByServiceType = false;
 
         for (Map.Entry<String, String> entry : keyValue.entrySet()) {
             if (entry.getKey().equals("name")) {
                 byName = true;
+            }
+            if (entry.getKey().equals("serverId")) {
+                byServerId = true;
+            }
+            if (entry.getKey().equals("service-type")) {
+                ByServiceType = true;
             }
         }
 
@@ -233,10 +241,19 @@ public class GovernorOfServer extends LordOfResources{
             for (Server server : serverRepository.findByName(keyValue.get("name"))) {
                 buildedServers.add((Server) build(server.getId()));
             }
-        } else {
-            for (Server server : serverRepository.findAll()) {
-                buildedServers.add((Server) build(server.getId()));
+        }
+        if (byServerId && ByServiceType) {
+            List<Service> services = new ArrayList<>();
+
+            Server server = (Server) build(keyValue.get("serverId"));
+            for (Service service : server.getServices()) {
+                String[] parts = service.getServiceType().getName().split("_");
+                if (keyValue.get("service-type").equals(parts[0])) {
+                    services.add(service);
+                }
             }
+
+            return services;
         }
 
         return buildedServers;

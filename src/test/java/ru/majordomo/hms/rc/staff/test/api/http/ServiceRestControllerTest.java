@@ -23,10 +23,7 @@ import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceSocketRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceTemplateRepository;
-import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
-import ru.majordomo.hms.rc.staff.resources.Service;
-import ru.majordomo.hms.rc.staff.resources.ServiceSocket;
-import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
+import ru.majordomo.hms.rc.staff.resources.*;
 import ru.majordomo.hms.rc.staff.test.config.EmbeddedServltetContainerConfig;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
 import ru.majordomo.hms.rc.staff.test.config.ServiceServicesConfig;
@@ -87,6 +84,8 @@ public class ServiceRestControllerTest {
 
             // Создать сервис и добавить в него сокет и сервис темплейт
             Service service = new Service();
+            ServiceType serviceType = new ServiceType();
+            service.setServiceType(serviceType);
             service.setName("Сервис " + i);
             service.setSwitchedOn(Boolean.TRUE);
             service.setServiceTemplate(serviceTemplate);
@@ -119,7 +118,8 @@ public class ServiceRestControllerTest {
                             fieldWithPath("name").description("Имя Service"),
                             fieldWithPath("switchedOn").description("Статус Service"),
                             fieldWithPath("serviceSockets").description("Список serviceSockets для Service"),
-                            fieldWithPath("serviceTemplate").description("serviceTemplate для Service")
+                            fieldWithPath("serviceTemplate").description("serviceTemplate для Service"),
+                            fieldWithPath("serviceType").description("serviceType для Service")
                     )
             ));
         } catch (Exception e) {
@@ -143,7 +143,8 @@ public class ServiceRestControllerTest {
                             fieldWithPath("[].name").description("Имя Service"),
                             fieldWithPath("[].switchedOn").description("Статус Service"),
                             fieldWithPath("[].serviceSockets").description("Список serviceSockets для Service"),
-                            fieldWithPath("[].serviceTemplate").description("serviceTemplate для Service")
+                            fieldWithPath("[].serviceTemplate").description("serviceTemplate для Service"),
+                            fieldWithPath("[].serviceType").description("serviceType для Service")
                     )
             ));
         } catch (Exception e) {
@@ -167,7 +168,8 @@ public class ServiceRestControllerTest {
                                     fieldWithPath("[].name").description("Имя Service"),
                                     fieldWithPath("[].switchedOn").description("Статус Service"),
                                     fieldWithPath("[].serviceSockets").description("Список serviceSockets для Service"),
-                                    fieldWithPath("[].serviceTemplate").description("serviceTemplate для Service")
+                                    fieldWithPath("[].serviceTemplate").description("serviceTemplate для Service"),
+                                    fieldWithPath("[].serviceType").description("serviceType для Service")
                             )
                     ));
         } catch (Exception e) {
@@ -187,7 +189,8 @@ public class ServiceRestControllerTest {
                     .andExpect(jsonPath("name").value(testingService.getName()))
                     .andExpect(jsonPath("switchedOn").value(testingService.getSwitchedOn()))
                     .andExpect(jsonPath("serviceTemplate.id").value(testingService.getServiceTemplateId()))
-                    .andExpect(jsonPath("serviceSockets.[0].id").value(testingService.getServiceSocketIds().get(0)))
+                    .andExpect(jsonPath("serviceSockets.[0].id").value(testingService.getServiceSocketIds().get(0))).andDo(print())
+                    .andExpect(jsonPath("serviceType.name").value(testingService.getServiceType().getName()))
                     .andDo(this.document)
                     .andDo(this.document.document(
                             responseFields(
@@ -195,7 +198,8 @@ public class ServiceRestControllerTest {
                                     fieldWithPath("name").description("Имя Service"),
                                     fieldWithPath("switchedOn").description("Статус Service"),
                                     fieldWithPath("serviceSockets").description("Список serviceSockets для Service"),
-                                    fieldWithPath("serviceTemplate").description("serviceTemplate для Service")
+                                    fieldWithPath("serviceTemplate").description("serviceTemplate для Service"),
+                                    fieldWithPath("serviceType").description("serviceType для Service")
                             )
                     ));
         } catch (Exception e) {

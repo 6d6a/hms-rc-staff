@@ -114,8 +114,18 @@ public class ServerRestControllerTest {
             List<Service> services = new ArrayList<>();
             Service service = new Service();
             ServiceSocket serviceSocket = new ServiceSocket();
-
             serviceSocketRepository.save(serviceSocket);
+
+            ServiceType serviceType = new ServiceType();
+            switch (i) {
+                case 1:
+                    serviceType.setName("database_mysql");
+                    break;
+                case 2:
+                    serviceType.setName("website_apache_php53_hardened");
+                    break;
+            }
+            service.setServiceType(serviceType);
             service.setServiceTemplate(serviceTemplate);
             service.addServiceSocket(serviceSocket);
             services.add(service);
@@ -206,6 +216,54 @@ public class ServerRestControllerTest {
                                     fieldWithPath("[].storages").description("Список Storages для Server")
                             )
                     ));
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void readAllServicesByIdAndServiceTypeDatabase() {
+        MultiValueMap<String, String> keyValue = new LinkedMultiValueMap<>();
+        keyValue.set("service-type", "database");
+
+        //Возвращает список объектов Service
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testServers.get(0).getId() + "/services").params(keyValue).accept(MediaType.APPLICATION_JSON_UTF8);
+
+        try {
+            mockMvc.perform(request).andExpect(status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                    .andExpect(jsonPath("$").isArray())
+                    .andExpect(jsonPath("$[0].id").value(testServers.get(0).getServices().get(0).getId()))
+                    .andExpect(jsonPath("$[0].name").value(testServers.get(0).getServices().get(0).getName()))
+                    .andExpect(jsonPath("$[0].switchedOn").value(testServers.get(0).getServices().get(0).getSwitchedOn()))
+                    .andExpect(jsonPath("$[0].serviceTemplate.id").value(testServers.get(0).getServices().get(0).getServiceTemplateId()))
+                    .andExpect(jsonPath("$[0].serviceSockets.[0].id").value(testServers.get(0).getServices().get(0).getServiceSocketIds().get(0))).andDo(print())
+                    .andExpect(jsonPath("$[0].serviceType.name").value(testServers.get(0).getServices().get(0).getServiceType().getName()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void readAllServicesByIdAndServiceTypeWebsite() {
+        MultiValueMap<String, String> keyValue = new LinkedMultiValueMap<>();
+        keyValue.set("service-type", "website");
+
+        //Возвращает список объектов Service
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testServers.get(1).getId() + "/services").params(keyValue).accept(MediaType.APPLICATION_JSON_UTF8);
+
+        try {
+            mockMvc.perform(request).andExpect(status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                    .andExpect(jsonPath("$").isArray())
+                    .andExpect(jsonPath("$[0].id").value(testServers.get(1).getServices().get(0).getId()))
+                    .andExpect(jsonPath("$[0].name").value(testServers.get(1).getServices().get(0).getName()))
+                    .andExpect(jsonPath("$[0].switchedOn").value(testServers.get(1).getServices().get(0).getSwitchedOn()))
+                    .andExpect(jsonPath("$[0].serviceTemplate.id").value(testServers.get(1).getServices().get(0).getServiceTemplateId()))
+                    .andExpect(jsonPath("$[0].serviceSockets.[0].id").value(testServers.get(1).getServices().get(0).getServiceSocketIds().get(0))).andDo(print())
+                    .andExpect(jsonPath("$[0].serviceType.name").value(testServers.get(1).getServices().get(0).getServiceType().getName()));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();

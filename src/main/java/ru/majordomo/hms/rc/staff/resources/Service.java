@@ -21,6 +21,16 @@ public class Service extends Resource {
     private String serviceTemplateId;
     private List<String> serviceSocketIds = new ArrayList<>();
 
+    private ServiceType serviceType;
+
+    public ServiceType getServiceType() {
+        return serviceType;
+    }
+
+    public void setServiceType(ServiceType serviceType) {
+        this.serviceType = serviceType;
+    }
+
     @Override
     public void switchResource() {
         switchedOn = !switchedOn;

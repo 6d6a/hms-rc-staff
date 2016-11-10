@@ -3,7 +3,9 @@ package ru.majordomo.hms.rc.staff.api.http;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +18,7 @@ import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfServer;
 import ru.majordomo.hms.rc.staff.resources.Resource;
 import ru.majordomo.hms.rc.staff.resources.Server;
+import ru.majordomo.hms.rc.staff.resources.Service;
 
 @RestController
 @RequestMapping(value = "/server")
@@ -29,6 +32,13 @@ public class ServerRestController extends RestControllerTemplate {
     @RequestMapping(value = "/{serverId}", method = RequestMethod.GET)
     public Server readOne(@PathVariable String serverId) {
         return (Server) processReadOneQuery(serverId);
+    }
+
+    //Возвращает список объектов Service
+    @RequestMapping(value = "/{serverId}/services", method = RequestMethod.GET)
+    public Collection<? extends Resource> readAllServices(@PathVariable String serverId, @RequestParam Map<String,String> requestParams) {
+          requestParams.put("serverId", serverId);
+          return processReadAllWithParamsQuery(requestParams);
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)

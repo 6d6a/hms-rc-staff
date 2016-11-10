@@ -7,6 +7,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.LordOfResources;
 import ru.majordomo.hms.rc.staff.resources.Resource;
+import ru.majordomo.hms.rc.staff.resources.Server;
 
 import java.util.Collection;
 import java.util.List;
