@@ -41,6 +41,8 @@ public class GovernorOfServerTest {
     private ServiceTemplateRepository serviceTemplateRepository;
     @Autowired
     private ConfigTemplateRepository configTemplateRepository;
+    @Autowired
+    private ServiceTypeRepository serviceTypeRepository;
 
     private ServiceMessage testServiceMessage;
     private Server testServer;
@@ -83,8 +85,12 @@ public class GovernorOfServerTest {
         serviceTemplateRepository.save(serviceTemplate);
 
         Service service = new Service();
+        ServiceType serviceType = new ServiceType();
+        serviceType.setName("DATABASE_MYSQL");
+        serviceTypeRepository.save(serviceType);
         service.addServiceSocket(serviceSocket);
         service.setServiceTemplate(serviceTemplate);
+        service.setServiceType(serviceType);
         serviceRepository.save(service);
 
         ServerRole serverRole = new ServerRole();

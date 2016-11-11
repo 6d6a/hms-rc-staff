@@ -64,6 +64,8 @@ public class ServerRestControllerTest {
     private ConfigTemplateRepository configTemplateRepository;
     @Autowired
     private ServiceSocketRepository serviceSocketRepository;
+    @Autowired
+    private ServiceTypeRepository serviceTypeRepository;
 
     private RestDocumentationResultHandler document;
 
@@ -124,7 +126,11 @@ public class ServerRestControllerTest {
                 case 2:
                     serviceType.setName("WEBSITE_APACHE_PHP53_HARDENED");
                     break;
+                default:
+                    serviceType.setName("DATABASE_POSTGRESQL");
+                    break;
             }
+            serviceTypeRepository.save(serviceType);
             service.setServiceType(serviceType);
             service.setServiceTemplate(serviceTemplate);
             service.addServiceSocket(serviceSocket);

@@ -21,6 +21,19 @@ public class Service extends Resource {
     private String serviceTemplateId;
     private List<String> serviceSocketIds = new ArrayList<>();
 
+    private String serviceTypeName;
+
+    @JsonIgnore
+    public String getServiceTypeName() {
+        return serviceTypeName;
+    }
+
+    @JsonIgnore
+    public void setServiceTypeName(String serviceTypeName) {
+        this.serviceTypeName = serviceTypeName;
+    }
+
+    @Transient
     private ServiceType serviceType;
 
     public ServiceType getServiceType() {
@@ -28,6 +41,7 @@ public class Service extends Resource {
     }
 
     public void setServiceType(ServiceType serviceType) {
+        this.serviceTypeName = serviceType.getName();
         this.serviceType = serviceType;
     }
 

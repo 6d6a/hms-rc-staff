@@ -80,7 +80,7 @@ public class GovernorOfService extends LordOfResources{
         if (service.getServiceSockets().isEmpty() || service.getServiceSocketIds().isEmpty()) {
             throw new ParameterValidateException("Не найден ни один ServiceSocket");
         }
-        if (service.getServiceType() == null) {
+        if (service.getServiceType() == null || service.getServiceTypeName() == null || service.getServiceTypeName().equals("")) {
             throw new ParameterValidateException("Отсутствует ServiceType");
         }
 
@@ -128,6 +128,12 @@ public class GovernorOfService extends LordOfResources{
 
         ServiceTemplate serviceTemplate = (ServiceTemplate) governorOfServiceTemplate.build(service.getServiceTemplateId());
         service.setServiceTemplate(serviceTemplate);
+
+        if (service.getServiceTypeName() == null) {
+            throw new ParameterValidateException("ServiceTypeName отсутствует");
+        }
+        ServiceType serviceType = governorOfServiceType.build(service.getServiceTypeName());
+        service.setServiceType(serviceType);
 
         return service;
     }
