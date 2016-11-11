@@ -179,6 +179,7 @@ public class GovernorOfServer extends LordOfResources{
 
         Boolean byActive = false;
         Boolean byServerRole = false;
+        Boolean byServiceId = false;
 
         for (Map.Entry<String, String> entry : keyValue.entrySet()) {
             if (entry.getKey().equals("state")) {
@@ -186,6 +187,9 @@ public class GovernorOfServer extends LordOfResources{
             }
             if (entry.getKey().equals("server-role")) {
                 byServerRole = true;
+            }
+            if (entry.getKey().equals("service-id")) {
+                byServiceId = true;
             }
         }
 
@@ -213,6 +217,11 @@ public class GovernorOfServer extends LordOfResources{
                     throw new ResourceNotFoundException("По ServerRole: " + keyValue.get("server-role") + " отсутствует фильтр");
             }
             server = serverRepository.findByServerRoleIdAndName(serverRole.getId(), activeServerName);
+        }
+
+        if (byServiceId) {
+            String serviceId = keyValue.get("service-id");
+            server = serverRepository.findByServiceId(serviceId);
         }
         return build(server.getId());
     }
