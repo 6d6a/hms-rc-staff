@@ -221,7 +221,7 @@ public class GovernorOfServer extends LordOfResources{
 
         if (byServiceId) {
             String serviceId = keyValue.get("service-id");
-            server = serverRepository.findByServiceId(serviceId);
+            server = serverRepository.findByServiceIds(serviceId);
         }
         return build(server.getId());
     }

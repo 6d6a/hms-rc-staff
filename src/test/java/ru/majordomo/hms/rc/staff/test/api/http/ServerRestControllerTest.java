@@ -29,6 +29,7 @@ import ru.majordomo.hms.rc.staff.test.config.EmbeddedServltetContainerConfig;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
 import ru.majordomo.hms.rc.staff.test.config.ServerServicesConfig;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
@@ -182,10 +183,10 @@ public class ServerRestControllerTest {
 
     @Test
     public void readOne() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testServers.get(0).getId()).accept(MediaType.APPLICATION_JSON_UTF8);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testServers.get(0).getId()).accept(APPLICATION_JSON_UTF8);
 
         try {
-            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(APPLICATION_JSON_UTF8))
                     .andDo(this.document)
                     .andDo(this.document.document(
                     responseFields(
@@ -205,11 +206,11 @@ public class ServerRestControllerTest {
 
     @Test
     public void readAll() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName ).accept(MediaType.APPLICATION_JSON_UTF8);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName ).accept(APPLICATION_JSON_UTF8);
 
         try {
             mockMvc.perform(request).andExpect(status().isOk())
-                    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                    .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                     .andExpect(jsonPath("$").isArray())
                     .andDo(this.document)
                     .andDo(this.document.document(
@@ -234,11 +235,11 @@ public class ServerRestControllerTest {
         keyValue.set("service-type", "database");
 
         //Возвращает список объектов Service
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testServers.get(0).getId() + "/services").params(keyValue).accept(MediaType.APPLICATION_JSON_UTF8);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testServers.get(0).getId() + "/services").params(keyValue).accept(APPLICATION_JSON_UTF8);
 
         try {
             mockMvc.perform(request).andExpect(status().isOk())
-                    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                    .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                     .andExpect(jsonPath("$").isArray())
                     .andExpect(jsonPath("$[0].id").value(testServers.get(0).getServices().get(0).getId()))
                     .andExpect(jsonPath("$[0].name").value(testServers.get(0).getServices().get(0).getName()))
@@ -258,11 +259,11 @@ public class ServerRestControllerTest {
         keyValue.set("service-type", "website");
 
         //Возвращает список объектов Service
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testServers.get(1).getId() + "/services").params(keyValue).accept(MediaType.APPLICATION_JSON_UTF8);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testServers.get(1).getId() + "/services").params(keyValue).accept(APPLICATION_JSON_UTF8);
 
         try {
             mockMvc.perform(request).andExpect(status().isOk())
-                    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                    .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                     .andExpect(jsonPath("$").isArray())
                     .andExpect(jsonPath("$[0].id").value(testServers.get(1).getServices().get(0).getId()))
                     .andExpect(jsonPath("$[0].name").value(testServers.get(1).getServices().get(0).getName()))
@@ -278,11 +279,11 @@ public class ServerRestControllerTest {
 
     @Test
     public void readAllByName() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName ).param("name", testServers.get(2).getName()).accept(MediaType.APPLICATION_JSON_UTF8);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName ).param("name", testServers.get(2).getName()).accept(APPLICATION_JSON_UTF8);
 
         try {
             mockMvc.perform(request).andExpect(status().isOk())
-                    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                    .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                     .andExpect(jsonPath("$").isArray())
                     .andDo(this.document)
                     .andDo(this.document.document(
@@ -307,10 +308,10 @@ public class ServerRestControllerTest {
         keyValue.set("server-role", "shared-hosting");
         keyValue.set("state", "active");
 
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/filter" ).params(keyValue).accept(MediaType.APPLICATION_JSON_UTF8);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/filter" ).params(keyValue).accept(APPLICATION_JSON_UTF8);
 
         try {
-            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(APPLICATION_JSON_UTF8))
                     .andExpect(jsonPath("name").value(testServers.get(0).getName()))
                     .andExpect(jsonPath("name").value(activeSharedHostingName))
                     .andExpect(jsonPath("switchedOn").value(testServers.get(0).getSwitchedOn()))
@@ -331,10 +332,10 @@ public class ServerRestControllerTest {
         keyValue.set("server-role", "mail-storage");
         keyValue.set("state", "active");
 
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/filter" ).params(keyValue).accept(MediaType.APPLICATION_JSON_UTF8);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/filter" ).params(keyValue).accept(APPLICATION_JSON_UTF8);
 
         try {
-            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(APPLICATION_JSON_UTF8))
                     .andExpect(jsonPath("name").value(testServers.get(1).getName()))
                     .andExpect(jsonPath("name").value(activeMailStorageName))
                     .andExpect(jsonPath("switchedOn").value(testServers.get(1).getSwitchedOn()))
@@ -355,10 +356,10 @@ public class ServerRestControllerTest {
         keyValue.set("server-role", "database-server");
         keyValue.set("state", "active");
 
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/filter" ).params(keyValue).accept(MediaType.APPLICATION_JSON_UTF8);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/filter" ).params(keyValue).accept(APPLICATION_JSON_UTF8);
 
         try {
-            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(APPLICATION_JSON_UTF8))
                     .andExpect(jsonPath("name").value(testServers.get(2).getName()))
                     .andExpect(jsonPath("name").value(activeDatabaseServerName))
                     .andExpect(jsonPath("switchedOn").value(testServers.get(2).getSwitchedOn()))
@@ -374,9 +375,23 @@ public class ServerRestControllerTest {
     }
 
     @Test
+    public void readByServiceId() throws Exception {
+        Server serverThatWeSearch = testServers.get(0);
+
+        MultiValueMap<String, String> keyValue = new LinkedMultiValueMap<>();
+        keyValue.set("service-id", serverThatWeSearch.getServiceIds().get(0));
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/filter").params(keyValue).accept(APPLICATION_JSON_UTF8);
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("id").value(serverThatWeSearch.getId()));
+    }
+
+    @Test
     public void readOneAndCheckObjectFields() {
         Server testingServer = testServers.get(0);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testingServer.getId()).accept(MediaType.APPLICATION_JSON_UTF8);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testingServer.getId()).accept(APPLICATION_JSON_UTF8);
 
         try {
             mockMvc.perform(request).andExpect(jsonPath("id").value(testingServer.getId()))
@@ -409,7 +424,7 @@ public class ServerRestControllerTest {
         Server server = testServers.get(0);
         server.setId(null);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + resourceName)
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .contentType(APPLICATION_JSON_UTF8)
                 .content(server.toJson());
         try {
             mockMvc.perform(request).andExpect(status().isCreated()).andDo(this.document);
@@ -423,7 +438,7 @@ public class ServerRestControllerTest {
     public void update() {
         Server server = testServers.get(0);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + resourceName + "/" + server.getId())
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .contentType(APPLICATION_JSON_UTF8)
                 .content(server.toJson());
         try {
             mockMvc.perform(request).andExpect(status().isOk()).andDo(this.document);
@@ -437,7 +452,7 @@ public class ServerRestControllerTest {
     public void updateNotExistingResource() {
         Server server = testServers.get(0);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + resourceName + "/" + ObjectId.get().toString())
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .contentType(APPLICATION_JSON_UTF8)
                 .content(server.toJson());
         try {
             mockMvc.perform(request).andExpect(status().isNotFound()).andDo(this.document);
@@ -451,7 +466,7 @@ public class ServerRestControllerTest {
     public void delete() {
         Server server = testServers.get(0);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + resourceName + "/" + server.getId())
-                .accept(MediaType.APPLICATION_JSON_UTF8);
+                .accept(APPLICATION_JSON_UTF8);
         try {
             mockMvc.perform(request).andExpect(status().isOk()).andDo(this.document);
         } catch (Exception e) {
@@ -463,7 +478,7 @@ public class ServerRestControllerTest {
     @Test
     public void deleteNotExisting() {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + resourceName + "/" + ObjectId.get().toString())
-                .accept(MediaType.APPLICATION_JSON_UTF8);
+                .accept(APPLICATION_JSON_UTF8);
         try {
             mockMvc.perform(request).andExpect(status().isNotFound()).andDo(this.document);
         } catch (Exception e) {
