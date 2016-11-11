@@ -68,7 +68,7 @@ publishing {
         mavenJava(MavenPublication) {
             groupId 'ru.majordomo.hms.rc.staff'
             artifactId 'resources'
-            version '1.0.5.' + versionBuild
+            version '1.0.6.' + versionBuild
             artifact resourceJar
         }
     }
