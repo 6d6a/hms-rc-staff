@@ -31,7 +31,8 @@ public class GovernorOfServer extends LordOfResources{
     private Cleaner cleaner;
     private String activeSharedHostingName;
     private String activeMailStorageName;
-    private String activeDatabaseServerName;
+    private String activeMysqlDatabaseServerName;
+    private String activePostgresqlDatabaseServerName;
 
     @Value("${server.active.name.shared-hosting}")
     public void setActiveSharedHostingName(String activeSharedHostingName) {
@@ -43,9 +44,14 @@ public class GovernorOfServer extends LordOfResources{
         this.activeMailStorageName = activeMailStorageName;
     }
 
-    @Value("${server.active.name.database-server}")
-    public void setActiveDatabaseServerName(String activeDatabaseServerName) {
-        this.activeDatabaseServerName = activeDatabaseServerName;
+    @Value("${server.active.name.mysql-database-server}")
+    public void setActiveMysqlDatabaseServerName(String activeMysqlDatabaseServerName) {
+        this.activeMysqlDatabaseServerName = activeMysqlDatabaseServerName;
+    }
+
+    @Value("${server.active.name.postgresql-database-server}")
+    public void setActivePostgresqlDatabaseServerName(String activePostgresqlDatabaseServerName) {
+        this.activePostgresqlDatabaseServerName = activePostgresqlDatabaseServerName;
     }
 
 
@@ -213,15 +219,16 @@ public class GovernorOfServer extends LordOfResources{
                 case "mail-storage":
                     activeServerName = activeMailStorageName;
                     break;
-                case "database-server":
-                    activeServerName = activeDatabaseServerName;
+                case "mysql-database-server":
+                    activeServerName = activeMysqlDatabaseServerName;
+                    break;
+                case "postgresql-database-server":
+                    activeServerName = activePostgresqlDatabaseServerName;
                     break;
                 default:
                     throw new ResourceNotFoundException("По ServerRole: " + keyValue.get("server-role") + " отсутствует фильтр");
             }
-            List<String> serverRolesIds = new ArrayList<>();
-            serverRolesIds.add(serverRole.getId());
-            server = serverRepository.findByServerRoleIdsAndName(serverRolesIds, activeServerName);
+            server = serverRepository.findByServerRoleIdsAndName(serverRole.getId(), activeServerName);
         }
 
         if (byServiceId) {

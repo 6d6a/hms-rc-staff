@@ -11,6 +11,6 @@ import ru.majordomo.hms.rc.staff.resources.Server;
 public interface ServerRepository extends MongoRepository<Server, String> {
     List<Server> findAll();
     List<Server> findByName(String name);
-    Server findByServerRoleIdsAndName(List<String> serverRoleIds, String name);
+    Server findByServerRoleIdsAndName(String serverRoleId, String name);
     Server findByServiceIds(String serviceId);
 }
