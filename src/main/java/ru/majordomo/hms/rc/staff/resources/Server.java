@@ -16,8 +16,8 @@ public class Server extends Resource {
     private List<Service> services = new ArrayList<>();
     private List<String> serviceIds = new ArrayList<>();
     @Transient
-    private ServerRole serverRole;
-    private String serverRoleId;
+    private List<ServerRole> serverRoles = new ArrayList<>();
+    private List<String> serverRoleIds = new ArrayList<>();
     @Transient
     private List<Storage> storages = new ArrayList<>();
     private List<String> storageIds = new ArrayList<>();
@@ -40,15 +40,17 @@ public class Server extends Resource {
         this.services = services;
     }
 
-    public ServerRole getServerRole() {
-        return serverRole;
+    public List<ServerRole> getServerRoles() {
+        return serverRoles;
     }
 
-    public void setServerRole(ServerRole serverRole) {
-        try {
-            setServerRoleId(serverRole.getId());
-        } catch (NullPointerException e) {}
-        this.serverRole = serverRole;
+    public void setServerRoles(List<ServerRole> serverRoles) {
+        List<String> serverRoleIds = new ArrayList<>();
+        for (ServerRole serverRole: serverRoles) {
+            serverRoleIds.add(serverRole.getId());
+        }
+        setServerRoleIds(serverRoleIds);
+        this.serverRoles = serverRoles;
     }
 
     public List<Storage> getStorages() {
@@ -75,13 +77,13 @@ public class Server extends Resource {
     }
 
     @JsonIgnore
-    public String getServerRoleId() {
-        return serverRoleId;
+    public List<String> getServerRoleIds() {
+        return serverRoleIds;
     }
 
     @JsonIgnore
-    public void setServerRoleId(String serverRoleId) {
-        this.serverRoleId = serverRoleId;
+    public void setServerRoleIds(List<String> serverRoleIds) {
+        this.serverRoleIds = serverRoleIds;
     }
 
     @JsonIgnore
@@ -110,6 +112,14 @@ public class Server extends Resource {
         }
     }
 
+    public void addServerRole(ServerRole serverRole) {
+        String serverRoleId = serverRole.getId();
+        this.serverRoles.add(serverRole);
+        if (serverRoleIds.contains(serverRoleId) == false) {
+            this.serverRoleIds.add(serverRoleId);
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -122,9 +132,9 @@ public class Server extends Resource {
             return false;
         if (getServiceIds() != null ? !getServiceIds().equals(server.getServiceIds()) : server.getServiceIds() != null)
             return false;
-        if (getServerRole() != null ? !getServerRole().equals(server.getServerRole()) : server.getServerRole() != null)
+        if (getServerRoles() != null ? !getServerRoles().equals(server.getServerRoles()) : server.getServerRoles() != null)
             return false;
-        if (getServerRoleId() != null ? !getServerRoleId().equals(server.getServerRoleId()) : server.getServerRoleId() != null)
+        if (getServerRoleIds() != null ? !getServerRoleIds().equals(server.getServerRoleIds()) : server.getServerRoleIds() != null)
             return false;
         if (getStorages() != null ? !getStorages().equals(server.getStorages()) : server.getStorages() != null)
             return false;

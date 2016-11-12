@@ -113,6 +113,8 @@ public class ServerRestControllerTest {
                     break;
             }
             serverRoleRepository.save(serverRole);
+            List<ServerRole> serverRoles = new ArrayList<>();
+            serverRoles.add(serverRole);
 
             List<Service> services = new ArrayList<>();
             Service service = new Service();
@@ -163,7 +165,7 @@ public class ServerRestControllerTest {
             Server server = new Server();
             server.setName(name);
             server.setSwitchedOn(switchedOn);
-            server.setServerRole(serverRole);
+            server.setServerRoles(serverRoles);
             server.setServices(services);
             server.setStorages(storages);
 
@@ -194,7 +196,7 @@ public class ServerRestControllerTest {
                             fieldWithPath("name").description("Имя Server"),
                             fieldWithPath("switchedOn").description("Статус Server"),
                             fieldWithPath("services").description("Список Service для Server"),
-                            fieldWithPath("serverRole").description("ServerRole для Server"),
+                            fieldWithPath("serverRoles").description("Список ServerRoles для Server"),
                             fieldWithPath("storages").description("Список Storages для Server")
                     )
             ));
@@ -219,7 +221,7 @@ public class ServerRestControllerTest {
                                     fieldWithPath("[].name").description("Имя Server"),
                                     fieldWithPath("[].switchedOn").description("Статус Server"),
                                     fieldWithPath("[].services").description("Список Service для Server"),
-                                    fieldWithPath("[].serverRole").description("ServerRole для Server"),
+                                    fieldWithPath("[].serverRoles").description("Список ServerRoles для Server"),
                                     fieldWithPath("[].storages").description("Список Storages для Server")
                             )
                     ));
@@ -292,7 +294,7 @@ public class ServerRestControllerTest {
                                     fieldWithPath("[].name").description("Имя Server"),
                                     fieldWithPath("[].switchedOn").description("Статус Server"),
                                     fieldWithPath("[].services").description("Список Service для Server"),
-                                    fieldWithPath("[].serverRole").description("ServerRole для Server"),
+                                    fieldWithPath("[].serverRoles").description("Список ServerRoles для Server"),
                                     fieldWithPath("[].storages").description("Список Storages для Server")
                             )
                     ));
@@ -315,7 +317,8 @@ public class ServerRestControllerTest {
                     .andExpect(jsonPath("name").value(testServers.get(0).getName()))
                     .andExpect(jsonPath("name").value(activeSharedHostingName))
                     .andExpect(jsonPath("switchedOn").value(testServers.get(0).getSwitchedOn()))
-                    .andExpect(jsonPath("serverRole.id").value(testServers.get(0).getServerRoleId()))
+                    .andExpect(jsonPath("serverRoles").isArray())
+                    .andExpect(jsonPath("serverRoles.[0].id").value(testServers.get(0).getServerRoles().get(0).getId()))
                     .andExpect(jsonPath("services").isArray())
                     .andExpect(jsonPath("services.[0].id").value(testServers.get(0).getServices().get(0).getId()))
                     .andExpect(jsonPath("storages").isArray())
@@ -339,7 +342,8 @@ public class ServerRestControllerTest {
                     .andExpect(jsonPath("name").value(testServers.get(1).getName()))
                     .andExpect(jsonPath("name").value(activeMailStorageName))
                     .andExpect(jsonPath("switchedOn").value(testServers.get(1).getSwitchedOn()))
-                    .andExpect(jsonPath("serverRole.id").value(testServers.get(1).getServerRoleId()))
+                    .andExpect(jsonPath("serverRoles").isArray())
+                    .andExpect(jsonPath("serverRoles.[0].id").value(testServers.get(1).getServerRoles().get(0).getId()))
                     .andExpect(jsonPath("services").isArray())
                     .andExpect(jsonPath("services.[0].id").value(testServers.get(1).getServices().get(0).getId()))
                     .andExpect(jsonPath("storages").isArray())
@@ -363,7 +367,8 @@ public class ServerRestControllerTest {
                     .andExpect(jsonPath("name").value(testServers.get(2).getName()))
                     .andExpect(jsonPath("name").value(activeDatabaseServerName))
                     .andExpect(jsonPath("switchedOn").value(testServers.get(2).getSwitchedOn()))
-                    .andExpect(jsonPath("serverRole.id").value(testServers.get(2).getServerRoleId()))
+                    .andExpect(jsonPath("serverRoles").isArray())
+                    .andExpect(jsonPath("serverRoles.[0].id").value(testServers.get(2).getServerRoles().get(0).getId()))
                     .andExpect(jsonPath("services").isArray())
                     .andExpect(jsonPath("services.[0].id").value(testServers.get(2).getServices().get(0).getId()))
                     .andExpect(jsonPath("storages").isArray())
@@ -397,7 +402,8 @@ public class ServerRestControllerTest {
             mockMvc.perform(request).andExpect(jsonPath("id").value(testingServer.getId()))
                     .andExpect(jsonPath("name").value(testingServer.getName()))
                     .andExpect(jsonPath("switchedOn").value(testingServer.getSwitchedOn()))
-                    .andExpect(jsonPath("serverRole.id").value(testingServer.getServerRoleId()))
+                    .andExpect(jsonPath("serverRoles").isArray())
+                    .andExpect(jsonPath("serverRoles.[0].id").value(testingServer.getServerRoles().get(0).getId()))
                     .andExpect(jsonPath("services").isArray())
                     .andExpect(jsonPath("services.[0].id").value(testingServer.getServices().get(0).getId()))
                     .andExpect(jsonPath("storages").isArray())
@@ -409,7 +415,7 @@ public class ServerRestControllerTest {
                                     fieldWithPath("name").description("Имя Server"),
                                     fieldWithPath("switchedOn").description("Статус Server"),
                                     fieldWithPath("services").description("Список Service для Server"),
-                                    fieldWithPath("serverRole").description("ServerRole для Server"),
+                                    fieldWithPath("serverRoles").description("Список ServerRoles для Server"),
                                     fieldWithPath("storages").description("Список Storages для Server")
                             )
                     ));

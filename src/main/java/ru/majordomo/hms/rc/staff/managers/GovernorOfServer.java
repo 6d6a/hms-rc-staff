@@ -91,8 +91,8 @@ public class GovernorOfServer extends LordOfResources{
             List<Storage> storages = (List<Storage>) serviceMessage.getParam("storages");
             server.setStorages(storages);
 
-            ServerRole serverRole = (ServerRole) serviceMessage.getParam("serverRole");
-            server.setServerRole(serverRole);
+            List<ServerRole> serverRoles = (List<ServerRole>) serviceMessage.getParam("serverRoles");
+            server.setServerRoles(serverRoles);
 
             isValid(server);
             save(server);
@@ -113,8 +113,8 @@ public class GovernorOfServer extends LordOfResources{
         if (server.getStorages().isEmpty() || server.getStorageIds().isEmpty()) {
             throw new ParameterValidateException("Не найден ни один Storage");
         }
-        if (server.getServerRole() == null || server.getServerRole().getId() == null || server.getServerRoleId() == null) {
-            throw new ParameterValidateException("Отсутствует ServerRole");
+        if (server.getServerRoles().isEmpty() || server.getServerRoleIds().isEmpty()) {
+            throw new ParameterValidateException("Не найден ни один ServerRole");
         }
 
         //Валидация Service
@@ -140,13 +140,14 @@ public class GovernorOfServer extends LordOfResources{
         }
 
         //Валидация ServerRole
-        ServerRole serverRoleToValidate = server.getServerRole();
-        ServerRole serverRoleFromRepository = (ServerRole) governorOfServerRole.build(serverRoleToValidate.getId());
-        if (serverRoleFromRepository == null) {
-            throw new ParameterValidateException("ServerRole с ID: " + serverRoleToValidate.getId() + " не найден");
-        }
-        if(!serverRoleFromRepository.equals(serverRoleToValidate)) {
-            throw new ParameterValidateException("ServerRole с ID: " + serverRoleToValidate.getId() + " задан некорректно");
+        for (ServerRole serverRoleToValidate : server.getServerRoles()) {
+            ServerRole serverRoleFromRepository = (ServerRole) governorOfServerRole.build(serverRoleToValidate.getId());
+            if (serverRoleFromRepository == null) {
+                throw new ParameterValidateException("ServerRole с ID: " + serverRoleToValidate.getId() + " не найден");
+            }
+            if (!serverRoleFromRepository.equals(serverRoleToValidate)) {
+                throw new ParameterValidateException("ServerRole с ID: " + serverRoleToValidate.getId() + " задан некорректно");
+            }
         }
     }
 
@@ -157,9 +158,6 @@ public class GovernorOfServer extends LordOfResources{
             throw new ResourceNotFoundException("Server с ID:" + resourceId + " не найден");
         }
 
-        ServerRole serverRole = (ServerRole) governorOfServerRole.build(server.getServerRoleId());
-        server.setServerRole(serverRole);
-
         for (String serviceId : server.getServiceIds()) {
             Service service = (Service) governorOfService.build(serviceId);
             server.addService(service);
@@ -168,6 +166,11 @@ public class GovernorOfServer extends LordOfResources{
         for (String storageId : server.getStorageIds()) {
             Storage storage = (Storage) governorOfStorage.build(storageId);
             server.addStorage(storage);
+        }
+
+        for (String serverRoleId : server.getServerRoleIds()) {
+            ServerRole serverRole = (ServerRole) governorOfServerRole.build(serverRoleId);
+            server.addServerRole(serverRole);
         }
 
         return server;
@@ -216,7 +219,9 @@ public class GovernorOfServer extends LordOfResources{
                 default:
                     throw new ResourceNotFoundException("По ServerRole: " + keyValue.get("server-role") + " отсутствует фильтр");
             }
-            server = serverRepository.findByServerRoleIdAndName(serverRole.getId(), activeServerName);
+            List<String> serverRolesIds = new ArrayList<>();
+            serverRolesIds.add(serverRole.getId());
+            server = serverRepository.findByServerRoleIdsAndName(serverRolesIds, activeServerName);
         }
 
         if (byServiceId) {
