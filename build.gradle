@@ -111,7 +111,7 @@ dependencies {
     compile('org.springframework.cloud:spring-cloud-starter-eureka')
     compile('org.springframework.boot:spring-boot-starter-data-mongodb')
     compile('org.springframework.amqp:spring-rabbit:1.6.2.RELEASE')
-    compile('commons-net:commons-net:2.0')
+    compile('commons-net:commons-net:3.5')
     compile('org.springframework.boot:spring-boot-starter-actuator')
     testCompile('com.github.fakemongo:fongo:2.0.9')
     testCompile('org.springframework.boot:spring-boot-starter-test')
