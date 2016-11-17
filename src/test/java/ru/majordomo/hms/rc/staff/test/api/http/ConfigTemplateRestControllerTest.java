@@ -82,7 +82,7 @@ public class ConfigTemplateRestControllerTest {
 
     @Test
     public void readOne() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + configTemplates.get(0).getId() + "/")
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + configTemplates.get(0).getId())
                 .accept(MediaType.APPLICATION_JSON_UTF8);
 
         try {
@@ -95,6 +95,29 @@ public class ConfigTemplateRestControllerTest {
                                 fieldWithPath("name").description("Имя ConfigTemplate"),
                                 fieldWithPath("switchedOn").description("Статус ConfigTemplate"),
                                 fieldWithPath("fileLink").description("Ссылка на файл")
+                            )
+                    ));
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void readOneWithSlash() {
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + configTemplates.get(1).getId() + "/")
+                .accept(MediaType.APPLICATION_JSON_UTF8);
+
+        try {
+            mockMvc.perform(request).andExpect(status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                            responseFields(
+                                    fieldWithPath("id").description("ConfigTemplate ID"),
+                                    fieldWithPath("name").description("Имя ConfigTemplate"),
+                                    fieldWithPath("switchedOn").description("Статус ConfigTemplate"),
+                                    fieldWithPath("fileLink").description("Ссылка на файл")
                             )
                     ));
         } catch (Exception e) {
@@ -150,6 +173,30 @@ public class ConfigTemplateRestControllerTest {
     @Test
     public void readOneAndCheckObjectFields() {
         ConfigTemplate configTemplate = configTemplates.get(0);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + configTemplate.getId()).accept(MediaType.APPLICATION_JSON_UTF8);
+
+        try {
+            mockMvc.perform(request).andExpect(jsonPath("name").value(configTemplate.getName()))
+                    .andExpect(jsonPath("switchedOn").value(configTemplate.getSwitchedOn()))
+                    .andExpect(jsonPath("fileLink").value(configTemplate.getFileLink()))
+                    .andDo(this.document)
+                    .andDo(this.document.document(
+                            responseFields(
+                                    fieldWithPath("id").description("ConfigTemplate ID"),
+                                    fieldWithPath("name").description("Имя ConfigTemplate"),
+                                    fieldWithPath("switchedOn").description("Статус ConfigTemplate"),
+                                    fieldWithPath("fileLink").description("Ссылка на файл")
+                            )
+                    ));
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void readOneAndCheckObjectFieldsWithSlash() {
+        ConfigTemplate configTemplate = configTemplates.get(1);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + configTemplate.getId() + "/").accept(MediaType.APPLICATION_JSON_UTF8);
 
         try {
