@@ -27,12 +27,12 @@ public class ConfigTemplateRestController extends RestControllerTemplate {
         this.governor = governor;
     }
 
-    @RequestMapping(value = "/{configTemplateId}/", method = RequestMethod.GET)
+    @RequestMapping(value = {"/{configTemplateId}", "/{configTemplateId}/"}, method = RequestMethod.GET)
     public ConfigTemplate readOne(@PathVariable String configTemplateId) {
         return (ConfigTemplate) processReadOneQuery(configTemplateId);
     }
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
     public Collection<? extends Resource> readAll(@RequestParam(required=false, defaultValue="") String name) {
         Map<String, String> keyValue = new HashMap<>();
         if (!name.isEmpty()) {
@@ -50,14 +50,14 @@ public class ConfigTemplateRestController extends RestControllerTemplate {
         return processCreateQuery(configTemplate);
     }
 
-    @RequestMapping(value = "/{configTemplateId}", method = {RequestMethod.PATCH, RequestMethod.PUT})
+    @RequestMapping(value = {"/{configTemplateId}", "/{configTemplateId}/"}, method = {RequestMethod.PATCH, RequestMethod.PUT})
     public ResponseEntity<?> update(@PathVariable String configTemplateId,
                                     @RequestBody ConfigTemplate configTemplate)
                                     throws ParameterValidateException {
         return processUpdateQuery(configTemplateId, configTemplate);
     }
 
-    @RequestMapping(value = "/{configTemplateId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = {"/{configTemplateId}", "/{configTemplateId}/"}, method = RequestMethod.DELETE)
     public ResponseEntity<?> delete(@PathVariable String configTemplateId) {
         return processDeleteQuery(configTemplateId);
     }
