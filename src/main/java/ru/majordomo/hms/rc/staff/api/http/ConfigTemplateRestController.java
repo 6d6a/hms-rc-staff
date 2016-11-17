@@ -27,7 +27,7 @@ public class ConfigTemplateRestController extends RestControllerTemplate {
         this.governor = governor;
     }
 
-    @RequestMapping(value = "/{configTemplateId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{configTemplateId}/", method = RequestMethod.GET)
     public ConfigTemplate readOne(@PathVariable String configTemplateId) {
         return (ConfigTemplate) processReadOneQuery(configTemplateId);
     }

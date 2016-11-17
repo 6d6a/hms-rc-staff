@@ -82,7 +82,7 @@ public class ConfigTemplateRestControllerTest {
 
     @Test
     public void readOne() {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + configTemplates.get(0).getId())
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + configTemplates.get(0).getId() + "/")
                 .accept(MediaType.APPLICATION_JSON_UTF8);
 
         try {
@@ -150,7 +150,7 @@ public class ConfigTemplateRestControllerTest {
     @Test
     public void readOneAndCheckObjectFields() {
         ConfigTemplate configTemplate = configTemplates.get(0);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + configTemplate.getId()).accept(MediaType.APPLICATION_JSON_UTF8);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + configTemplate.getId() + "/").accept(MediaType.APPLICATION_JSON_UTF8);
 
         try {
             mockMvc.perform(request).andExpect(jsonPath("name").value(configTemplate.getName()))
