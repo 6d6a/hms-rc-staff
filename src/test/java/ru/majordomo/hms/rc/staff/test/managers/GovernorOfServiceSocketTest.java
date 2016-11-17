@@ -118,16 +118,23 @@ public class GovernorOfServiceSocketTest {
     }
 
     @Test(expected = ParameterValidateException.class)
-    public void createWithBadAddress() throws ParameterValidateException {
+    public void createWithBadAddressHigher() throws ParameterValidateException {
         ServiceMessage badAddressServiceMessage = testServiceMessage;
-        badAddressServiceMessage.addParam("address", "10.20.30.40");
-        ServiceSocket createdServiceSocket = (ServiceSocket) governor.createResource(badAddressServiceMessage);
+        badAddressServiceMessage.addParam("address", "11.20.30.40");
+        governor.createResource(badAddressServiceMessage);
+    }
+
+    @Test(expected = ParameterValidateException.class)
+    public void createWithBadAddressLower() throws ParameterValidateException {
+        ServiceMessage badAddressServiceMessage = testServiceMessage;
+        badAddressServiceMessage.addParam("address", "9.20.30.40");
+        governor.createResource(badAddressServiceMessage);
     }
 
     @Test(expected = ParameterValidateException.class)
     public void createWithBadPort() throws ParameterValidateException {
         ServiceMessage badPortServiceMessage = testServiceMessage;
         badPortServiceMessage.addParam("port", -1);
-        ServiceSocket createdServiceSocket = (ServiceSocket) governor.createResource(badPortServiceMessage);
+        governor.createResource(badPortServiceMessage);
     }
 }
