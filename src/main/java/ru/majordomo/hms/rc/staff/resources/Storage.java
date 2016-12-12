@@ -7,6 +7,7 @@ public class Storage extends Resource {
 
     private Double capacity;
     private Double capacityUsed;
+    private String mountPoint;
 
     @Override
     public void switchResource() {
@@ -27,6 +28,14 @@ public class Storage extends Resource {
 
     public void setCapacityUsed(Double capacityUsed) {
         this.capacityUsed = capacityUsed;
+    }
+
+    public String getMountPoint() {
+        return mountPoint;
+    }
+
+    public void setMountPoint(String mountPoint) {
+        this.mountPoint = mountPoint;
     }
 
     @Override
