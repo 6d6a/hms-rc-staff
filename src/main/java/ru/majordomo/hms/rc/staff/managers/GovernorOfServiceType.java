@@ -58,7 +58,12 @@ public class GovernorOfServiceType {
         Matcher matcherWebsite = pattern1.matcher(name);
         boolean isMatchedWebsite = matcherWebsite.matches();
 
-        if (!isMatchedDatabase && !isMatchedWebsite) {
+        String patternMailStorage = "MAILBOX_[A-Z]+";
+        Pattern pattern2 = Pattern.compile(patternMailStorage, Pattern.CASE_INSENSITIVE);
+        Matcher matcherMailStorage = pattern2.matcher(name);
+        boolean isMatchedMailStorage = matcherMailStorage.matches();
+
+        if (!isMatchedDatabase && !isMatchedWebsite && !isMatchedMailStorage) {
             throw new ParameterValidateException("Заданное имя: " + name + " некорректно");
         }
     }
