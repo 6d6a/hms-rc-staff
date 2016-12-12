@@ -31,22 +31,24 @@ public class GovernorOfStorageTest {
     private StorageRepository storageRepository;
 
     private ServiceMessage generateServiceMessage(String name, Boolean switchedOn,
-                                                  Double capacity, Double capacityUsed) {
+                                                  Double capacity, Double capacityUsed, String mountPoint) {
         ServiceMessage serviceMessage = new ServiceMessage();
         serviceMessage.addParam("name", name);
         serviceMessage.addParam("switchedOn", switchedOn);
         serviceMessage.addParam("capacity", capacity);
         serviceMessage.addParam("capacityUsed", capacityUsed);
+        serviceMessage.addParam("mountPoint", mountPoint);
         return serviceMessage;
     }
 
     private Storage generateStorage(String name, Boolean switchedOn,
-                                    Double capacity, Double capacityUsed) {
+                                    Double capacity, Double capacityUsed, String mountPoint) {
         Storage storage = new Storage();
         storage.setName(name);
         storage.setSwitchedOn(switchedOn);
         storage.setCapacity(capacity);
         storage.setCapacityUsed(capacityUsed);
+        storage.setMountPoint(mountPoint);
         return storage;
     }
 
@@ -56,8 +58,9 @@ public class GovernorOfStorageTest {
         Boolean switchedOn = Boolean.TRUE;
         Double capacity = 5 * Math.pow(10, 12);
         Double capacityUsed = 3 * Math.pow(10, 12);
-        testServiceMessage = generateServiceMessage(name, switchedOn, capacity, capacityUsed);
-        testStorage = generateStorage(name, switchedOn, capacity, capacityUsed);
+        String mountPoint = "/home/";
+        testServiceMessage = generateServiceMessage(name, switchedOn, capacity, capacityUsed, mountPoint);
+        testStorage = generateStorage(name, switchedOn, capacity, capacityUsed, mountPoint);
     }
 
     @Test
@@ -68,6 +71,7 @@ public class GovernorOfStorageTest {
             Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testStorage.getSwitchedOn(), createdStorage.getSwitchedOn());
             Assert.assertEquals("Capacity не совпадает с ожидаемым", testStorage.getCapacity(), createdStorage.getCapacity());
             Assert.assertEquals("CapacityUsed не совпадает с ожидаемым", testStorage.getCapacityUsed(), createdStorage.getCapacityUsed());
+            Assert.assertEquals("mountPoint не совпадает с ожидаемым", testStorage.getMountPoint(), createdStorage.getMountPoint());
         } catch (ParameterValidateException e) {
             e.printStackTrace();
             Assert.fail();
@@ -83,6 +87,7 @@ public class GovernorOfStorageTest {
             Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testStorage.getSwitchedOn(), buildedStorage.getSwitchedOn());
             Assert.assertEquals("Capacity не совпадает с ожидаемым", testStorage.getCapacity(), buildedStorage.getCapacity());
             Assert.assertEquals("CapacityUsed не совпадает с ожидаемым", testStorage.getCapacityUsed(), buildedStorage.getCapacityUsed());
+            Assert.assertEquals("mountPoint не совпадает с ожидаемым", testStorage.getMountPoint(), buildedStorage.getMountPoint());
         } catch (ParameterValidateException | NullPointerException e ) {
             e.printStackTrace();
             Assert.fail();
@@ -98,6 +103,7 @@ public class GovernorOfStorageTest {
             Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testStorage.getSwitchedOn(), buildedStorage.get(buildedStorage.size()-1).getSwitchedOn());
             Assert.assertEquals("Capacity не совпадает с ожидаемым", testStorage.getCapacity(), buildedStorage.get(buildedStorage.size()-1).getCapacity());
             Assert.assertEquals("CapacityUsed не совпадает с ожидаемым", testStorage.getCapacityUsed(), buildedStorage.get(buildedStorage.size()-1).getCapacityUsed());
+            Assert.assertEquals("mountPoint не совпадает с ожидаемым", testStorage.getMountPoint(), buildedStorage.get(buildedStorage.size()-1).getMountPoint());
         } catch (ParameterValidateException | NullPointerException e ) {
             e.printStackTrace();
             Assert.fail();
@@ -106,19 +112,19 @@ public class GovernorOfStorageTest {
 
     @Test(expected = ParameterValidateException.class)
     public void createResourceWithInvalidCapacity() throws ParameterValidateException {
-        testServiceMessage = generateServiceMessage("Хранилище 2", Boolean.TRUE, 0.0, 3 * Math.pow(10, 12));
+        testServiceMessage = generateServiceMessage("Хранилище 2", Boolean.TRUE, 0.0, 3 * Math.pow(10, 12), "/home/");
         governor.createResource(testServiceMessage);
     }
 
     @Test(expected = ParameterValidateException.class)
     public void createResourceWithInvalidCapacityUsed() throws ParameterValidateException {
-        testServiceMessage = generateServiceMessage("Хранилище 3", Boolean.TRUE, 5 * Math.pow(10, 12), -10.0);
+        testServiceMessage = generateServiceMessage("Хранилище 3", Boolean.TRUE, 5 * Math.pow(10, 12), -10.0, "/home/");
         governor.createResource(testServiceMessage);
     }
 
     @Test(expected = ParameterValidateException.class)
     public void createResourceWithCapacityUsedBiggerThenCapacity() throws ParameterValidateException {
-        testServiceMessage = generateServiceMessage("Хранилище 4", Boolean.TRUE, 3 * Math.pow(10, 12), 5 * Math.pow(10, 12));
+        testServiceMessage = generateServiceMessage("Хранилище 4", Boolean.TRUE, 3 * Math.pow(10, 12), 5 * Math.pow(10, 12), "/home/");
         governor.createResource(testServiceMessage);
     }
 

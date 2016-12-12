@@ -96,7 +96,8 @@ public class StorageRestControllerTest {
                             fieldWithPath("name").description("Имя Storage"),
                             fieldWithPath("switchedOn").description("Статус Storage"),
                             fieldWithPath("capacity").description("Объем хранилища"),
-                            fieldWithPath("capacityUsed").description("Занятый объем хранилища")
+                            fieldWithPath("capacityUsed").description("Занятый объем хранилища"),
+                            fieldWithPath("mountPoint").description("mountPoint хранилища")
                     )
             ));
         } catch (Exception e) {
@@ -118,7 +119,8 @@ public class StorageRestControllerTest {
                             fieldWithPath("[].name").description("Имя Storage"),
                             fieldWithPath("[].switchedOn").description("Статус Storage"),
                             fieldWithPath("[].capacity").description("Объем хранилища"),
-                            fieldWithPath("[].capacityUsed").description("Занятый объем хранилища")
+                            fieldWithPath("[].capacityUsed").description("Занятый объем хранилища"),
+                            fieldWithPath("[].mountPoint").description("mountPoint хранилища")
                     )
             ));
         } catch (Exception e) {
@@ -140,7 +142,8 @@ public class StorageRestControllerTest {
                                     fieldWithPath("[].name").description("Имя Storage"),
                                     fieldWithPath("[].switchedOn").description("Статус Storage"),
                                     fieldWithPath("[].capacity").description("Объем хранилища"),
-                                    fieldWithPath("[].capacityUsed").description("Занятый объем хранилища")
+                                    fieldWithPath("[].capacityUsed").description("Занятый объем хранилища"),
+                                    fieldWithPath("[].mountPoint").description("mountPoint хранилища")
                             )
                     ));
         } catch (Exception e) {
@@ -167,7 +170,8 @@ public class StorageRestControllerTest {
                                     fieldWithPath("name").description("Имя Storage"),
                                     fieldWithPath("switchedOn").description("Статус Storage"),
                                     fieldWithPath("capacity").description("Объем хранилища"),
-                                    fieldWithPath("capacityUsed").description("Занятый объем хранилища")
+                                    fieldWithPath("capacityUsed").description("Занятый объем хранилища"),
+                                    fieldWithPath("mountPoint").description("mountPoint хранилища")
                             )
                     ));
         } catch (Exception e){
@@ -177,71 +181,46 @@ public class StorageRestControllerTest {
     }
 
     @Test
-    public void create() {
+    public void create()  throws Exception {
         Storage testingStorage = storages.get(0);
         testingStorage.setId(null);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + resourceName)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(testingStorage.toJson());
-        try {
-            mockMvc.perform(request).andExpect(status().isCreated()).andDo(this.document);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail();
-        }
+        mockMvc.perform(request).andExpect(status().isCreated()).andDo(this.document);
     }
 
     @Test
-    public void update() {
+    public void update() throws Exception {
         Storage storage = storages.get(0);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + resourceName + "/" + storage.getId())
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(storage.toJson());
-        try {
-            mockMvc.perform(request).andExpect(status().isOk()).andDo(this.document);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail();
-        }
+        mockMvc.perform(request).andExpect(status().isOk()).andDo(this.document);
     }
 
     @Test
-    public void updateNotExistingResource() {
+    public void updateNotExistingResource() throws Exception {
         Storage storage = storages.get(0);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.patch("/" + resourceName + "/" + ObjectId.get().toString())
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(storage.toJson());
-        try {
-            mockMvc.perform(request).andExpect(status().isNotFound()).andDo(this.document);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail();
-        }
+        mockMvc.perform(request).andExpect(status().isNotFound()).andDo(this.document);
     }
 
     @Test
-    public void delete() {
+    public void delete() throws Exception {
         Storage storage = storages.get(0);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + resourceName + "/" + storage.getId())
                 .accept(MediaType.APPLICATION_JSON_UTF8);
-        try {
-            mockMvc.perform(request).andExpect(status().isOk()).andDo(this.document);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail();
-        }
+        mockMvc.perform(request).andExpect(status().isOk()).andDo(this.document);
     }
 
     @Test
-    public void deleteNotExisting() {
+    public void deleteNotExisting() throws Exception {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete("/" + resourceName + "/" + ObjectId.get().toString())
                 .accept(MediaType.APPLICATION_JSON_UTF8);
-        try {
-            mockMvc.perform(request).andExpect(status().isNotFound()).andDo(this.document);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail();
-        }
+        mockMvc.perform(request).andExpect(status().isNotFound()).andDo(this.document);
     }
 
     @After

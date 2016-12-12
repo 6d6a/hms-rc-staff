@@ -54,8 +54,16 @@ public class GovernorOfStorage extends LordOfResources {
             if (capacityUsed > capacity) {
                 throw new ParameterValidateException("capacityUsed не может быть больше capacity");
             }
+            String mountPoint = (String) serviceMessage.getParam("mountPoint");
+            if (mountPoint == null) {
+                throw new ParameterValidateException("Нужен mountPoint");
+            }
+            if (!mountPoint.startsWith("/")) {
+                throw new ParameterValidateException("Путь должен быть абсолютным");
+            }
             storage.setCapacity(capacity);
             storage.setCapacityUsed(capacityUsed);
+            storage.setMountPoint(mountPoint);
 
             save(storage);
         } catch (ClassCastException e){
