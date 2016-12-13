@@ -18,12 +18,19 @@ import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
 import ru.majordomo.hms.rc.staff.test.config.ServerServicesConfig;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {RepositoriesConfig.class,
+@SpringBootTest(
+        classes = {RepositoriesConfig.class,
         EmbeddedServltetContainerConfig.class, ServerServicesConfig.class},
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = {
+                "server.active.mail-storage.active-storage-mountpoint:/homebig"
+        }
+)
 public class GovernorOfServerTest {
     @Autowired
     private GovernorOfServer governor;
@@ -62,6 +69,7 @@ public class GovernorOfServerTest {
     private Server generateServer(String name, Boolean switchedOn,
                                           List<Service> services, List<ServerRole> serverRoles, List<Storage> storages) {
         Server server = new Server();
+        server.setId(ObjectId.get().toString());
         server.setName(name);
         server.setSwitchedOn(switchedOn);
         server.setServices(services);
@@ -171,6 +179,29 @@ public class GovernorOfServerTest {
             e.printStackTrace();
             Assert.fail();
         }
+    }
+
+    @Test
+    public void buildMailStorageServerByActiveStorage() throws Exception {
+        Storage storage = new Storage();
+        storage.setId(ObjectId.get().toString());
+        storage.setMountPoint("/homebig");
+
+        storageRepository.save(storage);
+
+        ServerRole serverRole = new ServerRole();
+        serverRole.setName("mail-storage");
+
+        serverRoleRepository.save(serverRole);
+
+        testServer.addServerRole(serverRole);
+        testServer.addStorage(storage);
+        serverRepository.save(testServer);
+        Map<String, String> keyValue = new HashMap<>();
+        keyValue.put("server-id", testServer.getId());
+        keyValue.put("active-storage", "true");
+        Storage buildedStorage = (Storage) governor.build(keyValue);
+        Assert.assertNotNull(buildedStorage);
     }
 
     @Test(expected = ParameterValidateException.class)

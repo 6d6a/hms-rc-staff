@@ -34,6 +34,14 @@ public class GovernorOfServer extends LordOfResources{
     private String activeMysqlDatabaseServerName;
     private String activePostgresqlDatabaseServerName;
 
+    private String activeMailboxStorageMountPoint;
+
+
+    @Value("${server.active.mail-storage.active-storage-mountpoint}")
+    public void setActiveMailboxStorageMountPoint(String activeMailboxStorageMountPoint) {
+        this.activeMailboxStorageMountPoint = activeMailboxStorageMountPoint;
+    }
+
     @Value("${server.active.name.shared-hosting}")
     public void setActiveSharedHostingName(String activeSharedHostingName) {
         this.activeSharedHostingName = activeSharedHostingName;
@@ -189,6 +197,8 @@ public class GovernorOfServer extends LordOfResources{
         Boolean byActive = false;
         Boolean byServerRole = false;
         Boolean byServiceId = false;
+        Boolean findStorage = false;
+        Boolean byServerId = false;
 
         for (Map.Entry<String, String> entry : keyValue.entrySet()) {
             if (entry.getKey().equals("state")) {
@@ -199,6 +209,12 @@ public class GovernorOfServer extends LordOfResources{
             }
             if (entry.getKey().equals("service-id")) {
                 byServiceId = true;
+            }
+            if (entry.getKey().equals("active-storage")) {
+                findStorage = true;
+            }
+            if (entry.getKey().equals("server-id")) {
+                byServerId = true;
             }
         }
 
@@ -234,6 +250,22 @@ public class GovernorOfServer extends LordOfResources{
         if (byServiceId) {
             String serviceId = keyValue.get("service-id");
             server = serverRepository.findByServiceIds(serviceId);
+        }
+
+        if (findStorage && byServerId) {
+            server = (Server) build(keyValue.get("server-id"));
+            List<Storage> storages = server.getStorages();
+            Storage buildedStorage = null;
+            for (Storage storage : storages) {
+                if (storage.getMountPoint() != null && storage.getMountPoint().equals(activeMailboxStorageMountPoint)) {
+                    buildedStorage = storage;
+                    break;
+                }
+            }
+            if (buildedStorage == null) {
+                throw new ResourceNotFoundException("Не найдено активного Storage");
+            }
+            return buildedStorage;
         }
         return build(server.getId());
     }
