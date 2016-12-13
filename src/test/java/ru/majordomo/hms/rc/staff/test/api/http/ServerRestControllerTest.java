@@ -43,8 +43,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {RepositoriesConfig.class, EmbeddedServltetContainerConfig.class, ServerServicesConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = {"server.active.name.shared-hosting:web99", "server.active.name.mail-storage:pop99", "server.active.name.mysql-database-server:mdb99"})
+@SpringBootTest(
+        classes = {RepositoriesConfig.class, EmbeddedServltetContainerConfig.class, ServerServicesConfig.class},
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = {
+                "server.active.name.shared-hosting:web99",
+                "server.active.name.mail-storage:pop99",
+                "server.active.name.mysql-database-server:mdb99",
+                "server.active.mail-storage.active-storage-mountpoint:/homebig"
+        }
+)
 public class ServerRestControllerTest {
     @Rule
     public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("build/generated-snippets");
@@ -153,6 +161,7 @@ public class ServerRestControllerTest {
 
             List<Storage> storages = new ArrayList<>();
             Storage storage = new Storage();
+            if (i == 2) storage.setMountPoint("/homebig");
             storages.add(storage);
             storageRepository.save(storages);
 
@@ -388,6 +397,21 @@ public class ServerRestControllerTest {
             e.printStackTrace();
             Assert.fail();
         }
+    }
+
+    @Test
+    public void filterActiveStorage() throws Exception {
+        Server serverThatWeSearch = testServers.get(1);
+
+        MultiValueMap<String, String> keyValue = new LinkedMultiValueMap<>();
+        keyValue.set("server-id", serverThatWeSearch.getId());
+        keyValue.set("active-storage", "true");
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/filter").params(keyValue).accept(APPLICATION_JSON_UTF8);
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("id").value(serverThatWeSearch.getStorages().get(0).getId()));
     }
 
     @Test

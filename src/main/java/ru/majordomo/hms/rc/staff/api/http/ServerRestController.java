@@ -48,8 +48,8 @@ public class ServerRestController extends RestControllerTemplate {
     }
 
     @RequestMapping(value = {"/filter"}, method = RequestMethod.GET)
-    public Server readOneFilter(@RequestParam() Map<String,String> requestParams) {
-        return (Server) processReadOneWithParamsQuery(requestParams);
+    public Resource readOneFilter(@RequestParam() Map<String,String> requestParams) {
+        return processReadOneWithParamsQuery(requestParams);
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
