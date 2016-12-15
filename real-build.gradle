@@ -1,0 +1,116 @@
+import org.ajoberstar.grgit.*
+
+buildscript {
+    repositories {
+        maven {
+            url 'https://nexus.intr/repository/mavengroup'
+        }
+    }
+    configurations.all {
+        resolutionStrategy.cacheDynamicVersionsFor 5, 'minutes'
+    }
+    dependencies {
+        classpath("io.spring.gradle:dependency-management-plugin:0.6.0.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath("se.transmode.gradle:gradle-docker:1.2")
+        classpath "com.avast.gradle:docker-compose-gradle-plugin:0.3.9"
+        classpath("ru.majordomo.gradle.plugins:copycompose:1.+")
+        classpath("ru.majordomo.hms.rc.staff:resources:1+")
+        classpath("org.ajoberstar:gradle-git:1.6.0")
+    }
+}
+
+plugins {
+    id "org.asciidoctor.convert" version "1.5.2"
+}
+
+apply plugin: 'java'
+apply plugin: 'spring-boot'
+apply plugin: 'docker'
+apply plugin: 'docker-compose'
+apply plugin: 'ru.majordomo.gradle.plugins.copycompose'
+apply plugin: 'maven-publish'
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId 'ru.majordomo.hms.rc.staff'
+            artifactId 'resources'
+            version '1.0.6.4'
+            artifact resourceJar
+        }
+    }
+    repositories {
+        maven {
+            url uri(mavenUrl)
+            credentials {
+                username = mavenUser
+                password = mavenPass
+            }
+        }
+    }
+}
+
+jar {
+    baseName = 'rc-staff'
+    version = '0.0.1-SNAPSHOT'
+    dependsOn asciidoctor
+    from ("${asciidoctor.outputDir}/html5") {
+        into 'static/docs'
+    }
+}
+
+task resourceJar(type: Jar, dependsOn: compileJava) {
+    baseName = 'resources'
+    from sourceSets.main.output.classesDir
+    include 'ru/majordomo/hms/rc/staff/resources/*'
+}
+
+repositories {
+    maven {
+        url 'https://nexus.intr/repository/mavengroup'
+    }
+}
+
+dependencies {
+    compile('ru.majordomo.hms.rc.staff:resources:1+')
+    compile('org.springframework.cloud:spring-cloud-starter-config')
+    compile('org.springframework.cloud:spring-cloud-starter-eureka')
+    compile('org.springframework.boot:spring-boot-starter-data-mongodb')
+    compile('org.springframework.amqp:spring-rabbit:1.6.2.RELEASE')
+    compile('commons-net:commons-net:3.5')
+    compile('org.springframework.boot:spring-boot-starter-actuator')
+    testCompile('com.github.fakemongo:fongo:2.0.9')
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile("org.springframework.restdocs:spring-restdocs-mockmvc:${springRestDocsVersion}")
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springVersion}"
+    }
+}
+
+ext {
+    snippetsDir = file('build/generated-snippets')
+}
+
+test {
+    outputs.dir snippetsDir
+}
+
+asciidoctor {
+    attributes 'snippets': snippetsDir
+    inputs.dir snippetsDir
+    outputDir "build/asciidoc"
+    dependsOn test
+    sourceDir 'src/main/asciidoc'
+}
+
+clean.doFirst {
+    delete "${rootDir}/docker-compose"
+    delete "${rootDir}/docker-compose.yml"
+}
+
+build.dependsOn("resourceJar")
+apply from: "https://nexus.intr/repository/init/gradle-init/refactor/dockertask.gradle"
