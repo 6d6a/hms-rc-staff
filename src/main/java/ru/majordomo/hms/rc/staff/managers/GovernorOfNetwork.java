@@ -18,15 +18,22 @@ import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.repositories.NetworkRepository;
 import ru.majordomo.hms.rc.staff.resources.Network;
+import ru.majordomo.hms.rc.staff.resources.ServiceSocket;
 
 @Component
 public class GovernorOfNetwork extends LordOfResources {
     private NetworkRepository networkRepository;
+    private GovernorOfServiceSocket governorOfServiceSocket;
     private Cleaner cleaner;
 
     @Autowired
     public void setRepository(NetworkRepository repository) {
         this.networkRepository = repository;
+    }
+
+    @Autowired
+    public void setGovernorOfServiceSocket(GovernorOfServiceSocket governorOfServiceSocket) {
+        this.governorOfServiceSocket = governorOfServiceSocket;
     }
 
     @Autowired
@@ -148,7 +155,19 @@ public class GovernorOfNetwork extends LordOfResources {
     }
 
     @Override
+    public void preDelete(String resourceId) {
+        Network network = networkRepository.findOne(resourceId);
+        List<ServiceSocket> sockets = governorOfServiceSocket.buildAll();
+        for (ServiceSocket socket : sockets) {
+            if (network.isAddressIn(socket.getAddressAsString())) {
+                throw new ParameterValidateException("Я нашла ServiceSocket с ID " + socket.getId() + ", именуемый " + socket.getName() + ", он так то в удаляемом Network");
+            }
+        }
+    }
+
+    @Override
     public void delete(String resourceId) {
+        preDelete(resourceId);
         networkRepository.delete(resourceId);
     }
 

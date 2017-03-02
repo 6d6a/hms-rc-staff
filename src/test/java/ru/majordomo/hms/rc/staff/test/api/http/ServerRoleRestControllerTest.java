@@ -24,12 +24,12 @@ import java.util.List;
 import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServerRoleRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceTemplateRepository;
+import ru.majordomo.hms.rc.staff.repositories.ServiceTypeRepository;
 import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
 import ru.majordomo.hms.rc.staff.resources.ServerRole;
 import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
-import ru.majordomo.hms.rc.staff.test.config.EmbeddedServltetContainerConfig;
-import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
-import ru.majordomo.hms.rc.staff.test.config.ServerRoleServicesConfig;
+import ru.majordomo.hms.rc.staff.resources.ServiceType;
+import ru.majordomo.hms.rc.staff.test.config.*;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
@@ -44,7 +44,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {RepositoriesConfig.class, EmbeddedServltetContainerConfig.class, ServerRoleServicesConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+        classes = {
+                RepositoriesConfig.class,
+                ConfigOfRestControllers.class,
+                ConfigOfGovernors.class
+        },
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
+)
 public class ServerRoleRestControllerTest {
     @Rule
     public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("build/generated-snippets");
@@ -57,6 +64,8 @@ public class ServerRoleRestControllerTest {
     private ServiceTemplateRepository serviceTemplateRepository;
     @Autowired
     private ConfigTemplateRepository configTemplateRepository;
+    @Autowired
+    private ServiceTypeRepository serviceTypeRepository;
 
     private RestDocumentationResultHandler document;
 
@@ -70,11 +79,26 @@ public class ServerRoleRestControllerTest {
 
     private void generateBatchOfServerRoles() {
         for (int i = 1; i < 6; i++) {
+            ServiceType serviceType = new ServiceType();
+            switch (i) {
+                case 1:
+                    serviceType.setName("DATABASE_MYSQL");
+                    break;
+                case 2:
+                    serviceType.setName("WEBSITE_APACHE_PHP53_HARDENED");
+                    break;
+                default:
+                    serviceType.setName("DATABASE_POSTGRESQL");
+                    break;
+            }
+            serviceTypeRepository.save(serviceType);
+
             ConfigTemplate configTemplate = new ConfigTemplate();
             configTemplateRepository.save(configTemplate);
             //создать сервис темплейт и сохранить его
             ServiceTemplate template = new ServiceTemplate();
             template.addConfigTemplate(configTemplate);
+            template.setServiceType(serviceType);
             serviceTemplateRepository.save(template);
             // создать сервер роль без сохранения
             String name = "Серверная роль " + i;

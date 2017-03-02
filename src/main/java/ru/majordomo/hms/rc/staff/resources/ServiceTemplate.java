@@ -13,9 +13,13 @@ import java.util.List;
 @Document
 public class ServiceTemplate extends Resource {
 
-    private List<String> configTemplateIds = new ArrayList<>();
     @Transient
     private List<ConfigTemplate> configTemplates = new ArrayList<>();
+    @Transient
+    private ServiceType serviceType;
+
+    private List<String> configTemplateIds = new ArrayList<>();
+    private String serviceTypeName;
 
     @Override
     public void switchResource() {
@@ -24,6 +28,24 @@ public class ServiceTemplate extends Resource {
 
     public List<ConfigTemplate> getConfigTemplates() {
         return configTemplates;
+    }
+
+    public void setConfigTemplates(List<ConfigTemplate> configTemplates) {
+        for (ConfigTemplate configTemplate: configTemplates) {
+            this.configTemplateIds.add(configTemplate.getId());
+        }
+        this.configTemplates = configTemplates;
+    }
+
+    public ServiceType getServiceType() {
+        return serviceType;
+    }
+
+    public void setServiceType(ServiceType serviceType) {
+        if (serviceType != null) {
+            this.serviceType = serviceType;
+            this.serviceTypeName = serviceType.getName();
+        }
     }
 
     @JsonIgnore
@@ -36,18 +58,23 @@ public class ServiceTemplate extends Resource {
         this.configTemplateIds = configTemplateIds;
     }
 
-    public void setConfigTemplates(List<ConfigTemplate> configTemplates) {
-        for (ConfigTemplate configTemplate: configTemplates) {
-            this.configTemplateIds.add(configTemplate.getId());
-        }
-        this.configTemplates = configTemplates;
+    @JsonIgnore
+    public String getServiceTypeName() {
+        return serviceTypeName;
+    }
+
+    @JsonIgnore
+    public void setServiceTypeName(String serviceTypeName) {
+        this.serviceTypeName = serviceTypeName;
     }
 
     public void addConfigTemplate(ConfigTemplate configTemplate) {
-        String configTemplateId = configTemplate.getId();
-        this.configTemplates.add(configTemplate);
-        if (configTemplateIds.contains(configTemplateId) == false) {
-            this.configTemplateIds.add(configTemplate.getId());
+        if (configTemplate != null) {
+            String configTemplateId = configTemplate.getId();
+            this.configTemplates.add(configTemplate);
+            if (!configTemplateIds.contains(configTemplateId)) {
+                this.configTemplateIds.add(configTemplate.getId());
+            }
         }
     }
 

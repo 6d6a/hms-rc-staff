@@ -21,9 +21,7 @@ import java.util.List;
 
 import ru.majordomo.hms.rc.staff.repositories.*;
 import ru.majordomo.hms.rc.staff.resources.*;
-import ru.majordomo.hms.rc.staff.test.config.EmbeddedServltetContainerConfig;
-import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
-import ru.majordomo.hms.rc.staff.test.config.ServiceServicesConfig;
+import ru.majordomo.hms.rc.staff.test.config.*;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
@@ -38,7 +36,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {RepositoriesConfig.class, EmbeddedServltetContainerConfig.class, ServiceServicesConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+        classes = {
+                RepositoriesConfig.class,
+                ConfigOfRestControllers.class,
+                ConfigOfGovernors.class
+        },
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
+)
 public class ServiceRestControllerTest {
     @Rule
     public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("build/generated-snippets");
@@ -66,6 +71,20 @@ public class ServiceRestControllerTest {
 
     private void generateBatchOfServices() {
         for (int i = 2; i < 6; i++) {
+            ServiceType serviceType = new ServiceType();
+            switch (i) {
+                case 1:
+                    serviceType.setName("DATABASE_MYSQL");
+                    break;
+                case 2:
+                    serviceType.setName("WEBSITE_APACHE_PHP53_HARDENED");
+                    break;
+                default:
+                    serviceType.setName("DATABASE_POSTGRESQL");
+                    break;
+            }
+            serviceTypeRepository.save(serviceType);
+
             // Создать сокет
             ServiceSocket serviceSocket = new ServiceSocket();
             serviceSocket.setAddress("10.10.10." + i);
@@ -79,15 +98,13 @@ public class ServiceRestControllerTest {
             ServiceTemplate serviceTemplate = new ServiceTemplate();
             serviceTemplate.setName("Шаблон сервиса " + i);
             serviceTemplate.addConfigTemplate(configTemplate);
+            serviceTemplate.setServiceType(serviceType);
             serviceTemplateRepository.save(serviceTemplate);
 
             // Создать сервис и добавить в него сокет и сервис темплейт
             Service service = new Service();
-            ServiceType serviceType = new ServiceType();
-            serviceType.setName("DATABASE_MYSQL");
             serviceTypeRepository.save(serviceType);
 
-            service.setServiceType(serviceType);
             service.setName("Сервис " + i);
             service.setSwitchedOn(Boolean.TRUE);
             service.setServiceTemplate(serviceTemplate);
@@ -120,8 +137,7 @@ public class ServiceRestControllerTest {
                             fieldWithPath("name").description("Имя Service"),
                             fieldWithPath("switchedOn").description("Статус Service"),
                             fieldWithPath("serviceSockets").description("Список serviceSockets для Service"),
-                            fieldWithPath("serviceTemplate").description("serviceTemplate для Service"),
-                            fieldWithPath("serviceType").description("serviceType для Service")
+                            fieldWithPath("serviceTemplate").description("serviceTemplate для Service")
                     )
             ));
         } catch (Exception e) {
@@ -145,8 +161,7 @@ public class ServiceRestControllerTest {
                             fieldWithPath("[].name").description("Имя Service"),
                             fieldWithPath("[].switchedOn").description("Статус Service"),
                             fieldWithPath("[].serviceSockets").description("Список serviceSockets для Service"),
-                            fieldWithPath("[].serviceTemplate").description("serviceTemplate для Service"),
-                            fieldWithPath("[].serviceType").description("serviceType для Service")
+                            fieldWithPath("[].serviceTemplate").description("serviceTemplate для Service")
                     )
             ));
         } catch (Exception e) {
@@ -170,8 +185,7 @@ public class ServiceRestControllerTest {
                                     fieldWithPath("[].name").description("Имя Service"),
                                     fieldWithPath("[].switchedOn").description("Статус Service"),
                                     fieldWithPath("[].serviceSockets").description("Список serviceSockets для Service"),
-                                    fieldWithPath("[].serviceTemplate").description("serviceTemplate для Service"),
-                                    fieldWithPath("[].serviceType").description("serviceType для Service")
+                                    fieldWithPath("[].serviceTemplate").description("serviceTemplate для Service")
                             )
                     ));
         } catch (Exception e) {
@@ -192,7 +206,6 @@ public class ServiceRestControllerTest {
                     .andExpect(jsonPath("switchedOn").value(testingService.getSwitchedOn()))
                     .andExpect(jsonPath("serviceTemplate.id").value(testingService.getServiceTemplateId()))
                     .andExpect(jsonPath("serviceSockets.[0].id").value(testingService.getServiceSocketIds().get(0))).andDo(print())
-                    .andExpect(jsonPath("serviceType.name").value(testingService.getServiceType().getName()))
                     .andDo(this.document)
                     .andDo(this.document.document(
                             responseFields(
@@ -200,8 +213,7 @@ public class ServiceRestControllerTest {
                                     fieldWithPath("name").description("Имя Service"),
                                     fieldWithPath("switchedOn").description("Статус Service"),
                                     fieldWithPath("serviceSockets").description("Список serviceSockets для Service"),
-                                    fieldWithPath("serviceTemplate").description("serviceTemplate для Service"),
-                                    fieldWithPath("serviceType").description("serviceType для Service")
+                                    fieldWithPath("serviceTemplate").description("serviceTemplate для Service")
                             )
                     ));
         } catch (Exception e) {

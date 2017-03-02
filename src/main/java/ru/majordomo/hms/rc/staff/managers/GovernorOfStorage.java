@@ -12,6 +12,7 @@ import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.repositories.StorageRepository;
+import ru.majordomo.hms.rc.staff.resources.Server;
 import ru.majordomo.hms.rc.staff.resources.Storage;
 
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import java.util.Map;
 public class GovernorOfStorage extends LordOfResources {
 
     private StorageRepository repository;
+    private GovernorOfServer governorOfServer;
     private Cleaner cleaner;
 
     @Autowired
@@ -32,6 +34,11 @@ public class GovernorOfStorage extends LordOfResources {
     @Autowired
     public void setRepository(StorageRepository repository) {
         this.repository = repository;
+    }
+
+    @Autowired
+    public void setGovernorOfServer(GovernorOfServer governorOfServer) {
+        this.governorOfServer = governorOfServer;
     }
 
     private static final Logger logger = LoggerFactory.getLogger(GovernorOfStorage.class);
@@ -144,7 +151,22 @@ public class GovernorOfStorage extends LordOfResources {
     }
 
     @Override
+    public void preDelete(String resourceId) {
+        List<Server> servers = governorOfServer.buildAll();
+        for (Server server : servers) {
+            List<Storage> storages = server.getStorages();
+            for (Storage storage : storages) {
+                if (storage.getId().equals(resourceId)) {
+                    throw new ParameterValidateException("Я нашла Server с ID " + server.getId() + ", именуемый " + server.getName() + ", так вот в нём имеется удаляемый Storage");
+                }
+            }
+        }
+
+    }
+
+    @Override
     public void delete(String resourceId) {
+        preDelete(resourceId);
         repository.delete(resourceId);
     }
 

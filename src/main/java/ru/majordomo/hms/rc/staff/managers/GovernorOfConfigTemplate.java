@@ -19,6 +19,7 @@ import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
 import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
+import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 
 @Component
 public class GovernorOfConfigTemplate extends LordOfResources {
@@ -26,10 +27,16 @@ public class GovernorOfConfigTemplate extends LordOfResources {
 
     private Cleaner cleaner;
     private ConfigTemplateRepository configTemplateRepository;
+    private GovernorOfServiceTemplate governorOfServiceTemplate;
 
     @Autowired
     public void setConfigTemplateRepository(ConfigTemplateRepository configTemplateRepository) {
         this.configTemplateRepository = configTemplateRepository;
+    }
+
+    @Autowired
+    public void setGovernorOfServiceTemplate(GovernorOfServiceTemplate governorOfServiceTemplate) {
+        this.governorOfServiceTemplate = governorOfServiceTemplate;
     }
 
     @Autowired
@@ -116,7 +123,18 @@ public class GovernorOfConfigTemplate extends LordOfResources {
     }
 
     @Override
+    public void preDelete(String resourceId) {
+        List<ServiceTemplate> serviceTemplates = governorOfServiceTemplate.buildAll();
+        for (ServiceTemplate serviceTemplate : serviceTemplates) {
+            if (serviceTemplate.getConfigTemplateIds().contains(resourceId)) {
+                throw new ParameterValidateException("Я нашла ServiceTemplate с ID " + serviceTemplate.getId() + ", именуемый " + serviceTemplate.getName() + ", так вот в нём имеется удаляемый ConfigTemplate. Прикинь.");
+            }
+        }
+    }
+
+    @Override
     public void delete(String resourceId) {
+        preDelete(resourceId);
         configTemplateRepository.delete(resourceId);
     }
 

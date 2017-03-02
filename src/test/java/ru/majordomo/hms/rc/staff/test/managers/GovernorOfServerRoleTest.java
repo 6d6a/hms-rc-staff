@@ -19,17 +19,24 @@ import ru.majordomo.hms.rc.staff.managers.GovernorOfServerRole;
 import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServerRoleRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceTemplateRepository;
+import ru.majordomo.hms.rc.staff.repositories.ServiceTypeRepository;
 import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
 import ru.majordomo.hms.rc.staff.resources.ServerRole;
 import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
+import ru.majordomo.hms.rc.staff.resources.ServiceType;
+import ru.majordomo.hms.rc.staff.test.config.ConfigOfGovernors;
 import ru.majordomo.hms.rc.staff.test.config.EmbeddedServltetContainerConfig;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
-import ru.majordomo.hms.rc.staff.test.config.ServerRoleServicesConfig;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {RepositoriesConfig.class,
-        EmbeddedServltetContainerConfig.class, ServerRoleServicesConfig.class},
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+        classes = {
+                RepositoriesConfig.class,
+                ConfigOfGovernors.class,
+                EmbeddedServltetContainerConfig.class
+        },
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
+)
 public class GovernorOfServerRoleTest {
     @Autowired
     private GovernorOfServerRole governor;
@@ -39,6 +46,8 @@ public class GovernorOfServerRoleTest {
     private ServerRoleRepository serverRoleRepository;
     @Autowired
     private ConfigTemplateRepository configTemplateRepository;
+    @Autowired
+    private ServiceTypeRepository serviceTypeRepository;
 
     private ServiceMessage testServiceMessage;
     private ServerRole testServerRole;
@@ -71,6 +80,10 @@ public class GovernorOfServerRoleTest {
 
         ServiceTemplate serviceTemplate = new ServiceTemplate();
         serviceTemplate.addConfigTemplate(configTemplate);
+        ServiceType serviceType = new ServiceType();
+        serviceType.setName("DATABASE_MYSQL");
+        serviceTypeRepository.save(serviceType);
+        serviceTemplate.setServiceType(serviceType);
         serviceTemplateRepository.save(serviceTemplate);
 
         // Создать сервер роль и сервисное сообщение

@@ -10,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
-import ru.majordomo.hms.rc.staff.test.config.ConfigTemplateServicesConfig;
+import ru.majordomo.hms.rc.staff.test.config.ConfigOfGovernors;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfConfigTemplate;
@@ -20,7 +20,10 @@ import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
 import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = {RepositoriesConfig.class, ConfigTemplateServicesConfig.class})
+@SpringBootTest(classes = {
+        RepositoriesConfig.class,
+        ConfigOfGovernors.class
+})
 public class GovernorOfConfigTemplateTest {
     @Autowired
     private ConfigTemplateRepository configTemplateRepository;

@@ -18,6 +18,7 @@ public abstract class LordOfResources {
     public abstract List<? extends Resource> buildAll();
     public abstract List<? extends Resource> buildAll(Map<String, String> keyValue);
     public abstract void save(Resource resource);
+    public abstract void preDelete(String resourceId);
     public abstract void delete(String resourceId);
     public static Resource setResourceParams(Resource resource, ServiceMessage serviceMessage, Cleaner cleaner) throws ClassCastException{
         String name = cleaner.cleanString((String) serviceMessage.getParam("name"));
