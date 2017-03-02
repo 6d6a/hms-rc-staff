@@ -8,7 +8,7 @@ import java.io.IOException;
 
 @Document
 public class ServiceType {
-    @Indexed(unique = true)
+    @Indexed
     private String name;
 
     public String getName() {
