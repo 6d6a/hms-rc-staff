@@ -19,6 +19,7 @@ import ru.majordomo.hms.rc.staff.repositories.NetworkRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceSocketRepository;
 import ru.majordomo.hms.rc.staff.resources.Network;
 import ru.majordomo.hms.rc.staff.resources.ServiceSocket;
+import ru.majordomo.hms.rc.staff.resources.ServiceType;
 
 @Service
 public class GovernorOfServiceSocket extends LordOfResources {
@@ -26,6 +27,7 @@ public class GovernorOfServiceSocket extends LordOfResources {
     private Cleaner cleaner;
     private NetworkRepository networkRepository;
     private ServiceSocketRepository serviceSocketRepository;
+    private GovernorOfService governorOfService;
 
     private static final Logger logger = LoggerFactory.getLogger(GovernorOfServiceSocket.class);
 
@@ -42,6 +44,11 @@ public class GovernorOfServiceSocket extends LordOfResources {
     @Autowired
     public void setNetworkRepository(NetworkRepository networkRepository) {
         this.networkRepository = networkRepository;
+    }
+
+    @Autowired
+    public void setGovernorOfService(GovernorOfService governorOfService) {
+        this.governorOfService = governorOfService;
     }
 
     @Override
@@ -139,7 +146,18 @@ public class GovernorOfServiceSocket extends LordOfResources {
     }
 
     @Override
+    public void preDelete(String resourceId) {
+        List<ru.majordomo.hms.rc.staff.resources.Service> services = governorOfService.buildAll();
+        for (ru.majordomo.hms.rc.staff.resources.Service service : services) {
+            if (service.getServiceSocketIds().contains(resourceId)) {
+                throw new ParameterValidateException("Я нашла Service с ID " + service.getId() + ", именуемый " + service.getName() + ", так вот в нём имеется удаляемый ServiceSocket");
+            }
+        }
+    }
+
+    @Override
     public void delete(String resourceId) {
+        preDelete(resourceId);
         serviceSocketRepository.delete(resourceId);
     }
 

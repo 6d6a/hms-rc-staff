@@ -12,13 +12,16 @@ import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfServiceType;
 import ru.majordomo.hms.rc.staff.repositories.ServiceTypeRepository;
 import ru.majordomo.hms.rc.staff.resources.ServiceType;
+import ru.majordomo.hms.rc.staff.test.config.ConfigOfGovernors;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
-import ru.majordomo.hms.rc.staff.test.config.ServiceTypeConfig;
 
 import java.util.List;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {ServiceTypeConfig.class, RepositoriesConfig.class})
+@SpringBootTest(classes = {
+        RepositoriesConfig.class,
+        ConfigOfGovernors.class
+})
 public class GovernorOfServiceTypeTest {
     @Autowired
     private GovernorOfServiceType governor;

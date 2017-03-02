@@ -13,13 +13,16 @@ import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfStorage;
 import ru.majordomo.hms.rc.staff.repositories.StorageRepository;
 import ru.majordomo.hms.rc.staff.resources.Storage;
+import ru.majordomo.hms.rc.staff.test.config.ConfigOfGovernors;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
-import ru.majordomo.hms.rc.staff.test.config.StorageServicesConfig;
 
 import java.util.List;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {StorageServicesConfig.class, RepositoriesConfig.class})
+@SpringBootTest(classes = {
+        RepositoriesConfig.class,
+        ConfigOfGovernors.class
+})
 public class GovernorOfStorageTest {
     @Autowired
     GovernorOfStorage governor;

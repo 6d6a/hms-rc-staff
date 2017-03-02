@@ -17,9 +17,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import ru.majordomo.hms.rc.staff.repositories.ServiceTypeRepository;
 import ru.majordomo.hms.rc.staff.resources.ServiceType;
-import ru.majordomo.hms.rc.staff.test.config.EmbeddedServltetContainerConfig;
-import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
-import ru.majordomo.hms.rc.staff.test.config.ServiceTypeConfig;
+import ru.majordomo.hms.rc.staff.test.config.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +28,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {RepositoriesConfig.class, ServiceTypeConfig.class, EmbeddedServltetContainerConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+        classes = {
+                RepositoriesConfig.class,
+                ConfigOfRestControllers.class,
+                ConfigOfGovernors.class
+        },
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
+)
 public class ServiceTypeRestControllerTest {
     @Autowired
     private ServiceTypeRepository serviceTypeRepository;

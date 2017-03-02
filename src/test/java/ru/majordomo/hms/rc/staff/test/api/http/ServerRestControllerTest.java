@@ -25,9 +25,7 @@ import java.util.Map;
 
 import ru.majordomo.hms.rc.staff.repositories.*;
 import ru.majordomo.hms.rc.staff.resources.*;
-import ru.majordomo.hms.rc.staff.test.config.EmbeddedServltetContainerConfig;
-import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
-import ru.majordomo.hms.rc.staff.test.config.ServerServicesConfig;
+import ru.majordomo.hms.rc.staff.test.config.*;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -44,7 +42,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(
-        classes = {RepositoriesConfig.class, EmbeddedServltetContainerConfig.class, ServerServicesConfig.class},
+        classes = {
+                RepositoriesConfig.class,
+                ConfigOfRestControllers.class,
+                ConfigOfGovernors.class
+        },
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = {
                 "server.active.name.shared-hosting:web99",
@@ -100,8 +102,23 @@ public class ServerRestControllerTest {
             ConfigTemplate configTemplate = new ConfigTemplate();
             configTemplateRepository.save(configTemplate);
 
+            ServiceType serviceType = new ServiceType();
+            switch (i) {
+                case 1:
+                    serviceType.setName("DATABASE_MYSQL");
+                    break;
+                case 2:
+                    serviceType.setName("WEBSITE_APACHE_PHP53_HARDENED");
+                    break;
+                default:
+                    serviceType.setName("DATABASE_POSTGRESQL");
+                    break;
+            }
+            serviceTypeRepository.save(serviceType);
+
             ServiceTemplate serviceTemplate = new ServiceTemplate();
             serviceTemplate.addConfigTemplate(configTemplate);
+            serviceTemplate.setServiceType(serviceType);
             serviceTemplateRepository.save(serviceTemplate);
 
             ServerRole serverRole = new ServerRole();
@@ -140,20 +157,6 @@ public class ServerRestControllerTest {
             ServiceSocket serviceSocket = new ServiceSocket();
             serviceSocketRepository.save(serviceSocket);
 
-            ServiceType serviceType = new ServiceType();
-            switch (i) {
-                case 1:
-                    serviceType.setName("DATABASE_MYSQL");
-                    break;
-                case 2:
-                    serviceType.setName("WEBSITE_APACHE_PHP53_HARDENED");
-                    break;
-                default:
-                    serviceType.setName("DATABASE_POSTGRESQL");
-                    break;
-            }
-            serviceTypeRepository.save(serviceType);
-            service.setServiceType(serviceType);
             service.setServiceTemplate(serviceTemplate);
             service.addServiceSocket(serviceSocket);
             services.add(service);
@@ -267,8 +270,7 @@ public class ServerRestControllerTest {
                     .andExpect(jsonPath("$[0].name").value(testServers.get(0).getServices().get(0).getName()))
                     .andExpect(jsonPath("$[0].switchedOn").value(testServers.get(0).getServices().get(0).getSwitchedOn()))
                     .andExpect(jsonPath("$[0].serviceTemplate.id").value(testServers.get(0).getServices().get(0).getServiceTemplateId()))
-                    .andExpect(jsonPath("$[0].serviceSockets.[0].id").value(testServers.get(0).getServices().get(0).getServiceSocketIds().get(0))).andDo(print())
-                    .andExpect(jsonPath("$[0].serviceType.name").value(testServers.get(0).getServices().get(0).getServiceType().getName()));
+                    .andExpect(jsonPath("$[0].serviceSockets.[0].id").value(testServers.get(0).getServices().get(0).getServiceSocketIds().get(0))).andDo(print());
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -291,8 +293,7 @@ public class ServerRestControllerTest {
                     .andExpect(jsonPath("$[0].name").value(testServers.get(1).getServices().get(0).getName()))
                     .andExpect(jsonPath("$[0].switchedOn").value(testServers.get(1).getServices().get(0).getSwitchedOn()))
                     .andExpect(jsonPath("$[0].serviceTemplate.id").value(testServers.get(1).getServices().get(0).getServiceTemplateId()))
-                    .andExpect(jsonPath("$[0].serviceSockets.[0].id").value(testServers.get(1).getServices().get(0).getServiceSocketIds().get(0))).andDo(print())
-                    .andExpect(jsonPath("$[0].serviceType.name").value(testServers.get(1).getServices().get(0).getServiceType().getName()));
+                    .andExpect(jsonPath("$[0].serviceSockets.[0].id").value(testServers.get(1).getServices().get(0).getServiceSocketIds().get(0))).andDo(print());
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();

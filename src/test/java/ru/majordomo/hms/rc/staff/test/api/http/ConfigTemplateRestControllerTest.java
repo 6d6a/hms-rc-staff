@@ -21,9 +21,7 @@ import java.util.List;
 
 import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
 import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
-import ru.majordomo.hms.rc.staff.test.config.ConfigTemplateServicesConfig;
-import ru.majordomo.hms.rc.staff.test.config.EmbeddedServltetContainerConfig;
-import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
+import ru.majordomo.hms.rc.staff.test.config.*;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
@@ -38,7 +36,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {RepositoriesConfig.class, ConfigTemplateServicesConfig.class, EmbeddedServltetContainerConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+        classes = {
+                RepositoriesConfig.class,
+                ConfigOfRestControllers.class,
+                ConfigOfGovernors.class
+        },
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
+)
 public class ConfigTemplateRestControllerTest {
     @Rule
     public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("build/generated-snippets");

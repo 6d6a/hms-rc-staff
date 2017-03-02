@@ -18,14 +18,19 @@ import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfService;
 import ru.majordomo.hms.rc.staff.repositories.*;
 import ru.majordomo.hms.rc.staff.resources.*;
+import ru.majordomo.hms.rc.staff.test.config.ConfigOfGovernors;
 import ru.majordomo.hms.rc.staff.test.config.EmbeddedServltetContainerConfig;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
-import ru.majordomo.hms.rc.staff.test.config.ServiceServicesConfig;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {RepositoriesConfig.class,
-        EmbeddedServltetContainerConfig.class, ServiceServicesConfig.class},
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+        classes = {
+                RepositoriesConfig.class,
+                ConfigOfGovernors.class,
+                EmbeddedServltetContainerConfig.class
+        },
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
+)
 public class GovernorOfServiceTest {
     @Autowired
     private GovernorOfService governor;
@@ -45,32 +50,34 @@ public class GovernorOfServiceTest {
 
     private ServiceMessage generateServiceMessage(String name, Boolean switchedOn,
                                                   ServiceTemplate serviceTemplate,
-                                                  List<ServiceSocket> serviceSockets, ServiceType serviceType) {
+                                                  List<ServiceSocket> serviceSockets) {
         ServiceMessage serviceMessage = new ServiceMessage();
         serviceMessage.addParam("name", name);
         serviceMessage.addParam("switchedOn", switchedOn);
         serviceMessage.addParam("serviceTemplate", serviceTemplate);
         serviceMessage.addParam("serviceSockets", serviceSockets);
-        serviceMessage.addParam("serviceType", serviceType);
 
         return serviceMessage;
     }
 
     private Service generateService(String name, Boolean switchedOn,
                                     ServiceTemplate serviceTemplate,
-                                    List<ServiceSocket> serviceSockets, ServiceType serviceType) {
+                                    List<ServiceSocket> serviceSockets) {
         Service service = new Service();
         service.setName(name);
         service.setSwitchedOn(switchedOn);
         service.setServiceTemplate(serviceTemplate);
         service.setServiceSockets(serviceSockets);
-        service.setServiceType(serviceType);
 
         return service;
     }
 
     @Before
     public void setUp() {
+
+        ServiceType serviceType = new ServiceType();
+        serviceType.setName("DATABASE_MYSQL");
+        serviceTypeRepository.save(serviceType);
 
         ServiceSocket serviceSocket = new ServiceSocket();
         serviceSocketRepository.save(serviceSocket);
@@ -80,19 +87,16 @@ public class GovernorOfServiceTest {
 
         ServiceTemplate serviceTemplate = new ServiceTemplate();
         serviceTemplate.addConfigTemplate(configTemplate);
+        serviceTemplate.setServiceType(serviceType);
         serviceTemplateRepository.save(serviceTemplate);
-
-        ServiceType serviceType = new ServiceType();
-        serviceType.setName("DATABASE_MYSQL");
-        serviceTypeRepository.save(serviceType);
 
         // Создать сервис и сервисное сообщение
         String name = "Тестовый сервис 1";
         Boolean switchedOn = Boolean.TRUE;
         List<ServiceSocket> serviceSockets = new ArrayList<>();
         serviceSockets.add(serviceSocket);
-        this.testService = generateService(name, switchedOn, serviceTemplate, serviceSockets, serviceType);
-        this.testServiceMessage = generateServiceMessage(name, switchedOn, serviceTemplate, serviceSockets, serviceType);
+        this.testService = generateService(name, switchedOn, serviceTemplate, serviceSockets);
+        this.testServiceMessage = generateServiceMessage(name, switchedOn, serviceTemplate, serviceSockets);
     }
 
     @Test
@@ -104,7 +108,6 @@ public class GovernorOfServiceTest {
             Assert.assertEquals("serviceTemplate не совпадает с ожидаемым", testService.getServiceTemplate().getId(), createdService.getServiceTemplate().getId());
             Assert.assertTrue(testService.getServiceSocketIds().equals(createdService.getServiceSocketIds()));
             Assert.assertTrue(testService.getServiceSocketIds().containsAll(createdService.getServiceSocketIds()));
-            Assert.assertEquals("ServiceType не совпадает с ожидаемым", testService.getServiceType().getName(), createdService.getServiceType().getName());
         } catch (ParameterValidateException e) {
             e.printStackTrace();
             Assert.fail();
@@ -121,7 +124,6 @@ public class GovernorOfServiceTest {
             Assert.assertEquals("serviceTemplate не совпадает с ожидаемым", testService.getServiceTemplate().getId(), buildedService.getServiceTemplate().getId());
             Assert.assertTrue(testService.getServiceSocketIds().equals(buildedService.getServiceSocketIds()));
             Assert.assertTrue(testService.getServiceSocketIds().containsAll(buildedService.getServiceSocketIds()));
-            Assert.assertEquals("ServiceType не совпадает с ожидаемым", testService.getServiceType().getName(), buildedService.getServiceType().getName());
         } catch (ParameterValidateException e) {
             e.printStackTrace();
             Assert.fail();
@@ -132,14 +134,13 @@ public class GovernorOfServiceTest {
     public void buildAll() {
         serviceRepository.save(testService);
         String emptyString = "";
-        List<Service> buildedServices =  governor.buildAll();
+        List<Service> buildedServices = governor.buildAll();
         try {
-            Assert.assertEquals("name не совпадает с ожидаемым", testService.getName(), buildedServices.get(buildedServices.size()-1).getName());
-            Assert.assertEquals("switchedOn не совпадает с ожидаемым", testService.getSwitchedOn(), buildedServices.get(buildedServices.size()-1).getSwitchedOn());
-            Assert.assertEquals("serviceTemplate не совпадает с ожидаемым", testService.getServiceTemplate().getId(), buildedServices.get(buildedServices.size()-1).getServiceTemplate().getId());
+            Assert.assertEquals("name не совпадает с ожидаемым", testService.getName(), buildedServices.get(buildedServices.size() - 1).getName());
+            Assert.assertEquals("switchedOn не совпадает с ожидаемым", testService.getSwitchedOn(), buildedServices.get(buildedServices.size() - 1).getSwitchedOn());
+            Assert.assertEquals("serviceTemplate не совпадает с ожидаемым", testService.getServiceTemplate().getId(), buildedServices.get(buildedServices.size() - 1).getServiceTemplate().getId());
             Assert.assertTrue(testService.getServiceSocketIds().equals(buildedServices.get(buildedServices.size() - 1).getServiceSocketIds()));
-            Assert.assertTrue(testService.getServiceSocketIds().containsAll(buildedServices.get(buildedServices.size()-1).getServiceSocketIds()));
-            Assert.assertEquals("ServiceType не совпадает с ожидаемым", testService.getServiceType().getName(), buildedServices.get(buildedServices.size()-1).getServiceType().getName());
+            Assert.assertTrue(testService.getServiceSocketIds().containsAll(buildedServices.get(buildedServices.size() - 1).getServiceSocketIds()));
         } catch (ParameterValidateException e) {
             e.printStackTrace();
             Assert.fail();
@@ -159,14 +160,6 @@ public class GovernorOfServiceTest {
     @Test(expected = ParameterValidateException.class)
     public void createWithUnknownTemplate() throws ParameterValidateException {
         testServiceMessage.addParam("serviceTemplate", ObjectId.get().toString());
-        governor.createResource(testServiceMessage);
-    }
-
-    @Test(expected = ParameterValidateException.class)
-    public void createWithUnknownServiceType() throws ParameterValidateException {
-        ServiceType serviceType = new ServiceType();
-        serviceType.setName("wrong_service_type");
-        testServiceMessage.addParam("serviceType", serviceType);
         governor.createResource(testServiceMessage);
     }
 

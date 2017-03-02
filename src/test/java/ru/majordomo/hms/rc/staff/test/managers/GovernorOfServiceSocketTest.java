@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import ru.majordomo.hms.rc.staff.test.config.ConfigOfGovernors;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
-import ru.majordomo.hms.rc.staff.test.config.ServiceSocketServicesConfig;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfServiceSocket;
@@ -21,7 +21,10 @@ import ru.majordomo.hms.rc.staff.resources.ServiceSocket;
 import java.util.List;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {ServiceSocketServicesConfig.class, RepositoriesConfig.class})
+@SpringBootTest(classes = {
+        RepositoriesConfig.class,
+        ConfigOfGovernors.class
+})
 public class GovernorOfServiceSocketTest {
     @Autowired
     GovernorOfServiceSocket governor;

@@ -14,13 +14,15 @@ import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.repositories.ServerRoleRepository;
+import ru.majordomo.hms.rc.staff.resources.Server;
 import ru.majordomo.hms.rc.staff.resources.ServerRole;
 import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 
 @Component
-public class GovernorOfServerRole extends LordOfResources{
+public class GovernorOfServerRole extends LordOfResources {
     private ServerRoleRepository serverRoleRepository;
     private GovernorOfServiceTemplate governorOfServiceTemplate;
+    private GovernorOfServer governorOfServer;
     private Cleaner cleaner;
 
     @Autowired
@@ -31,6 +33,11 @@ public class GovernorOfServerRole extends LordOfResources{
     @Autowired
     public void setGovernor(GovernorOfServiceTemplate governorOfServiceTemplate) {
         this.governorOfServiceTemplate = governorOfServiceTemplate;
+    }
+
+    @Autowired
+    public void setGovernorOfServer(GovernorOfServer governorOfServer) {
+        this.governorOfServer = governorOfServer;
     }
 
     @Autowired
@@ -150,7 +157,18 @@ public class GovernorOfServerRole extends LordOfResources{
     }
 
     @Override
+    public void preDelete(String resourceId) {
+        List<Server> servers = governorOfServer.buildAll();
+        for (Server server : servers) {
+            if (server.getServerRoleIds().contains(resourceId)) {
+                throw new ParameterValidateException("Я нашла Server с ID " + server.getId() + ", именуемый " + server.getName() + ", так вот в нём имеется удаляемый ServerRole.");
+            }
+        }
+    }
+
+    @Override
     public void delete(String resourceId) {
+        preDelete(resourceId);
         serverRoleRepository.delete(resourceId);
     }
 

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.repositories.ServiceTypeRepository;
+import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 import ru.majordomo.hms.rc.staff.resources.ServiceType;
 import java.util.regex.*;
 
@@ -13,10 +14,16 @@ import java.util.List;
 @Service
 public class GovernorOfServiceType {
     private ServiceTypeRepository serviceTypeRepository;
+    private GovernorOfServiceTemplate governorOfServiceTemplate;
 
     @Autowired
     public void setRepository(ServiceTypeRepository repository) {
         this.serviceTypeRepository = repository;
+    }
+
+    @Autowired
+    public void setGovernorOfServiceTemplate(GovernorOfServiceTemplate governorOfServiceTemplate) {
+        this.governorOfServiceTemplate = governorOfServiceTemplate;
     }
 
     public ServiceType build(String serviceTypeName) throws ResourceNotFoundException {
@@ -68,7 +75,17 @@ public class GovernorOfServiceType {
         }
     }
 
+    private void preDelete(String name) {
+        List<ServiceTemplate> templates = governorOfServiceTemplate.buildAll();
+        for (ServiceTemplate template : templates) {
+            if (template.getServiceTypeName().equals(name)) {
+                throw new ParameterValidateException("Я нашла ServiceTemplate с ID " + template.getId() + ", именуемый " + template.getName() + ", так вот в нём имеется удаляемый ServiceType.");
+            }
+        }
+    }
+
     public void delete(String name) {
+        preDelete(name);
         serviceTypeRepository.deleteServiceTypeByName(name);
     }
 }

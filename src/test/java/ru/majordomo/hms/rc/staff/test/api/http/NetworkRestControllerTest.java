@@ -20,9 +20,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.majordomo.hms.rc.staff.test.config.EmbeddedServltetContainerConfig;
-import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
-import ru.majordomo.hms.rc.staff.test.config.NetworkServicesConfig;
+import ru.majordomo.hms.rc.staff.test.config.*;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfNetwork;
 import ru.majordomo.hms.rc.staff.repositories.NetworkRepository;
 import ru.majordomo.hms.rc.staff.resources.Network;
@@ -40,7 +38,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {RepositoriesConfig.class, NetworkServicesConfig.class, EmbeddedServltetContainerConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+        classes = {
+                RepositoriesConfig.class,
+                ConfigOfRestControllers.class,
+                ConfigOfGovernors.class
+        },
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
+)
 public class NetworkRestControllerTest {
     @Rule
     public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("build/generated-snippets");

@@ -13,9 +13,9 @@ import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfServer;
 import ru.majordomo.hms.rc.staff.repositories.*;
 import ru.majordomo.hms.rc.staff.resources.*;
+import ru.majordomo.hms.rc.staff.test.config.ConfigOfGovernors;
 import ru.majordomo.hms.rc.staff.test.config.EmbeddedServltetContainerConfig;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
-import ru.majordomo.hms.rc.staff.test.config.ServerServicesConfig;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,8 +24,11 @@ import java.util.Map;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(
-        classes = {RepositoriesConfig.class,
-        EmbeddedServltetContainerConfig.class, ServerServicesConfig.class},
+        classes = {
+                RepositoriesConfig.class,
+                ConfigOfGovernors.class,
+                EmbeddedServltetContainerConfig.class
+        },
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = {
                 "server.active.mail-storage.active-storage-mountpoint:/homebig"
@@ -88,17 +91,17 @@ public class GovernorOfServerTest {
         ConfigTemplate configTemplate = new ConfigTemplate();
         configTemplateRepository.save(configTemplate);
 
+        ServiceType serviceType = new ServiceType();
+        serviceType.setName("DATABASE_MYSQL");
         ServiceTemplate serviceTemplate = new ServiceTemplate();
         serviceTemplate.addConfigTemplate(configTemplate);
+        serviceTemplate.setServiceType(serviceType);
         serviceTemplateRepository.save(serviceTemplate);
 
         Service service = new Service();
-        ServiceType serviceType = new ServiceType();
-        serviceType.setName("DATABASE_MYSQL");
         serviceTypeRepository.save(serviceType);
         service.addServiceSocket(serviceSocket);
         service.setServiceTemplate(serviceTemplate);
-        service.setServiceType(serviceType);
         serviceRepository.save(service);
 
         ServerRole serverRole = new ServerRole();

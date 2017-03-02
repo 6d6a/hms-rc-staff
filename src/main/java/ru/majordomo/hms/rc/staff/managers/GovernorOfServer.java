@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class GovernorOfServer extends LordOfResources{
+public class GovernorOfServer extends LordOfResources {
 
     private ServerRepository serverRepository;
     private ServerRoleRepository serverRoleRepository;
@@ -300,7 +300,7 @@ public class GovernorOfServer extends LordOfResources{
 
             Server server = (Server) build(keyValue.get("serverId"));
             for (Service service : server.getServices()) {
-                String[] parts = service.getServiceType().getName().split("_");
+                String[] parts = service.getServiceTemplate().getServiceType().getName().split("_");
                 if (keyValue.get("service-type").toUpperCase().equals(parts[0])) {
                     services.add(service);
                 }
@@ -324,6 +324,11 @@ public class GovernorOfServer extends LordOfResources{
     @Override
     public void save(Resource resource) {
         serverRepository.save((Server) resource);
+    }
+
+    @Override
+    public void preDelete(String resourceId) {
+
     }
 
     @Override

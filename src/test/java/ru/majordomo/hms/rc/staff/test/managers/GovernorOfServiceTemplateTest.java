@@ -13,8 +13,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.majordomo.hms.rc.staff.repositories.ServiceTemplateRepository;
+import ru.majordomo.hms.rc.staff.repositories.ServiceTypeRepository;
+import ru.majordomo.hms.rc.staff.resources.ServiceType;
+import ru.majordomo.hms.rc.staff.test.config.ConfigOfGovernors;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
-import ru.majordomo.hms.rc.staff.test.config.ServiceTemplateServicesConfig;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfServiceTemplate;
@@ -23,7 +25,10 @@ import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
 import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = {ServiceTemplateServicesConfig.class, RepositoriesConfig.class})
+@SpringBootTest(classes = {
+        RepositoriesConfig.class,
+        ConfigOfGovernors.class
+})
 public class GovernorOfServiceTemplateTest {
 
     @Autowired
@@ -35,12 +40,16 @@ public class GovernorOfServiceTemplateTest {
     @Autowired
     ServiceTemplateRepository serviceTemplateRepository;
 
+    @Autowired
+    private ServiceTypeRepository serviceTypeRepository;
+
     private List<ConfigTemplate> configTemplates = new ArrayList<>();
 
     @Before
     public void setUp() {
         for (int i = 0; i < 10; i++) {
             String configTemplateId = ObjectId.get().toString();
+
             ConfigTemplate configTemplate = new ConfigTemplate();
             configTemplate.setId(configTemplateId);
             configTemplateRepository.save(configTemplate);
@@ -69,10 +78,16 @@ public class GovernorOfServiceTemplateTest {
 
     @Test
     public void build() {
+
+        ServiceType serviceType = new ServiceType();
+        serviceType.setName("DATABASE_MYSQL");
+        serviceTypeRepository.save(serviceType);
+
         ServiceTemplate serviceTemplate = new ServiceTemplate();
         serviceTemplate.setConfigTemplates(configTemplates);
         serviceTemplate.setName("Тестовый service template");
         serviceTemplate.setSwitchedOn(Boolean.TRUE);
+        serviceTemplate.setServiceType(serviceType);
         serviceTemplateRepository.save(serviceTemplate);
         ServiceTemplate buildedServiceTemplate = (ServiceTemplate) governorOfServiceTemplate.build(serviceTemplate.getId());
         try {
@@ -86,10 +101,16 @@ public class GovernorOfServiceTemplateTest {
 
     @Test
     public void buildAll() {
+
+        ServiceType serviceType = new ServiceType();
+        serviceType.setName("DATABASE_MYSQL");
+        serviceTypeRepository.save(serviceType);
         ServiceTemplate serviceTemplate = new ServiceTemplate();
+
         serviceTemplate.setConfigTemplates(configTemplates);
         serviceTemplate.setName("Тестовый service template");
         serviceTemplate.setSwitchedOn(Boolean.TRUE);
+        serviceTemplate.setServiceType(serviceType);
         serviceTemplateRepository.save(serviceTemplate);
         List<ServiceTemplate> buildedServiceTemplates = governorOfServiceTemplate.buildAll();
         try {

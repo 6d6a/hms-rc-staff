@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import ru.majordomo.hms.rc.staff.test.config.ConfigOfGovernors;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
-import ru.majordomo.hms.rc.staff.test.config.NetworkServicesConfig;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfNetwork;
@@ -19,7 +19,10 @@ import ru.majordomo.hms.rc.staff.resources.Network;
 import java.util.List;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {RepositoriesConfig.class, NetworkServicesConfig.class})
+@SpringBootTest(classes = {
+        RepositoriesConfig.class,
+        ConfigOfGovernors.class
+})
 public class GovernorOfNetworkTest {
 
     @Autowired

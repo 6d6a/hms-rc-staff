@@ -16,12 +16,12 @@ import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.repositories.ServiceRepository;
 
 @Component
-public class GovernorOfService extends LordOfResources{
+public class GovernorOfService extends LordOfResources {
 
     private ServiceRepository repository;
     private GovernorOfServiceTemplate governorOfServiceTemplate;
     private GovernorOfServiceSocket governorOfServiceSocket;
-    private GovernorOfServiceType governorOfServiceType;
+    private GovernorOfServer governorOfServer;
     private Cleaner cleaner;
 
     @Autowired
@@ -40,8 +40,8 @@ public class GovernorOfService extends LordOfResources{
     }
 
     @Autowired
-    public void setGovernorOfServiceType(GovernorOfServiceType governorOfServiceType) {
-        this.governorOfServiceType = governorOfServiceType;
+    public void setGovernorOfServer(GovernorOfServer governorOfServer) {
+        this.governorOfServer = governorOfServer;
     }
 
     @Autowired
@@ -56,10 +56,8 @@ public class GovernorOfService extends LordOfResources{
             LordOfResources.setResourceParams(service, serviceMessage, cleaner);
             ServiceTemplate serviceTemplate = (ServiceTemplate) serviceMessage.getParam("serviceTemplate");
             List<ServiceSocket> serviceSockets = (List<ServiceSocket>) serviceMessage.getParam("serviceSockets");
-            ServiceType serviceType = (ServiceType) serviceMessage.getParam("serviceType");
             service.setServiceTemplate(serviceTemplate);
             service.setServiceSockets(serviceSockets);
-            service.setServiceType(serviceType);
             isValid(service);
             save(service);
         } catch (ClassCastException e) {
@@ -67,7 +65,6 @@ public class GovernorOfService extends LordOfResources{
         }
         return service;
     }
-
 
 
     @Override
@@ -80,9 +77,6 @@ public class GovernorOfService extends LordOfResources{
         if (service.getServiceSockets().isEmpty() || service.getServiceSocketIds().isEmpty()) {
             throw new ParameterValidateException("Не найден ни один ServiceSocket");
         }
-        if (service.getServiceType() == null || service.getServiceTypeName() == null || service.getServiceTypeName().equals("")) {
-            throw new ParameterValidateException("Отсутствует ServiceType");
-        }
 
         //Валидация ServiceTemplate
         ServiceTemplate serviceTemplateToValidate = service.getServiceTemplate();
@@ -90,7 +84,7 @@ public class GovernorOfService extends LordOfResources{
         if (serviceTemplateFromRepository == null) {
             throw new ParameterValidateException("ServiceTemplate с ID: " + serviceTemplateToValidate.getId() + " не найден");
         }
-        if(!serviceTemplateFromRepository.equals(serviceTemplateToValidate)) {
+        if (!serviceTemplateFromRepository.equals(serviceTemplateToValidate)) {
             throw new ParameterValidateException("ServiceTemplate с ID: " + serviceTemplateToValidate.getId() + " задан некорректно");
         }
 
@@ -100,16 +94,9 @@ public class GovernorOfService extends LordOfResources{
             if (serviceSocketFromRepository == null) {
                 throw new ParameterValidateException("ServiceSocket с ID: " + serviceSocketToValidate.getId() + " не найден");
             }
-            if(!serviceSocketFromRepository.equals(serviceSocketToValidate)) {
+            if (!serviceSocketFromRepository.equals(serviceSocketToValidate)) {
                 throw new ParameterValidateException("ServiceSocket с ID: " + serviceSocketToValidate.getId() + " задан некорректно");
             }
-        }
-
-        //Валидация ServiceType
-        try {
-            governorOfServiceType.build(service.getServiceType().getName());
-        } catch (ResourceNotFoundException e)  {
-            throw new ParameterValidateException("ServiceType с именем: " + service.getServiceType().getName() + " не найден");
         }
 
     }
@@ -121,19 +108,13 @@ public class GovernorOfService extends LordOfResources{
             throw new ResourceNotFoundException("Service с ID:" + resourceId + " не найден");
         }
 
-        for (String serviceSocketId: service.getServiceSocketIds()) {
+        for (String serviceSocketId : service.getServiceSocketIds()) {
             ServiceSocket serviceSocket = (ServiceSocket) governorOfServiceSocket.build(serviceSocketId);
             service.addServiceSocket(serviceSocket);
         }
 
         ServiceTemplate serviceTemplate = (ServiceTemplate) governorOfServiceTemplate.build(service.getServiceTemplateId());
         service.setServiceTemplate(serviceTemplate);
-
-        if (service.getServiceTypeName() == null) {
-            throw new ParameterValidateException("ServiceTypeName отсутствует");
-        }
-        ServiceType serviceType = governorOfServiceType.build(service.getServiceTypeName());
-        service.setServiceType(serviceType);
 
         return service;
     }
@@ -184,7 +165,18 @@ public class GovernorOfService extends LordOfResources{
     }
 
     @Override
+    public void preDelete(String resourceId) {
+        List<Server> servers = governorOfServer.buildAll();
+        for (Server server : servers) {
+            if (server.getServiceIds().contains(resourceId)) {
+                throw new ParameterValidateException("Я нашла Server с ID " + server.getId() + ", именуемый " + server.getName() + ", так вот в нём имеется удаляемый Service.");
+            }
+        }
+    }
+
+    @Override
     public void delete(String resourceId) {
+        preDelete(resourceId);
         repository.delete(resourceId);
     }
 
