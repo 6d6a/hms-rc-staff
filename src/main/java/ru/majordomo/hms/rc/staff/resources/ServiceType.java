@@ -1,14 +1,14 @@
 package ru.majordomo.hms.rc.staff.resources;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.IOException;
 
 @Document
 public class ServiceType {
-    @Id
+    @Indexed(unique = true)
     private String name;
 
     public String getName() {
