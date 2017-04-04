@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
-import ru.majordomo.hms.rc.staff.resources.Resource;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
@@ -19,7 +18,7 @@ import ru.majordomo.hms.rc.staff.resources.ServerRole;
 import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 
 @Component
-public class GovernorOfServerRole extends LordOfResources {
+public class GovernorOfServerRole extends LordOfResources<ServerRole> {
     private ServerRoleRepository serverRoleRepository;
     private GovernorOfServiceTemplate governorOfServiceTemplate;
     private GovernorOfServer governorOfServer;
@@ -46,12 +45,12 @@ public class GovernorOfServerRole extends LordOfResources {
     }
 
     @Override
-    public Resource createResource(ServiceMessage serviceMessage) throws ParameterValidateException {
+    public ServerRole createResource(ServiceMessage serviceMessage) throws ParameterValidateException {
         ServerRole serverRole = new ServerRole();
         try {
             LordOfResources.setResourceParams(serverRole, serviceMessage, cleaner);
 
-            List<ServiceTemplate> serviceTemplates = (List<ServiceTemplate>)serviceMessage.getParam("serviceTemplates");
+            @SuppressWarnings("unchecked") List<ServiceTemplate> serviceTemplates = (List<ServiceTemplate>)serviceMessage.getParam("serviceTemplates");
             serverRole.setServiceTemplates(serviceTemplates);
             isValid(serverRole);
 
@@ -76,18 +75,17 @@ public class GovernorOfServerRole extends LordOfResources {
     }
 
     @Override
-    public void isValid(Resource resource) throws ParameterValidateException {
-        ServerRole serverRole = (ServerRole) resource;
-        if (serverRole.getServiceTemplates().isEmpty()) {
+    public void isValid(ServerRole resource) throws ParameterValidateException {
+        if (resource.getServiceTemplates().isEmpty()) {
             throw new ParameterValidateException("Не найден ни один ServiceTemplate");
         }
-        if (serverRole.getServiceTemplateIds().isEmpty()) {
+        if (resource.getServiceTemplateIds().isEmpty()) {
             throw new ParameterValidateException("Не найден ни один ServiceTemplateId");
         }
 
         //Валидация ServiceTemplate
-        for (ServiceTemplate serviceTemplateToValidate : serverRole.getServiceTemplates()) {
-            ServiceTemplate serviceTemplateFromRepository = (ServiceTemplate) governorOfServiceTemplate.build(serviceTemplateToValidate.getId());
+        for (ServiceTemplate serviceTemplateToValidate : resource.getServiceTemplates()) {
+            ServiceTemplate serviceTemplateFromRepository = governorOfServiceTemplate.build(serviceTemplateToValidate.getId());
             if (serviceTemplateFromRepository == null) {
                 throw new ParameterValidateException("ServiceTemplate с ID: " + serviceTemplateToValidate.getId() + " не найден");
             }
@@ -98,14 +96,14 @@ public class GovernorOfServerRole extends LordOfResources {
     }
 
     @Override
-    public Resource build(String resourceId) throws ResourceNotFoundException {
+    public ServerRole build(String resourceId) throws ResourceNotFoundException {
         ServerRole serverRole = serverRoleRepository.findOne(resourceId);
         if (serverRole == null) {
             throw new ResourceNotFoundException("ServerRole с ID:" + resourceId + " не найден");
         }
 
         for (String serviceTemplateId: serverRole.getServiceTemplateIds()) {
-            ServiceTemplate serviceTemplate = (ServiceTemplate) governorOfServiceTemplate.build(serviceTemplateId);
+            ServiceTemplate serviceTemplate = governorOfServiceTemplate.build(serviceTemplateId);
 
             serverRole.addServiceTemplate(serviceTemplate);
         }
@@ -113,7 +111,7 @@ public class GovernorOfServerRole extends LordOfResources {
     }
 
     @Override
-    public Resource build(Map<String, String> keyValue) throws NotImplementedException {
+    public ServerRole build(Map<String, String> keyValue) throws NotImplementedException {
         throw new NotImplementedException();
     }
 
@@ -132,11 +130,11 @@ public class GovernorOfServerRole extends LordOfResources {
 
         if (byName) {
             ServerRole serverRole = serverRoleRepository.findByName(keyValue.get("name"));
-            buildedServerRoles.add((ServerRole) build(serverRole.getId()));
+            buildedServerRoles.add(build(serverRole.getId()));
 
         } else {
             ServerRole serverRole = serverRoleRepository.findByName(keyValue.get("name"));
-            buildedServerRoles.add((ServerRole) build(serverRole.getId()));
+            buildedServerRoles.add(build(serverRole.getId()));
         }
 
         return buildedServerRoles;
@@ -146,14 +144,14 @@ public class GovernorOfServerRole extends LordOfResources {
     public List<ServerRole> buildAll() {
         List<ServerRole> buildedServerRoles = new ArrayList<>();
         for (ServerRole serverRole : serverRoleRepository.findAll()) {
-            buildedServerRoles.add((ServerRole) build(serverRole.getId()));
+            buildedServerRoles.add(build(serverRole.getId()));
         }
         return buildedServerRoles;
     }
 
     @Override
-    public void save(Resource resource) {
-        serverRoleRepository.save((ServerRole) resource);
+    public void save(ServerRole resource) {
+        serverRoleRepository.save(resource);
     }
 
     @Override
@@ -161,7 +159,8 @@ public class GovernorOfServerRole extends LordOfResources {
         List<Server> servers = governorOfServer.buildAll();
         for (Server server : servers) {
             if (server.getServerRoleIds().contains(resourceId)) {
-                throw new ParameterValidateException("Я нашла Server с ID " + server.getId() + ", именуемый " + server.getName() + ", так вот в нём имеется удаляемый ServerRole.");
+                throw new ParameterValidateException("Я нашла Server с ID " + server.getId()
+                        + ", именуемый " + server.getName() + ", так вот в нём имеется удаляемый ServerRole.");
             }
         }
     }

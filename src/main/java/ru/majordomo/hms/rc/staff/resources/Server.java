@@ -1,6 +1,5 @@
 package ru.majordomo.hms.rc.staff.resources;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import org.springframework.data.annotation.Transient;
@@ -21,6 +20,9 @@ public class Server extends Resource {
     @Transient
     private List<Storage> storages = new ArrayList<>();
     private List<String> storageIds = new ArrayList<>();
+
+    @Transient
+    private String activeMailboxStorageMountPoint;
 
     @Override
     public void switchResource() {
@@ -67,6 +69,16 @@ public class Server extends Resource {
     }
 
     @JsonIgnore
+    public Storage getActiveMailboxStorage() {
+        for (Storage storage : storages) {
+            if (storage.getMountPoint() != null && storage.getMountPoint().equals(activeMailboxStorageMountPoint)) {
+                return storage;
+            }
+        }
+        return null;
+    }
+
+    @JsonIgnore
     public List<String> getServiceIds() {
         return serviceIds;
     }
@@ -99,7 +111,7 @@ public class Server extends Resource {
     public void addStorage(Storage storage) {
         String storageId = storage.getId();
         this.storages.add(storage);
-        if (storageIds.contains(storageId) == false) {
+        if (!storageIds.contains(storageId)) {
             this.storageIds.add(storageId);
         }
     }
@@ -107,7 +119,7 @@ public class Server extends Resource {
     public void addService(Service service) {
         String serviceId = service.getId();
         this.services.add(service);
-        if (serviceIds.contains(serviceId) == false) {
+        if (!serviceIds.contains(serviceId)) {
             this.serviceIds.add(serviceId);
         }
     }
@@ -115,9 +127,13 @@ public class Server extends Resource {
     public void addServerRole(ServerRole serverRole) {
         String serverRoleId = serverRole.getId();
         this.serverRoles.add(serverRole);
-        if (serverRoleIds.contains(serverRoleId) == false) {
+        if (!serverRoleIds.contains(serverRoleId)) {
             this.serverRoleIds.add(serverRoleId);
         }
+    }
+
+    public void setActiveMailboxStorageMountPoint(String activeMailboxStorageMountPoint) {
+        this.activeMailboxStorageMountPoint = activeMailboxStorageMountPoint;
     }
 
     @Override

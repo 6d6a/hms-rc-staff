@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class EmbeddedServltetContainerConfig {
+public class EmbeddedServletContainerConfig {
     @Bean
     public EmbeddedServletContainerFactory embeddedServletContainerFactory() {
         return new TomcatEmbeddedServletContainerFactory(0);

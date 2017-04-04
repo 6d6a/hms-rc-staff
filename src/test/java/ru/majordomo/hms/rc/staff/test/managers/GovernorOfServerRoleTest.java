@@ -25,7 +25,7 @@ import ru.majordomo.hms.rc.staff.resources.ServerRole;
 import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 import ru.majordomo.hms.rc.staff.resources.ServiceType;
 import ru.majordomo.hms.rc.staff.test.config.ConfigOfGovernors;
-import ru.majordomo.hms.rc.staff.test.config.EmbeddedServltetContainerConfig;
+import ru.majordomo.hms.rc.staff.test.config.EmbeddedServletContainerConfig;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
 
 @RunWith(SpringRunner.class)
@@ -33,7 +33,7 @@ import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
         classes = {
                 RepositoriesConfig.class,
                 ConfigOfGovernors.class,
-                EmbeddedServltetContainerConfig.class
+                EmbeddedServletContainerConfig.class
         },
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
@@ -98,7 +98,7 @@ public class GovernorOfServerRoleTest {
     @Test
     public void create() {
         try {
-            ServerRole createdRole = (ServerRole) governor.createResource(testServiceMessage);
+            ServerRole createdRole = governor.createResource(testServiceMessage);
             Assert.assertEquals("Имя не совпадает с ожидаемым", testServerRole.getName(), createdRole.getName());
             Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testServerRole.getSwitchedOn(), createdRole.getSwitchedOn());
             Assert.assertTrue(testServerRole.getServiceTemplates().equals(createdRole.getServiceTemplates()));
@@ -113,7 +113,7 @@ public class GovernorOfServerRoleTest {
     public void build() {
         serverRoleRepository.save(testServerRole);
         try {
-            ServerRole buildedServerRole = (ServerRole) governor.build(testServerRole.getId());
+            ServerRole buildedServerRole = governor.build(testServerRole.getId());
             Assert.assertEquals("Имя не совпадает с ожидаемым", testServerRole.getName(), buildedServerRole.getName());
             Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testServerRole.getSwitchedOn(), buildedServerRole.getSwitchedOn());
             Assert.assertTrue(testServerRole.getServiceTemplates().equals(buildedServerRole.getServiceTemplates()));

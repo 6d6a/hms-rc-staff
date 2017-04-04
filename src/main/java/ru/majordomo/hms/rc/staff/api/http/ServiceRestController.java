@@ -2,6 +2,7 @@ package ru.majordomo.hms.rc.staff.api.http;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,25 +16,26 @@ import java.util.Map;
 
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfService;
-import ru.majordomo.hms.rc.staff.resources.Resource;
 import ru.majordomo.hms.rc.staff.resources.Service;
 
 @RestController
 @RequestMapping("/service")
-public class ServiceRestController extends RestControllerTemplate {
+public class ServiceRestController extends RestControllerTemplate<Service> {
 
     @Autowired
     public void setGovernor(GovernorOfService governor) {
         this.governor = governor;
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVICE_VIEW')")
     @RequestMapping(value = "/{serviceId}", method = RequestMethod.GET)
     public Service readOne(@PathVariable String serviceId) {
-        return (Service) processReadOneQuery(serviceId);
+        return processReadOneQuery(serviceId);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVICE_VIEW')")
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
-    public Collection<? extends Resource> readAll(@RequestParam(required=false, defaultValue="") String name) {
+    public Collection<Service> readAll(@RequestParam(required=false, defaultValue="") String name) {
         Map<String, String> keyValue = new HashMap<>();
         if (!name.isEmpty()) {
             keyValue.put("name", name);
@@ -45,19 +47,22 @@ public class ServiceRestController extends RestControllerTemplate {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVICE_CREATE')")
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
-    public ResponseEntity<?> create(@RequestBody Service service) throws ParameterValidateException {
+    public ResponseEntity<Service> create(@RequestBody Service service) throws ParameterValidateException {
         return processCreateQuery(service);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVICE_EDIT')")
     @RequestMapping(value = "/{serviceId}", method = {RequestMethod.PATCH, RequestMethod.PUT})
-    public ResponseEntity<?> update(@PathVariable String serviceId,
+    public ResponseEntity<Service> update(@PathVariable String serviceId,
                                     @RequestBody Service service) throws ParameterValidateException {
         return processUpdateQuery(serviceId, service);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVICE_DELETE')")
     @RequestMapping(value = "/{serviceId}", method = RequestMethod.DELETE)
-    public ResponseEntity<?> delete(@PathVariable String serviceId) throws ParameterValidateException {
+    public ResponseEntity<Void> delete(@PathVariable String serviceId) throws ParameterValidateException {
         return processDeleteQuery(serviceId);
     }
 }

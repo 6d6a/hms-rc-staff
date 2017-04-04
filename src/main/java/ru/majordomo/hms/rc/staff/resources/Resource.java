@@ -6,7 +6,7 @@ import org.springframework.data.annotation.Id;
 
 import java.io.IOException;
 
-public abstract class Resource extends Object {
+public abstract class Resource {
     @Id
     private String id;
     private String name;

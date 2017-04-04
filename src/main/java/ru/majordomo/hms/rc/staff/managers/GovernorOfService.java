@@ -16,7 +16,7 @@ import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.repositories.ServiceRepository;
 
 @Component
-public class GovernorOfService extends LordOfResources {
+public class GovernorOfService extends LordOfResources<Service> {
 
     private ServiceRepository repository;
     private GovernorOfServiceTemplate governorOfServiceTemplate;
@@ -50,12 +50,12 @@ public class GovernorOfService extends LordOfResources {
     }
 
     @Override
-    public Resource createResource(ServiceMessage serviceMessage) throws ParameterValidateException {
+    public Service createResource(ServiceMessage serviceMessage) throws ParameterValidateException {
         Service service = new Service();
         try {
             LordOfResources.setResourceParams(service, serviceMessage, cleaner);
             ServiceTemplate serviceTemplate = (ServiceTemplate) serviceMessage.getParam("serviceTemplate");
-            List<ServiceSocket> serviceSockets = (List<ServiceSocket>) serviceMessage.getParam("serviceSockets");
+            @SuppressWarnings("unchecked") List<ServiceSocket> serviceSockets = (List<ServiceSocket>) serviceMessage.getParam("serviceSockets");
             service.setServiceTemplate(serviceTemplate);
             service.setServiceSockets(serviceSockets);
             isValid(service);
@@ -68,19 +68,17 @@ public class GovernorOfService extends LordOfResources {
 
 
     @Override
-    public void isValid(Resource resource) throws ParameterValidateException {
-        Service service = (Service) resource;
-
-        if (service.getServiceTemplate() == null || service.getServiceTemplate().getId() == null || service.getServiceTemplateId() == null) {
+    public void isValid(Service resource) throws ParameterValidateException {
+        if (resource.getServiceTemplate() == null || resource.getServiceTemplate().getId() == null || resource.getServiceTemplateId() == null) {
             throw new ParameterValidateException("Отсутствует ServiceTemplate");
         }
-        if (service.getServiceSockets().isEmpty() || service.getServiceSocketIds().isEmpty()) {
+        if (resource.getServiceSockets().isEmpty() || resource.getServiceSocketIds().isEmpty()) {
             throw new ParameterValidateException("Не найден ни один ServiceSocket");
         }
 
         //Валидация ServiceTemplate
-        ServiceTemplate serviceTemplateToValidate = service.getServiceTemplate();
-        ServiceTemplate serviceTemplateFromRepository = (ServiceTemplate) governorOfServiceTemplate.build(serviceTemplateToValidate.getId());
+        ServiceTemplate serviceTemplateToValidate = resource.getServiceTemplate();
+        ServiceTemplate serviceTemplateFromRepository = governorOfServiceTemplate.build(serviceTemplateToValidate.getId());
         if (serviceTemplateFromRepository == null) {
             throw new ParameterValidateException("ServiceTemplate с ID: " + serviceTemplateToValidate.getId() + " не найден");
         }
@@ -89,8 +87,8 @@ public class GovernorOfService extends LordOfResources {
         }
 
         //Валидация ServiceSockets
-        for (ServiceSocket serviceSocketToValidate : service.getServiceSockets()) {
-            ServiceSocket serviceSocketFromRepository = (ServiceSocket) governorOfServiceSocket.build(serviceSocketToValidate.getId());
+        for (ServiceSocket serviceSocketToValidate : resource.getServiceSockets()) {
+            ServiceSocket serviceSocketFromRepository = governorOfServiceSocket.build(serviceSocketToValidate.getId());
             if (serviceSocketFromRepository == null) {
                 throw new ParameterValidateException("ServiceSocket с ID: " + serviceSocketToValidate.getId() + " не найден");
             }
@@ -102,25 +100,25 @@ public class GovernorOfService extends LordOfResources {
     }
 
     @Override
-    public Resource build(String resourceId) throws ResourceNotFoundException {
+    public Service build(String resourceId) throws ResourceNotFoundException {
         Service service = repository.findOne(resourceId);
         if (service == null) {
             throw new ResourceNotFoundException("Service с ID:" + resourceId + " не найден");
         }
 
         for (String serviceSocketId : service.getServiceSocketIds()) {
-            ServiceSocket serviceSocket = (ServiceSocket) governorOfServiceSocket.build(serviceSocketId);
+            ServiceSocket serviceSocket = governorOfServiceSocket.build(serviceSocketId);
             service.addServiceSocket(serviceSocket);
         }
 
-        ServiceTemplate serviceTemplate = (ServiceTemplate) governorOfServiceTemplate.build(service.getServiceTemplateId());
+        ServiceTemplate serviceTemplate = governorOfServiceTemplate.build(service.getServiceTemplateId());
         service.setServiceTemplate(serviceTemplate);
 
         return service;
     }
 
     @Override
-    public Resource build(Map<String, String> keyValue) throws NotImplementedException {
+    public Service build(Map<String, String> keyValue) throws NotImplementedException {
         throw new NotImplementedException();
     }
 
@@ -139,11 +137,11 @@ public class GovernorOfService extends LordOfResources {
 
         if (byName) {
             for (Service service : repository.findByName(keyValue.get("name"))) {
-                buildedServices.add((Service) build(service.getId()));
+                buildedServices.add(build(service.getId()));
             }
         } else {
             for (Service service : repository.findAll()) {
-                buildedServices.add((Service) build(service.getId()));
+                buildedServices.add(build(service.getId()));
             }
         }
 
@@ -154,14 +152,14 @@ public class GovernorOfService extends LordOfResources {
     public List<Service> buildAll() {
         List<Service> buildedServices = new ArrayList<>();
         for (Service service : repository.findAll()) {
-            buildedServices.add((Service) build(service.getId()));
+            buildedServices.add(build(service.getId()));
         }
         return buildedServices;
     }
 
     @Override
-    public void save(Resource resource) {
-        repository.save((Service) resource);
+    public void save(Service resource) {
+        repository.save(resource);
     }
 
     @Override
@@ -169,7 +167,8 @@ public class GovernorOfService extends LordOfResources {
         List<Server> servers = governorOfServer.buildAll();
         for (Server server : servers) {
             if (server.getServiceIds().contains(resourceId)) {
-                throw new ParameterValidateException("Я нашла Server с ID " + server.getId() + ", именуемый " + server.getName() + ", так вот в нём имеется удаляемый Service.");
+                throw new ParameterValidateException("Я нашла Server с ID " + server.getId()
+                        + ", именуемый " + server.getName() + ", так вот в нём имеется удаляемый Service.");
             }
         }
     }

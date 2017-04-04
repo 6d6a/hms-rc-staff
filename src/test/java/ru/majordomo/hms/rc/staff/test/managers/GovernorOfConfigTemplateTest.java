@@ -41,7 +41,7 @@ public class GovernorOfConfigTemplateTest {
 
         ServiceMessage serviceMessage = buildCreateServiceMessage(fileName, switchedOn, fileLink);
         try {
-            ConfigTemplate configTemplate = (ConfigTemplate)governorOfConfigTemplate.createResource(serviceMessage);
+            ConfigTemplate configTemplate = governorOfConfigTemplate.createResource(serviceMessage);
             Assert.assertEquals("name соответствует ожидаемому", fileName, configTemplate.getName());
             Assert.assertEquals("switchedOn соответствует ожидаемомему", switchedOn, configTemplate.getSwitchedOn());
             Assert.assertEquals("fileLink соответствует ожидаемому", fileLink, configTemplate.getFileLink());
@@ -62,7 +62,7 @@ public class GovernorOfConfigTemplateTest {
         configTemplate.setSwitchedOn(switchedOn);
         configTemplateRepository.save(configTemplate);
 
-        ConfigTemplate buildedConfigTemplate = (ConfigTemplate)governorOfConfigTemplate.build(configTemplate.getId());
+        ConfigTemplate buildedConfigTemplate = governorOfConfigTemplate.build(configTemplate.getId());
         try {
             Assert.assertEquals("name соответствует ожидаемому", fileName, buildedConfigTemplate.getName());
             Assert.assertEquals("switchedOn соответствует ожидаемомему", switchedOn, buildedConfigTemplate.getSwitchedOn());
@@ -104,7 +104,7 @@ public class GovernorOfConfigTemplateTest {
 
         ServiceMessage serviceMessage = buildCreateServiceMessage(fileName, switchedOn, fileLink);
         try {
-            ConfigTemplate configTemplate = (ConfigTemplate)governorOfConfigTemplate.createResource(serviceMessage);
+            ConfigTemplate configTemplate = governorOfConfigTemplate.createResource(serviceMessage);
         } catch (NullPointerException e ) {
             e.printStackTrace();
             Assert.fail();

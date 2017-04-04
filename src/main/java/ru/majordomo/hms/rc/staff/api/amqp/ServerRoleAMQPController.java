@@ -51,7 +51,7 @@ public class ServerRoleAMQPController {
         reportServiceMessage.setActionIdentity(serviceMessage.getActionIdentity());
         reportServiceMessage.setOperationIdentity(serviceMessage.getOperationIdentity());
         try {
-            ServerRole serverRole = (ServerRole) governor.createResource(serviceMessage);
+            ServerRole serverRole = governor.createResource(serviceMessage);
             logger.info(loggerPrefix + "server role успешно создана");
             reportServiceMessage.setObjRef("http://" + applicationName + "/" + serviceName + "/" + serverRole.getId());
             reportServiceMessage.addParam("success", Boolean.TRUE);

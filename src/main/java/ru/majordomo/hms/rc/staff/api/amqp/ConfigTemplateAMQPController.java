@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfConfigTemplate;
-import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
 import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
 
 @EnableRabbit
@@ -42,7 +41,7 @@ public class ConfigTemplateAMQPController {
         String loggerPrefix = "OPERATION IDENTITY:" + serviceMessage.getOperationIdentity() + "ACTION IDENTITY:" + serviceMessage.getActionIdentity() + " ";
 
         try {
-            ConfigTemplate configTemplate = (ConfigTemplate) governorOfConfigTemplate.createResource(serviceMessage);
+            ConfigTemplate configTemplate = governorOfConfigTemplate.createResource(serviceMessage);
             reportServiceMessage.setObjRef("http://" + applicationName + "/ru.majordomo.hms.rc.staff.test.api.config-template/" + configTemplate.getId());
             reportServiceMessage.addParam("success", Boolean.TRUE);
 

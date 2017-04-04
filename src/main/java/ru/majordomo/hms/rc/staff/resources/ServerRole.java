@@ -1,9 +1,7 @@
 package ru.majordomo.hms.rc.staff.resources;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import com.fasterxml.jackson.annotation.JsonSetter;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -46,7 +44,7 @@ public class ServerRole extends Resource {
     public void addServiceTemplate(ServiceTemplate serviceTemplate) {
         String serviceTemplateId = serviceTemplate.getId();
         this.serviceTemplates.add(serviceTemplate);
-        if (serviceTemplateIds.contains(serviceTemplateId) == false) {
+        if (!serviceTemplateIds.contains(serviceTemplateId)) {
             this.serviceTemplateIds.add(serviceTemplate.getId());
         }
     }

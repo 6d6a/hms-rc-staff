@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
-import ru.majordomo.hms.rc.staff.resources.Resource;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
@@ -22,7 +21,7 @@ import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
 import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 
 @Component
-public class GovernorOfConfigTemplate extends LordOfResources {
+public class GovernorOfConfigTemplate extends LordOfResources<ConfigTemplate> {
     private static final Logger logger = LoggerFactory.getLogger(GovernorOfConfigTemplate.class);
 
     private Cleaner cleaner;
@@ -45,7 +44,7 @@ public class GovernorOfConfigTemplate extends LordOfResources {
     }
 
     @Override
-    public Resource createResource(ServiceMessage serviceMessage) throws ParameterValidateException {
+    public ConfigTemplate createResource(ServiceMessage serviceMessage) throws ParameterValidateException {
         String loggerPrefix = "OPERATION IDENTITY:" + serviceMessage.getOperationIdentity() + " ACTION IDENTITY:" + serviceMessage.getActionIdentity() + " ";
 
         ConfigTemplate configTemplate = new ConfigTemplate();
@@ -58,9 +57,8 @@ public class GovernorOfConfigTemplate extends LordOfResources {
     }
 
     @Override
-    public void isValid(Resource resource) throws ParameterValidateException {
-        ConfigTemplate configTemplate = (ConfigTemplate) resource;
-        String fileLink = configTemplate.getFileLink();
+    public void isValid(ConfigTemplate resource) throws ParameterValidateException {
+        String fileLink = resource.getFileLink();
         if (fileLink.equals("")) {
             throw new ParameterValidateException("Адрес не может быть пустым");
         }
@@ -73,7 +71,7 @@ public class GovernorOfConfigTemplate extends LordOfResources {
     }
 
     @Override
-    public Resource build(String resourceId) throws ResourceNotFoundException {
+    public ConfigTemplate build(String resourceId) throws ResourceNotFoundException {
         ConfigTemplate configTemplate = configTemplateRepository.findOne(resourceId);
         if (configTemplate == null) {
             throw new ResourceNotFoundException("ConfigTemplate с ID:" + resourceId + " не найден");
@@ -82,7 +80,7 @@ public class GovernorOfConfigTemplate extends LordOfResources {
     }
 
     @Override
-    public Resource build(Map<String, String> keyValue) throws NotImplementedException {
+    public ConfigTemplate build(Map<String, String> keyValue) throws NotImplementedException {
         throw new NotImplementedException();
     }
 
@@ -101,11 +99,11 @@ public class GovernorOfConfigTemplate extends LordOfResources {
 
         if (byName) {
             for (ConfigTemplate configTemplate : configTemplateRepository.findByName(keyValue.get("name"))) {
-                buildedConfigTemplates.add((ConfigTemplate) build(configTemplate.getId()));
+                buildedConfigTemplates.add(build(configTemplate.getId()));
             }
         } else {
             for (ConfigTemplate configTemplate : configTemplateRepository.findAll()) {
-                buildedConfigTemplates.add((ConfigTemplate) build(configTemplate.getId()));
+                buildedConfigTemplates.add(build(configTemplate.getId()));
             }
         }
 
@@ -118,8 +116,8 @@ public class GovernorOfConfigTemplate extends LordOfResources {
     }
 
     @Override
-    public void save(Resource resource) {
-        configTemplateRepository.save((ConfigTemplate) resource);
+    public void save(ConfigTemplate resource) {
+        configTemplateRepository.save(resource);
     }
 
     @Override
@@ -127,7 +125,9 @@ public class GovernorOfConfigTemplate extends LordOfResources {
         List<ServiceTemplate> serviceTemplates = governorOfServiceTemplate.buildAll();
         for (ServiceTemplate serviceTemplate : serviceTemplates) {
             if (serviceTemplate.getConfigTemplateIds().contains(resourceId)) {
-                throw new ParameterValidateException("Я нашла ServiceTemplate с ID " + serviceTemplate.getId() + ", именуемый " + serviceTemplate.getName() + ", так вот в нём имеется удаляемый ConfigTemplate. Прикинь.");
+                throw new ParameterValidateException("Я нашла ServiceTemplate с ID "
+                        + serviceTemplate.getId() + ", именуемый " + serviceTemplate.getName()
+                        + ", так вот в нём имеется удаляемый ConfigTemplate. Прикинь.");
             }
         }
     }

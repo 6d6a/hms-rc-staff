@@ -19,7 +19,7 @@ import ru.majordomo.hms.rc.staff.managers.GovernorOfService;
 import ru.majordomo.hms.rc.staff.repositories.*;
 import ru.majordomo.hms.rc.staff.resources.*;
 import ru.majordomo.hms.rc.staff.test.config.ConfigOfGovernors;
-import ru.majordomo.hms.rc.staff.test.config.EmbeddedServltetContainerConfig;
+import ru.majordomo.hms.rc.staff.test.config.EmbeddedServletContainerConfig;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
 
 @RunWith(SpringRunner.class)
@@ -27,7 +27,7 @@ import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
         classes = {
                 RepositoriesConfig.class,
                 ConfigOfGovernors.class,
-                EmbeddedServltetContainerConfig.class
+                EmbeddedServletContainerConfig.class
         },
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
@@ -102,7 +102,7 @@ public class GovernorOfServiceTest {
     @Test
     public void create() {
         try {
-            Service createdService = (Service) governor.createResource(testServiceMessage);
+            Service createdService = governor.createResource(testServiceMessage);
             Assert.assertEquals("name не совпадает с ожидаемым", testService.getName(), createdService.getName());
             Assert.assertEquals("switchedOn не совпадает с ожидаемым", testService.getSwitchedOn(), createdService.getSwitchedOn());
             Assert.assertEquals("serviceTemplate не совпадает с ожидаемым", testService.getServiceTemplate().getId(), createdService.getServiceTemplate().getId());
@@ -117,7 +117,7 @@ public class GovernorOfServiceTest {
     @Test
     public void build() {
         serviceRepository.save(testService);
-        Service buildedService = (Service) governor.build(testService.getId());
+        Service buildedService = governor.build(testService.getId());
         try {
             Assert.assertEquals("name не совпадает с ожидаемым", testService.getName(), buildedService.getName());
             Assert.assertEquals("switchedOn не совпадает с ожидаемым", testService.getSwitchedOn(), buildedService.getSwitchedOn());

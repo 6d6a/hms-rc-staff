@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
-import ru.majordomo.hms.rc.staff.resources.Resource;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
@@ -19,10 +18,9 @@ import ru.majordomo.hms.rc.staff.repositories.NetworkRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceSocketRepository;
 import ru.majordomo.hms.rc.staff.resources.Network;
 import ru.majordomo.hms.rc.staff.resources.ServiceSocket;
-import ru.majordomo.hms.rc.staff.resources.ServiceType;
 
 @Service
-public class GovernorOfServiceSocket extends LordOfResources {
+public class GovernorOfServiceSocket extends LordOfResources<ServiceSocket> {
 
     private Cleaner cleaner;
     private NetworkRepository networkRepository;
@@ -52,7 +50,7 @@ public class GovernorOfServiceSocket extends LordOfResources {
     }
 
     @Override
-    public Resource createResource(ServiceMessage serviceMessage) throws ParameterValidateException {
+    public ServiceSocket createResource(ServiceMessage serviceMessage) throws ParameterValidateException {
 
         String loggerPrefix = "OPERATION IDENTITY:" + serviceMessage.getOperationIdentity() + " ACTION IDENTITY:" + serviceMessage.getActionIdentity() + " ";
         ServiceSocket serviceSocket = new ServiceSocket();
@@ -72,12 +70,11 @@ public class GovernorOfServiceSocket extends LordOfResources {
     }
 
     @Override
-    public void isValid(Resource resource) throws ParameterValidateException {
-        ServiceSocket socket = (ServiceSocket) resource;
-        String address = socket.getAddressAsString();
-        Integer port = socket.getPort();
+    public void isValid(ServiceSocket resource) throws ParameterValidateException {
+        String address = resource.getAddressAsString();
+        Integer port = resource.getPort();
         Boolean inRange = Boolean.FALSE;
-        List<Network> networkList = new ArrayList<>();
+        List<Network> networkList;
         networkList = networkRepository.findAll();
 
         for (Network network : networkList) {
@@ -96,7 +93,7 @@ public class GovernorOfServiceSocket extends LordOfResources {
     }
 
     @Override
-    public Resource build(String resourceId) throws ResourceNotFoundException {
+    public ServiceSocket build(String resourceId) throws ResourceNotFoundException {
         ServiceSocket serviceSocket = serviceSocketRepository.findOne(resourceId);
         if (serviceSocket == null) {
             throw new ResourceNotFoundException("ServiceSocket с ID:" + resourceId + " не найден");
@@ -105,7 +102,7 @@ public class GovernorOfServiceSocket extends LordOfResources {
     }
 
     @Override
-    public Resource build(Map<String, String> keyValue) throws NotImplementedException {
+    public ServiceSocket build(Map<String, String> keyValue) throws NotImplementedException {
         throw new NotImplementedException();
     }
 
@@ -124,11 +121,11 @@ public class GovernorOfServiceSocket extends LordOfResources {
 
         if (byName) {
             for (ServiceSocket serviceSocket : serviceSocketRepository.findByName(keyValue.get("name"))) {
-                buildedServiceSockets.add((ServiceSocket) build(serviceSocket.getId()));
+                buildedServiceSockets.add(build(serviceSocket.getId()));
             }
         } else {
             for (ServiceSocket serviceSocket : serviceSocketRepository.findAll()) {
-                buildedServiceSockets.add((ServiceSocket) build(serviceSocket.getId()));
+                buildedServiceSockets.add(build(serviceSocket.getId()));
             }
         }
 
@@ -141,8 +138,8 @@ public class GovernorOfServiceSocket extends LordOfResources {
     }
 
     @Override
-    public void save(Resource resource) {
-        serviceSocketRepository.save((ServiceSocket) resource);
+    public void save(ServiceSocket resource) {
+        serviceSocketRepository.save(resource);
     }
 
     @Override
@@ -150,7 +147,8 @@ public class GovernorOfServiceSocket extends LordOfResources {
         List<ru.majordomo.hms.rc.staff.resources.Service> services = governorOfService.buildAll();
         for (ru.majordomo.hms.rc.staff.resources.Service service : services) {
             if (service.getServiceSocketIds().contains(resourceId)) {
-                throw new ParameterValidateException("Я нашла Service с ID " + service.getId() + ", именуемый " + service.getName() + ", так вот в нём имеется удаляемый ServiceSocket");
+                throw new ParameterValidateException("Я нашла Service с ID " + service.getId()
+                        + ", именуемый " + service.getName() + ", так вот в нём имеется удаляемый ServiceSocket");
             }
         }
     }

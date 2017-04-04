@@ -79,7 +79,9 @@ public class GovernorOfServiceType {
         List<ServiceTemplate> templates = governorOfServiceTemplate.buildAll();
         for (ServiceTemplate template : templates) {
             if (template.getServiceTypeName().equals(name)) {
-                throw new ParameterValidateException("Я нашла ServiceTemplate с ID " + template.getId() + ", именуемый " + template.getName() + ", так вот в нём имеется удаляемый ServiceType.");
+                throw new ParameterValidateException("Я нашла ServiceTemplate с ID "
+                        + template.getId() + ", именуемый " + template.getName()
+                        + ", так вот в нём имеется удаляемый ServiceType.");
             }
         }
     }

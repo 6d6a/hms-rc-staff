@@ -14,7 +14,7 @@ import ru.majordomo.hms.rc.staff.managers.GovernorOfServer;
 import ru.majordomo.hms.rc.staff.repositories.*;
 import ru.majordomo.hms.rc.staff.resources.*;
 import ru.majordomo.hms.rc.staff.test.config.ConfigOfGovernors;
-import ru.majordomo.hms.rc.staff.test.config.EmbeddedServltetContainerConfig;
+import ru.majordomo.hms.rc.staff.test.config.EmbeddedServletContainerConfig;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
 
 import java.util.ArrayList;
@@ -27,11 +27,11 @@ import java.util.Map;
         classes = {
                 RepositoriesConfig.class,
                 ConfigOfGovernors.class,
-                EmbeddedServltetContainerConfig.class
+                EmbeddedServletContainerConfig.class
         },
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = {
-                "server.active.mail-storage.active-storage-mountpoint:/homebig"
+                "server.active.mail-storage.active-storage-mountpoint=/homebig"
         }
 )
 public class GovernorOfServerTest {
@@ -131,7 +131,7 @@ public class GovernorOfServerTest {
     @Test
     public void create() {
         try {
-            Server createdServer = (Server) governor.createResource(testServiceMessage);
+            Server createdServer = governor.createResource(testServiceMessage);
             Assert.assertEquals("Имя не совпадает с ожидаемым", testServer.getName(), createdServer.getName());
             Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testServer.getSwitchedOn(), createdServer.getSwitchedOn());
             Assert.assertTrue(testServer.getServices().equals(createdServer.getServices()));
@@ -149,7 +149,7 @@ public class GovernorOfServerTest {
     @Test
     public void build() {
         serverRepository.save(testServer);
-        Server buildedServer = (Server) governor.build(testServer.getId());
+        Server buildedServer = governor.build(testServer.getId());
         try {
             Assert.assertEquals("Имя не совпадает с ожидаемым", testServer.getName(), buildedServer.getName());
             Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testServer.getSwitchedOn(), buildedServer.getSwitchedOn());
@@ -203,7 +203,7 @@ public class GovernorOfServerTest {
         Map<String, String> keyValue = new HashMap<>();
         keyValue.put("server-id", testServer.getId());
         keyValue.put("active-storage", "true");
-        Storage buildedStorage = (Storage) governor.build(keyValue);
+        Storage buildedStorage = governor.build(keyValue).getActiveMailboxStorage();
         Assert.assertNotNull(buildedStorage);
     }
 

@@ -43,7 +43,7 @@ public class StorageAMQPController {
         String loggerPrefix = "OPERATION IDENTITY:" + serviceMessage.getOperationIdentity() + "ACTION IDENTITY:" + serviceMessage.getActionIdentity() + " ";
         ServiceMessage serviceReportMessage = new ServiceMessage();
         try {
-            Storage storage = (Storage) governorOfStorage.createResource(serviceMessage);
+            Storage storage = governorOfStorage.createResource(serviceMessage);
             logger.info(loggerPrefix + "storage успешно создан");
             serviceReportMessage.setObjRef("http://" + applicationName + "/storage/" + storage.getId());
             serviceReportMessage.addParam("success", Boolean.TRUE);
