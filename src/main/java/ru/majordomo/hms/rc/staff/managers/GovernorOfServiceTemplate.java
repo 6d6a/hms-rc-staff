@@ -18,7 +18,7 @@ import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.repositories.ServiceTemplateRepository;
 
 @Component
-public class GovernorOfServiceTemplate extends LordOfResources {
+public class GovernorOfServiceTemplate extends LordOfResources<ServiceTemplate> {
     private Cleaner cleaner;
     private ServiceTemplateRepository serviceTemplateRepository;
     private GovernorOfConfigTemplate governorOfConfigTemplate;
@@ -59,13 +59,13 @@ public class GovernorOfServiceTemplate extends LordOfResources {
     private static final Logger logger = LoggerFactory.getLogger(GovernorOfServiceTemplate.class);
 
     @Override
-    public Resource createResource(ServiceMessage serviceMessage) throws ParameterValidateException {
+    public ServiceTemplate createResource(ServiceMessage serviceMessage) throws ParameterValidateException {
         String loggerPrefix = "OPERATION IDENTITY:" + serviceMessage.getOperationIdentity() + " ACTION IDENTITY:" + serviceMessage.getActionIdentity() + " ";
         ServiceTemplate serviceTemplate = new ServiceTemplate();
 
         LordOfResources.setResourceParams(serviceTemplate, serviceMessage, cleaner);
 
-        List<ConfigTemplate> configTemplates = (List<ConfigTemplate>)serviceMessage.getParam("configTemplates");
+        @SuppressWarnings("unchecked") List<ConfigTemplate> configTemplates = (List<ConfigTemplate>)serviceMessage.getParam("configTemplates");
         ServiceType serviceType = (ServiceType) serviceMessage.getParam("serviceType");
         serviceTemplate.setConfigTemplates(configTemplates);
         serviceTemplate.setServiceType(serviceType);
@@ -76,22 +76,20 @@ public class GovernorOfServiceTemplate extends LordOfResources {
     }
 
     @Override
-    public void isValid(Resource resource) throws ParameterValidateException {
-        ServiceTemplate serviceTemplate = (ServiceTemplate) resource;
-
-        if (serviceTemplate.getConfigTemplates().isEmpty()) {
+    public void isValid(ServiceTemplate resource) throws ParameterValidateException {
+        if (resource.getConfigTemplates().isEmpty()) {
             throw new ParameterValidateException("Не найден ни один ConfigTemplate");
         }
-        if (serviceTemplate.getConfigTemplateIds().isEmpty()) {
+        if (resource.getConfigTemplateIds().isEmpty()) {
             throw new ParameterValidateException("Не найден ни один ConfigTemplateId");
         }
-        if (serviceTemplate.getServiceType() == null || serviceTemplate.getServiceTypeName() == null || serviceTemplate.getServiceTypeName().equals("")) {
+        if (resource.getServiceType() == null || resource.getServiceTypeName() == null || resource.getServiceTypeName().equals("")) {
             throw new ParameterValidateException("Отсутствует ServiceType");
         }
 
         //Валидация ConfigTemplate
-        for (ConfigTemplate configTemplateToValidate : serviceTemplate.getConfigTemplates()) {
-            ConfigTemplate configTemplateFromRepository = (ConfigTemplate) governorOfConfigTemplate.build(configTemplateToValidate.getId());
+        for (ConfigTemplate configTemplateToValidate : resource.getConfigTemplates()) {
+            ConfigTemplate configTemplateFromRepository = governorOfConfigTemplate.build(configTemplateToValidate.getId());
             if (configTemplateFromRepository == null) {
                 throw new ParameterValidateException("ConfigTemplate с ID: " + configTemplateToValidate.getId() + " не найден");
             }
@@ -102,21 +100,21 @@ public class GovernorOfServiceTemplate extends LordOfResources {
 
         //Валидация ServiceType
         try {
-            governorOfServiceType.build(serviceTemplate.getServiceType().getName());
+            governorOfServiceType.build(resource.getServiceType().getName());
         } catch (ResourceNotFoundException e)  {
-            throw new ParameterValidateException("ServiceType с именем: " + serviceTemplate.getServiceType().getName() + " не найден");
+            throw new ParameterValidateException("ServiceType с именем: " + resource.getServiceType().getName() + " не найден");
         }
 
     }
 
     @Override
-    public Resource build(String resourceId) throws ResourceNotFoundException {
+    public ServiceTemplate build(String resourceId) throws ResourceNotFoundException {
         ServiceTemplate serviceTemplate = serviceTemplateRepository.findOne(resourceId);
         if (serviceTemplate == null) {
             throw new ResourceNotFoundException("ServiceTemplate с ID:" + resourceId + " не найден");
         }
         for (String configTemplateId : serviceTemplate.getConfigTemplateIds()) {
-            ConfigTemplate configTemplate = (ConfigTemplate) governorOfConfigTemplate.build(configTemplateId);
+            ConfigTemplate configTemplate = governorOfConfigTemplate.build(configTemplateId);
             serviceTemplate.addConfigTemplate(configTemplate);
         }
 
@@ -130,7 +128,7 @@ public class GovernorOfServiceTemplate extends LordOfResources {
     }
 
     @Override
-    public Resource build(Map<String, String> keyValue) throws NotImplementedException {
+    public ServiceTemplate build(Map<String, String> keyValue) throws NotImplementedException {
         throw new NotImplementedException();
     }
 
@@ -149,11 +147,11 @@ public class GovernorOfServiceTemplate extends LordOfResources {
 
         if (byName) {
             for (ServiceTemplate serviceTemplate : serviceTemplateRepository.findByName(keyValue.get("name"))) {
-                buildedServiceTemplates.add((ServiceTemplate) build(serviceTemplate.getId()));
+                buildedServiceTemplates.add(build(serviceTemplate.getId()));
             }
         } else {
             for (ServiceTemplate serviceTemplate : serviceTemplateRepository.findAll()) {
-                buildedServiceTemplates.add((ServiceTemplate) build(serviceTemplate.getId()));
+                buildedServiceTemplates.add(build(serviceTemplate.getId()));
             }
         }
 
@@ -164,14 +162,14 @@ public class GovernorOfServiceTemplate extends LordOfResources {
     public List<ServiceTemplate> buildAll() {
         List<ServiceTemplate> buildedServiceTemplates = new ArrayList<>();
         for (ServiceTemplate serviceTemplate : serviceTemplateRepository.findAll()) {
-            buildedServiceTemplates.add((ServiceTemplate) build(serviceTemplate.getId()));
+            buildedServiceTemplates.add(build(serviceTemplate.getId()));
         }
         return buildedServiceTemplates;
     }
 
     @Override
-    public void save(Resource resource) {
-        serviceTemplateRepository.save((ServiceTemplate) resource);
+    public void save(ServiceTemplate resource) {
+        serviceTemplateRepository.save(resource);
     }
 
     @Override
@@ -179,14 +177,17 @@ public class GovernorOfServiceTemplate extends LordOfResources {
         List<ServerRole> roles = governorOfServerRole.buildAll();
         for (ServerRole role : roles) {
             if (role.getServiceTemplateIds().contains(resourceId)) {
-                throw new ParameterValidateException("Я нашла ServerRole с ID " + role.getId() + ", именуемый " + role.getName() + ", так вот в нём имеется удаляемый ServiceTemplate. A-ta-ta.");
+                throw new ParameterValidateException("Я нашла ServerRole с ID " + role.getId()
+                        + ", именуемый " + role.getName() + ", так вот в нём имеется удаляемый ServiceTemplate. A-ta-ta.");
             }
         }
 
         List<Service> services = governorOfService.buildAll();
         for (Service service : services) {
             if (service.getServiceTemplateId().equals(resourceId)) {
-                throw new ParameterValidateException("Я нашла Service с ID " + service.getId() + ", именуемый " + service.getName() + ", так вот в нём имеется удаляемый ServiceTemplate. What's wrong with this rebatishki?");
+                throw new ParameterValidateException("Я нашла Service с ID " + service.getId()
+                        + ", именуемый " + service.getName()
+                        + ", так вот в нём имеется удаляемый ServiceTemplate. What's wrong with this rebatishki?");
             }
         }
     }

@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
-import ru.majordomo.hms.rc.staff.resources.Resource;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
@@ -21,7 +20,7 @@ import ru.majordomo.hms.rc.staff.resources.Network;
 import ru.majordomo.hms.rc.staff.resources.ServiceSocket;
 
 @Component
-public class GovernorOfNetwork extends LordOfResources {
+public class GovernorOfNetwork extends LordOfResources<Network> {
     private NetworkRepository networkRepository;
     private GovernorOfServiceSocket governorOfServiceSocket;
     private Cleaner cleaner;
@@ -42,7 +41,7 @@ public class GovernorOfNetwork extends LordOfResources {
     }
 
     @Override
-    public Resource createResource(ServiceMessage serviceMessage) throws ParameterValidateException {
+    public Network createResource(ServiceMessage serviceMessage) throws ParameterValidateException {
         Network network = new Network();
         try {
             network = (Network) LordOfResources.setResourceParams(network, serviceMessage, cleaner);
@@ -67,30 +66,28 @@ public class GovernorOfNetwork extends LordOfResources {
     }
 
     @Override
-    public void isValid(Resource resource) throws ParameterValidateException {
-        Network network = (Network) resource;
-
-        Long addressAsLong = network.getAddress();
+    public void isValid(Network resource) throws ParameterValidateException {
+        Long addressAsLong = resource.getAddress();
         if (addressAsLong < 0L || addressAsLong > 4294967295L) {
             throw new ParameterValidateException("параметр address указан неверно");
         }
 
-        String address = network.getAddressAsString();
+        String address = resource.getAddressAsString();
         if (address.equals("") || !InetAddresses.isInetAddress(address)) {
             throw new ParameterValidateException("параметр address указан неверно");
         }
 
-        Integer netmask = network.getMask();
+        Integer netmask = resource.getMask();
         if (netmask < 0 || netmask > 30) {
             throw new ParameterValidateException("значение параметра mask должно находиться в диапазоне от 1 до 30");
         }
 
-        String gwAddress = network.getGatewayAddressAsString();
+        String gwAddress = resource.getGatewayAddressAsString();
         if (gwAddress.equals("") || !InetAddresses.isInetAddress(gwAddress)) {
             throw new ParameterValidateException("gatewayAddress должен быть указан");
         }
 
-        Integer vlanNumber = network.getVlanNumber();
+        Integer vlanNumber = resource.getVlanNumber();
         if (vlanNumber < 0 || vlanNumber > 4096) {
             throw new ParameterValidateException("значение параметра vlanNumber должно находиться в диапазоне от 0 до 4096");
         }
@@ -105,7 +102,7 @@ public class GovernorOfNetwork extends LordOfResources {
     }
 
     @Override
-    public Resource build(String resourceId) throws ResourceNotFoundException {
+    public Network build(String resourceId) throws ResourceNotFoundException {
         Network network = networkRepository.findOne(resourceId);
         if (network == null) {
             throw new ResourceNotFoundException("Network с ID:" + resourceId + " не найден");
@@ -114,7 +111,7 @@ public class GovernorOfNetwork extends LordOfResources {
     }
 
     @Override
-    public Resource build(Map<String, String> keyValue) throws NotImplementedException {
+    public Network build(Map<String, String> keyValue) throws NotImplementedException {
         throw new NotImplementedException();
     }
 
@@ -133,11 +130,11 @@ public class GovernorOfNetwork extends LordOfResources {
 
         if (byName) {
             for (Network network : networkRepository.findByName(keyValue.get("name"))) {
-                buildedNetworks.add((Network) build(network.getId()));
+                buildedNetworks.add(build(network.getId()));
             }
         } else {
             for (Network network : networkRepository.findAll()) {
-                buildedNetworks.add((Network) build(network.getId()));
+                buildedNetworks.add(build(network.getId()));
             }
         }
 
@@ -150,8 +147,8 @@ public class GovernorOfNetwork extends LordOfResources {
     }
 
     @Override
-    public void save(Resource resource) {
-        networkRepository.save((Network) resource);
+    public void save(Network resource) {
+        networkRepository.save(resource);
     }
 
     @Override
@@ -160,7 +157,8 @@ public class GovernorOfNetwork extends LordOfResources {
         List<ServiceSocket> sockets = governorOfServiceSocket.buildAll();
         for (ServiceSocket socket : sockets) {
             if (network.isAddressIn(socket.getAddressAsString())) {
-                throw new ParameterValidateException("Я нашла ServiceSocket с ID " + socket.getId() + ", именуемый " + socket.getName() + ", он так то в удаляемом Network");
+                throw new ParameterValidateException("Я нашла ServiceSocket с ID " + socket.getId()
+                        + ", именуемый " + socket.getName() + ", он так то в удаляемом Network");
             }
         }
     }

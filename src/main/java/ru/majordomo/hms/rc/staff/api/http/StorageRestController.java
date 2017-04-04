@@ -2,6 +2,7 @@ package ru.majordomo.hms.rc.staff.api.http;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -15,25 +16,26 @@ import java.util.Map;
 
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfStorage;
-import ru.majordomo.hms.rc.staff.resources.Resource;
 import ru.majordomo.hms.rc.staff.resources.Storage;
 
 @RestController
 @RequestMapping("/storage")
-public class StorageRestController extends RestControllerTemplate {
+public class StorageRestController extends RestControllerTemplate<Storage> {
 
     @Autowired
     public void setGovernor(GovernorOfStorage governor) {
         this.governor = governor;
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('STORAGE_VIEW')")
     @RequestMapping(value = "/{storageId}", method = RequestMethod.GET)
     public Storage readOne(@PathVariable String storageId) {
-        return (Storage) processReadOneQuery(storageId);
+        return processReadOneQuery(storageId);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('STORAGE_VIEW')")
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
-    public Collection<? extends Resource> readAll(@RequestParam(required=false, defaultValue="") String name) {
+    public Collection<Storage> readAll(@RequestParam(required=false, defaultValue="") String name) {
         Map<String, String> keyValue = new HashMap<>();
         if (!name.isEmpty()) {
             keyValue.put("name", name);
@@ -45,18 +47,21 @@ public class StorageRestController extends RestControllerTemplate {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('STORAGE_CREATE')")
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
-    public ResponseEntity<?> create (@RequestBody Storage storage) throws ParameterValidateException {
+    public ResponseEntity<Storage> create (@RequestBody Storage storage) throws ParameterValidateException {
         return processCreateQuery(storage);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('STORAGE_EDIT')")
     @RequestMapping(value = "/{storageId}", method = {RequestMethod.PATCH, RequestMethod.PUT})
-    public ResponseEntity<?> update(@PathVariable String storageId, @RequestBody Storage storage) throws ParameterValidateException {
+    public ResponseEntity<Storage> update(@PathVariable String storageId, @RequestBody Storage storage) throws ParameterValidateException {
         return processUpdateQuery(storageId, storage);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('STORAGE_DELETE')")
     @RequestMapping(value = "/{storageId}", method = RequestMethod.DELETE)
-    public ResponseEntity<?> delete(@PathVariable String storageId) {
+    public ResponseEntity<Void> delete(@PathVariable String storageId) {
         return processDeleteQuery(storageId);
     }
 }

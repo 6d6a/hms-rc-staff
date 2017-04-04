@@ -40,7 +40,7 @@ public class NetworkAMQPController {
         reportServiceMessage.setOperationIdentity(serviceMessage.getOperationIdentity());
         String loggerPrefix = "OPERATION IDENTITY:" + serviceMessage.getOperationIdentity() + "ACTION IDENTITY:" + serviceMessage.getActionIdentity() + " ";
         try {
-            Network network = (Network) governorOfNetwork.createResource(serviceMessage);
+            Network network = governorOfNetwork.createResource(serviceMessage);
             logger.info(loggerPrefix + "ресурс network создан");
             reportServiceMessage.addParam("success", Boolean.TRUE);
         } catch (ParameterValidateException e) {

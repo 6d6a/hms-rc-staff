@@ -69,7 +69,7 @@ public class GovernorOfStorageTest {
     @Test
     public void create() {
         try {
-            Storage createdStorage = (Storage) governor.createResource(testServiceMessage);
+            Storage createdStorage = governor.createResource(testServiceMessage);
             Assert.assertEquals("Имя не совпадает с ожидаемым", testStorage.getName(), createdStorage.getName());
             Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testStorage.getSwitchedOn(), createdStorage.getSwitchedOn());
             Assert.assertEquals("Capacity не совпадает с ожидаемым", testStorage.getCapacity(), createdStorage.getCapacity());
@@ -84,7 +84,7 @@ public class GovernorOfStorageTest {
     @Test
     public void build() {
         storageRepository.save(testStorage);
-        Storage buildedStorage = (Storage)governor.build(testStorage.getId());
+        Storage buildedStorage = governor.build(testStorage.getId());
         try {
             Assert.assertEquals("Имя не совпадает с ожидаемым", testStorage.getName(), buildedStorage.getName());
             Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testStorage.getSwitchedOn(), buildedStorage.getSwitchedOn());

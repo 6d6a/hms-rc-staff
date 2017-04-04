@@ -79,7 +79,7 @@ public class GovernorOfServiceSocketTest {
     @Test
     public void create() {
         try {
-            ServiceSocket createdServiceSocket = (ServiceSocket) governor.createResource(testServiceMessage);
+            ServiceSocket createdServiceSocket = governor.createResource(testServiceMessage);
             Assert.assertEquals("Имя не совпадает с ожидаемым", testServiceSocket.getName(), createdServiceSocket.getName());
             Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testServiceSocket.getName(), createdServiceSocket.getName());
             Assert.assertEquals("Адрес не совпадает с ожидаемым", testServiceSocket.getAddress(), createdServiceSocket.getAddress());
@@ -93,7 +93,7 @@ public class GovernorOfServiceSocketTest {
     @Test
     public void build() {
         repository.save(testServiceSocket);
-        ServiceSocket buildedServiceSocket = (ServiceSocket) governor.build(testServiceSocket.getId());
+        ServiceSocket buildedServiceSocket = governor.build(testServiceSocket.getId());
         try {
             Assert.assertEquals("Имя не совпадает с ожидаемым", testServiceSocket.getName(), buildedServiceSocket.getName());
             Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testServiceSocket.getName(), buildedServiceSocket.getName());

@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 public class ParameterValidateException extends RuntimeException {
-    public ParameterValidateException() {};
+    public ParameterValidateException() {}
 
     public ParameterValidateException(String message) {
         super(message);

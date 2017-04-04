@@ -50,7 +50,7 @@ public class ServiceAMQPController {
         reportServiceMessage.setActionIdentity(serviceMessage.getActionIdentity());
         reportServiceMessage.setOperationIdentity(serviceMessage.getOperationIdentity());
         try {
-            Service service = (Service) governor.createResource(serviceMessage);
+            Service service = governor.createResource(serviceMessage);
             logger.info(loggerPrefix + "service успешно создан");
             reportServiceMessage.setObjRef("http://" + applicationName + "/" + serviceName + "/" + service.getId());
             reportServiceMessage.addParam("success", Boolean.TRUE);

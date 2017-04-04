@@ -14,14 +14,14 @@ import ru.majordomo.hms.rc.staff.resources.Server;
 import ru.majordomo.hms.rc.staff.resources.ServerRole;
 import ru.majordomo.hms.rc.staff.resources.Service;
 import ru.majordomo.hms.rc.staff.resources.Storage;
-import ru.majordomo.hms.rc.staff.resources.Resource;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 @Component
-public class GovernorOfServer extends LordOfResources {
+public class GovernorOfServer extends LordOfResources<Server> {
 
     private ServerRepository serverRepository;
     private ServerRoleRepository serverRoleRepository;
@@ -94,18 +94,18 @@ public class GovernorOfServer extends LordOfResources {
     }
 
     @Override
-    public Resource createResource(ServiceMessage serviceMessage) throws ParameterValidateException {
+    public Server createResource(ServiceMessage serviceMessage) throws ParameterValidateException {
         Server server = new Server();
         try {
             LordOfResources.setResourceParams(server, serviceMessage, cleaner);
 
-            List<Service> services = (List<Service>) serviceMessage.getParam("services");
+            @SuppressWarnings("unchecked") List<Service> services = (List<Service>) serviceMessage.getParam("services");
             server.setServices(services);
 
-            List<Storage> storages = (List<Storage>) serviceMessage.getParam("storages");
+            @SuppressWarnings("unchecked") List<Storage> storages = (List<Storage>) serviceMessage.getParam("storages");
             server.setStorages(storages);
 
-            List<ServerRole> serverRoles = (List<ServerRole>) serviceMessage.getParam("serverRoles");
+            @SuppressWarnings("unchecked") List<ServerRole> serverRoles = (List<ServerRole>) serviceMessage.getParam("serverRoles");
             server.setServerRoles(serverRoles);
 
             isValid(server);
@@ -118,22 +118,20 @@ public class GovernorOfServer extends LordOfResources {
     }
 
     @Override
-    public void isValid(Resource resource) throws ParameterValidateException {
-        Server server = (Server) resource;
-
-        if (server.getServices().isEmpty() || server.getServiceIds().isEmpty()) {
+    public void isValid(Server resource) throws ParameterValidateException {
+        if (resource.getServices().isEmpty() || resource.getServiceIds().isEmpty()) {
             throw new ParameterValidateException("Не найден ни один Service");
         }
-        if (server.getStorages().isEmpty() || server.getStorageIds().isEmpty()) {
+        if (resource.getStorages().isEmpty() || resource.getStorageIds().isEmpty()) {
             throw new ParameterValidateException("Не найден ни один Storage");
         }
-        if (server.getServerRoles().isEmpty() || server.getServerRoleIds().isEmpty()) {
+        if (resource.getServerRoles().isEmpty() || resource.getServerRoleIds().isEmpty()) {
             throw new ParameterValidateException("Не найден ни один ServerRole");
         }
 
         //Валидация Service
-        for (Service serviceToValidate : server.getServices()) {
-            Service serviceFromRepository = (Service) governorOfService.build(serviceToValidate.getId());
+        for (Service serviceToValidate : resource.getServices()) {
+            Service serviceFromRepository = governorOfService.build(serviceToValidate.getId());
             if (serviceFromRepository == null) {
                 throw new ParameterValidateException("Service с ID: " + serviceToValidate.getId() + " не найден");
             }
@@ -143,8 +141,8 @@ public class GovernorOfServer extends LordOfResources {
         }
 
         //Валидация Storage
-        for (Storage storageToValidate : server.getStorages()) {
-            Storage storageFromRepository = (Storage) governorOfStorage.build(storageToValidate.getId());
+        for (Storage storageToValidate : resource.getStorages()) {
+            Storage storageFromRepository = governorOfStorage.build(storageToValidate.getId());
             if (storageFromRepository == null) {
                 throw new ParameterValidateException("Storage с ID: " + storageToValidate.getId() + " не найден");
             }
@@ -154,8 +152,8 @@ public class GovernorOfServer extends LordOfResources {
         }
 
         //Валидация ServerRole
-        for (ServerRole serverRoleToValidate : server.getServerRoles()) {
-            ServerRole serverRoleFromRepository = (ServerRole) governorOfServerRole.build(serverRoleToValidate.getId());
+        for (ServerRole serverRoleToValidate : resource.getServerRoles()) {
+            ServerRole serverRoleFromRepository = governorOfServerRole.build(serverRoleToValidate.getId());
             if (serverRoleFromRepository == null) {
                 throw new ParameterValidateException("ServerRole с ID: " + serverRoleToValidate.getId() + " не найден");
             }
@@ -166,31 +164,31 @@ public class GovernorOfServer extends LordOfResources {
     }
 
     @Override
-    public Resource build(String resourceId) throws ResourceNotFoundException {
+    public Server build(String resourceId) throws ResourceNotFoundException {
         Server server = serverRepository.findOne(resourceId);
         if (server == null) {
             throw new ResourceNotFoundException("Server с ID:" + resourceId + " не найден");
         }
 
         for (String serviceId : server.getServiceIds()) {
-            Service service = (Service) governorOfService.build(serviceId);
+            Service service = governorOfService.build(serviceId);
             server.addService(service);
         }
 
         for (String storageId : server.getStorageIds()) {
-            Storage storage = (Storage) governorOfStorage.build(storageId);
+            Storage storage = governorOfStorage.build(storageId);
             server.addStorage(storage);
         }
 
         for (String serverRoleId : server.getServerRoleIds()) {
-            ServerRole serverRole = (ServerRole) governorOfServerRole.build(serverRoleId);
+            ServerRole serverRole = governorOfServerRole.build(serverRoleId);
             server.addServerRole(serverRole);
         }
 
         return server;
     }
 
-    public Resource build(Map<String, String> keyValue) throws ResourceNotFoundException {
+    public Server build(Map<String, String> keyValue) throws ResourceNotFoundException {
 
         Server server = new Server();
 
@@ -253,25 +251,17 @@ public class GovernorOfServer extends LordOfResources {
         }
 
         if (findStorage && byServerId) {
-            server = (Server) build(keyValue.get("server-id"));
-            List<Storage> storages = server.getStorages();
-            Storage buildedStorage = null;
-            for (Storage storage : storages) {
-                if (storage.getMountPoint() != null && storage.getMountPoint().equals(activeMailboxStorageMountPoint)) {
-                    buildedStorage = storage;
-                    break;
-                }
-            }
-            if (buildedStorage == null) {
-                throw new ResourceNotFoundException("Не найдено активного Storage");
-            }
-            return buildedStorage;
+            server = build(keyValue.get("server-id"));
+
+            server.setActiveMailboxStorageMountPoint(activeMailboxStorageMountPoint);
+
+            return server;
         }
         return build(server.getId());
     }
 
     @Override
-    public List<? extends Resource> buildAll(Map<String, String> keyValue) {
+    public List<Server> buildAll(Map<String, String> keyValue) {
         List<Server> buildedServers = new ArrayList<>();
 
         Boolean byName = false;
@@ -292,13 +282,13 @@ public class GovernorOfServer extends LordOfResources {
 
         if (byName) {
             for (Server server : serverRepository.findByName(keyValue.get("name"))) {
-                buildedServers.add((Server) build(server.getId()));
+                buildedServers.add(build(server.getId()));
             }
         }
         if (byServerId && ByServiceType) {
             List<Service> services = new ArrayList<>();
 
-            Server server = (Server) build(keyValue.get("serverId"));
+            Server server = build(keyValue.get("serverId"));
             for (Service service : server.getServices()) {
                 String[] parts = service.getServiceTemplate().getServiceType().getName().split("_");
                 if (keyValue.get("service-type").toUpperCase().equals(parts[0])) {
@@ -306,7 +296,9 @@ public class GovernorOfServer extends LordOfResources {
                 }
             }
 
-            return services;
+            server.setServices(services);
+
+            return Collections.singletonList(server);
         }
 
         return buildedServers;
@@ -316,14 +308,14 @@ public class GovernorOfServer extends LordOfResources {
     public List<Server> buildAll() {
         List<Server> buildedServers = new ArrayList<>();
         for (Server server : serverRepository.findAll()) {
-            buildedServers.add((Server) build(server.getId()));
+            buildedServers.add(build(server.getId()));
         }
         return buildedServers;
     }
 
     @Override
-    public void save(Resource resource) {
-        serverRepository.save((Server) resource);
+    public void save(Server resource) {
+        serverRepository.save(resource);
     }
 
     @Override

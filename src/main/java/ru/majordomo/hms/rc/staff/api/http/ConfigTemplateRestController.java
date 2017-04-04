@@ -2,6 +2,7 @@ package ru.majordomo.hms.rc.staff.api.http;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,24 +17,25 @@ import java.util.Map;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfConfigTemplate;
 import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
-import ru.majordomo.hms.rc.staff.resources.Resource;
 
 @RestController
 @RequestMapping("/config-template")
-public class ConfigTemplateRestController extends RestControllerTemplate {
+public class ConfigTemplateRestController extends RestControllerTemplate<ConfigTemplate> {
 
     @Autowired
     public void setGovernor(GovernorOfConfigTemplate governor) {
         this.governor = governor;
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('CONFIG_TEMPLATE_VIEW')")
     @RequestMapping(value = {"/{configTemplateId}", "/{configTemplateId}/"}, method = RequestMethod.GET)
     public ConfigTemplate readOne(@PathVariable String configTemplateId) {
-        return (ConfigTemplate) processReadOneQuery(configTemplateId);
+        return processReadOneQuery(configTemplateId);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('CONFIG_TEMPLATE_VIEW')")
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
-    public Collection<? extends Resource> readAll(@RequestParam(required=false, defaultValue="") String name) {
+    public Collection<ConfigTemplate> readAll(@RequestParam(required=false, defaultValue="") String name) {
         Map<String, String> keyValue = new HashMap<>();
         if (!name.isEmpty()) {
             keyValue.put("name", name);
@@ -45,20 +47,23 @@ public class ConfigTemplateRestController extends RestControllerTemplate {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('CONFIG_TEMPLATE_CREATE')")
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
-    public ResponseEntity<?> create(@RequestBody ConfigTemplate configTemplate) throws ParameterValidateException {
+    public ResponseEntity<ConfigTemplate> create(@RequestBody ConfigTemplate configTemplate) throws ParameterValidateException {
         return processCreateQuery(configTemplate);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ADMIN') or hasAuthority('CONFIG_TEMPLATE_EDIT')")
     @RequestMapping(value = {"/{configTemplateId}", "/{configTemplateId}/"}, method = {RequestMethod.PATCH, RequestMethod.PUT})
-    public ResponseEntity<?> update(@PathVariable String configTemplateId,
+    public ResponseEntity<ConfigTemplate> update(@PathVariable String configTemplateId,
                                     @RequestBody ConfigTemplate configTemplate)
                                     throws ParameterValidateException {
         return processUpdateQuery(configTemplateId, configTemplate);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('CONFIG_TEMPLATE_DELETE')")
     @RequestMapping(value = {"/{configTemplateId}", "/{configTemplateId}/"}, method = RequestMethod.DELETE)
-    public ResponseEntity<?> delete(@PathVariable String configTemplateId) {
+    public ResponseEntity<Void> delete(@PathVariable String configTemplateId) {
         return processDeleteQuery(configTemplateId);
     }
 }

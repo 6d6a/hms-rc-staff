@@ -1,8 +1,6 @@
 package ru.majordomo.hms.rc.staff.resources;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonSetter;
 
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -51,9 +49,7 @@ public class Service extends Resource {
     }
 
     public void setServiceTemplate(ServiceTemplate serviceTemplate) {
-        try {
-            this.serviceTemplateId = serviceTemplate.getId();
-        } catch (NullPointerException e){}
+        this.serviceTemplateId = serviceTemplate != null ? serviceTemplate.getId() : null;
         this.serviceTemplate = serviceTemplate;
     }
 
@@ -73,7 +69,7 @@ public class Service extends Resource {
     public void addServiceSocket(ServiceSocket serviceSocket) {
         String serviceSocketId = serviceSocket.getId();
         this.serviceSockets.add(serviceSocket);
-        if (serviceSocketIds.contains(serviceSocketId) == false) {
+        if (!serviceSocketIds.contains(serviceSocketId)) {
             this.serviceSocketIds.add(serviceSocket.getId());
         }
     }

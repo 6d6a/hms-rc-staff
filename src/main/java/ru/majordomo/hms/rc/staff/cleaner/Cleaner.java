@@ -19,7 +19,7 @@ public class Cleaner {
     public List<String> cleanListWithStrings(List<String> stringList) {
         for (int i = 0; i < stringList.size(); i++) {
             String element = cleanString(stringList.get(i));
-            if (element == "") {
+            if (element.equals("")) {
                 stringList.remove(i);
             } else {
                 stringList.set(i, element);

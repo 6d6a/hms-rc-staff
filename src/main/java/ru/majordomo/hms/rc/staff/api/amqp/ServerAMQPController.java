@@ -45,7 +45,7 @@ public class ServerAMQPController {
         reportServiceMessage.setActionIdentity(serviceMessage.getActionIdentity());
         reportServiceMessage.setOperationIdentity(serviceMessage.getOperationIdentity());
         try {
-            Server server = (Server) governor.createResource(serviceMessage);
+            Server server = governor.createResource(serviceMessage);
             logger.info(loggerPrefix + "service успешно создан");
             reportServiceMessage.setObjRef("http://" + applicationName + "/" + serviceName + "/" + server.getId());
             reportServiceMessage.addParam("success", Boolean.TRUE);

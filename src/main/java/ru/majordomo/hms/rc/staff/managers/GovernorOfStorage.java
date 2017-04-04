@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
-import ru.majordomo.hms.rc.staff.resources.Resource;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
@@ -20,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class GovernorOfStorage extends LordOfResources {
+public class GovernorOfStorage extends LordOfResources<Storage> {
 
     private StorageRepository repository;
     private GovernorOfServer governorOfServer;
@@ -44,7 +43,7 @@ public class GovernorOfStorage extends LordOfResources {
     private static final Logger logger = LoggerFactory.getLogger(GovernorOfStorage.class);
 
     @Override
-    public Resource createResource(ServiceMessage serviceMessage) throws ParameterValidateException {
+    public Storage createResource(ServiceMessage serviceMessage) throws ParameterValidateException {
         String loggerPrefix = "OPERATION IDENTITY:" + serviceMessage.getOperationIdentity() + "ACTION IDENTITY:" + serviceMessage.getActionIdentity() + " ";
         Storage storage = new Storage();
         storage = (Storage) LordOfResources.setResourceParams(storage, serviceMessage, cleaner);
@@ -81,11 +80,9 @@ public class GovernorOfStorage extends LordOfResources {
     }
 
     @Override
-    public void isValid(Resource resource) throws ParameterValidateException {
-        Storage storage = (Storage) resource;
-
-        Double capacity = storage.getCapacity();
-        Double capacityUsed = storage.getCapacityUsed();
+    public void isValid(Storage resource) throws ParameterValidateException {
+        Double capacity = resource.getCapacity();
+        Double capacityUsed = resource.getCapacityUsed();
 
         if (capacity <= 0) {
             throw new ParameterValidateException("capacity не может быть меньше или равен нулю");
@@ -101,7 +98,7 @@ public class GovernorOfStorage extends LordOfResources {
     }
 
     @Override
-    public Resource build(String resourceId) throws ResourceNotFoundException {
+    public Storage build(String resourceId) throws ResourceNotFoundException {
         Storage storage = repository.findOne(resourceId);
         if (storage == null) {
             throw new ResourceNotFoundException("Storage с ID:" + resourceId + " не найден");
@@ -110,7 +107,7 @@ public class GovernorOfStorage extends LordOfResources {
     }
 
     @Override
-    public Resource build(Map<String, String> keyValue) throws NotImplementedException {
+    public Storage build(Map<String, String> keyValue) throws NotImplementedException {
         throw new NotImplementedException();
     }
 
@@ -129,11 +126,11 @@ public class GovernorOfStorage extends LordOfResources {
 
         if (byName) {
             for (Storage storage : repository.findByName(keyValue.get("name"))) {
-                buildedStorages.add((Storage) build(storage.getId()));
+                buildedStorages.add(build(storage.getId()));
             }
         } else {
             for (Storage storage : repository.findAll()) {
-                buildedStorages.add((Storage) build(storage.getId()));
+                buildedStorages.add(build(storage.getId()));
             }
         }
 
@@ -146,8 +143,8 @@ public class GovernorOfStorage extends LordOfResources {
     }
 
     @Override
-    public void save(Resource resource) {
-        repository.save((Storage) resource);
+    public void save(Storage resource) {
+        repository.save(resource);
     }
 
     @Override
@@ -157,7 +154,8 @@ public class GovernorOfStorage extends LordOfResources {
             List<Storage> storages = server.getStorages();
             for (Storage storage : storages) {
                 if (storage.getId().equals(resourceId)) {
-                    throw new ParameterValidateException("Я нашла Server с ID " + server.getId() + ", именуемый " + server.getName() + ", так вот в нём имеется удаляемый Storage");
+                    throw new ParameterValidateException("Я нашла Server с ID " + server.getId()
+                            + ", именуемый " + server.getName() + ", так вот в нём имеется удаляемый Storage");
                 }
             }
         }

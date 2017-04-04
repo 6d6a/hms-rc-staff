@@ -6,7 +6,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -19,9 +18,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import ru.majordomo.hms.rc.staff.repositories.*;
 import ru.majordomo.hms.rc.staff.resources.*;
@@ -404,11 +401,7 @@ public class ServerRestControllerTest {
     public void filterActiveStorage() throws Exception {
         Server serverThatWeSearch = testServers.get(1);
 
-        MultiValueMap<String, String> keyValue = new LinkedMultiValueMap<>();
-        keyValue.set("server-id", serverThatWeSearch.getId());
-        keyValue.set("active-storage", "true");
-
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/filter").params(keyValue).accept(APPLICATION_JSON_UTF8);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + serverThatWeSearch.getId() + "/active-storage").accept(APPLICATION_JSON_UTF8);
         mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))

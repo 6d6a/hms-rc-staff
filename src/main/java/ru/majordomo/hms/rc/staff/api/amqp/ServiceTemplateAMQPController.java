@@ -40,7 +40,7 @@ public class ServiceTemplateAMQPController {
         ServiceMessage serviceReportMessage = new ServiceMessage();
 
         try {
-            ServiceTemplate serviceTemplate = (ServiceTemplate) governorOfServiceTemplate.createResource(serviceMessage);
+            ServiceTemplate serviceTemplate = governorOfServiceTemplate.createResource(serviceMessage);
             logger.info("service template успешно создан и сохранен");
             serviceReportMessage.setObjRef("http://" + applicationName + "/service-template/" + serviceTemplate.getId());
             serviceMessage.addParam("success", Boolean.TRUE);

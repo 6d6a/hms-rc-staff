@@ -294,5 +294,9 @@ public class ServiceRestControllerTest {
     @After
     public void cleanAll() {
         serviceRepository.deleteAll();
+        serviceTemplateRepository.deleteAll();
+        serviceTypeRepository.deleteAll();
+        serviceSocketRepository.deleteAll();
+        configTemplateRepository.deleteAll();
     }
 }

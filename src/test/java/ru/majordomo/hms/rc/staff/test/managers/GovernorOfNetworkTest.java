@@ -67,7 +67,7 @@ public class GovernorOfNetworkTest {
     public void create() {
         try {
             serviceMessage = createServiceMessage(name,switchedOn,address,mask,gatewayAddress,vlanNumber);
-            Network network = (Network) governorOfNetwork.createResource(serviceMessage);
+            Network network = governorOfNetwork.createResource(serviceMessage);
             Network network1 = networkRepository.findOne(network.getId());
             Assert.assertEquals("Имя сети, полученное из базы не совпадает с ожидаемым", name, network1.getName());
             Assert.assertEquals("Флаг switchedOn не совпадает с ожидаемым", switchedOn, network1.getSwitchedOn());
@@ -92,7 +92,7 @@ public class GovernorOfNetworkTest {
         network.setVlanNumber(vlanNumber);
         networkRepository.save(network);
 
-        Network buildedNetwork = (Network)governorOfNetwork.build(network.getId());
+        Network buildedNetwork = governorOfNetwork.build(network.getId());
         try {
             Assert.assertEquals("Имя сети, полученное из базы не совпадает с ожидаемым", name, buildedNetwork.getName());
             Assert.assertEquals("Флаг switchedOn не совпадает с ожидаемым", switchedOn, buildedNetwork.getSwitchedOn());
@@ -164,7 +164,7 @@ public class GovernorOfNetworkTest {
     @Test(expected = ParameterValidateException.class)
     public void validateWithInvalidAddress() throws ParameterValidateException {
         serviceMessage = createServiceMessage(name, switchedOn, address, mask, gatewayAddress, vlanNumber);
-        Network network = (Network) governorOfNetwork.createResource(serviceMessage);
+        Network network = governorOfNetwork.createResource(serviceMessage);
         network.setAddress(-1L);
         governorOfNetwork.isValid(network);
     }
@@ -172,7 +172,7 @@ public class GovernorOfNetworkTest {
     @Test(expected = ParameterValidateException.class)
     public void validateWithInvalidGatewayNotInNetwork() throws ParameterValidateException {
         serviceMessage = createServiceMessage(name, switchedOn, address, mask, gatewayAddress, 103);
-        Network network = (Network) governorOfNetwork.createResource(serviceMessage);
+        Network network = governorOfNetwork.createResource(serviceMessage);
         network.setGatewayAddress("10.10.10.1");
         governorOfNetwork.isValid(network);
     }
@@ -180,7 +180,7 @@ public class GovernorOfNetworkTest {
     @Test(expected = ParameterValidateException.class)
     public void validateWithMaskOutOfRange() throws ParameterValidateException {
         serviceMessage = createServiceMessage(name, switchedOn, address, mask, gatewayAddress, vlanNumber);
-        Network network = (Network) governorOfNetwork.createResource(serviceMessage);
+        Network network = governorOfNetwork.createResource(serviceMessage);
         network.setMask(101);
         governorOfNetwork.isValid(network);
     }
@@ -188,7 +188,7 @@ public class GovernorOfNetworkTest {
     @Test(expected = ParameterValidateException.class)
     public void validateWithVlanOutOfRange() throws ParameterValidateException {
         serviceMessage = createServiceMessage(name, switchedOn, address, mask, gatewayAddress, vlanNumber);
-        Network network = (Network) governorOfNetwork.createResource(serviceMessage);
+        Network network = governorOfNetwork.createResource(serviceMessage);
         network.setVlanNumber(-1);
         governorOfNetwork.isValid(network);
     }
