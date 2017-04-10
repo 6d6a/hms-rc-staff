@@ -24,6 +24,7 @@ plugins {
     id "org.asciidoctor.convert" version "1.5.2"
 }
 
+apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'docker'
@@ -31,12 +32,35 @@ apply plugin: 'docker-compose'
 apply plugin: 'ru.majordomo.gradle.plugins.copycompose'
 apply plugin: 'maven-publish'
 
+def versionPropsFile = file('version.properties')
+def versionBuild
+
+if (versionPropsFile.canRead()) {
+    def Properties versionProps = new Properties()
+    versionProps.load(new FileInputStream(versionPropsFile))
+    versionBuild = versionProps['VERSION_BUILD'].toInteger()
+} else {
+    throw new GradleException("Could not read version.properties!")
+}
+
+ext.autoIncrementBuildNumber = {
+    if (versionPropsFile.canRead()) {
+        def Properties versionProps = new Properties()
+        versionProps.load(new FileInputStream(versionPropsFile))
+        versionBuild = versionProps['VERSION_BUILD'].toInteger() + 1
+        versionProps['VERSION_BUILD'] = versionBuild.toString()
+        versionProps.store(versionPropsFile.newWriter(), null)
+    } else {
+        throw new GradleException("Could not read version.properties!")
+    }
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
             groupId 'ru.majordomo.hms.rc.staff'
             artifactId 'resources'
-            version '1.0.6.4'
+            version '1.1.' + versionBuild
             artifact resourceJar
         }
     }
@@ -114,4 +138,5 @@ clean.doFirst {
 }
 
 build.dependsOn("resourceJar")
+publish.doFirst autoIncrementBuildNumber
 apply from: "https://nexus.intr/repository/init/gradle-init/0.1/dockertask.gradle"
