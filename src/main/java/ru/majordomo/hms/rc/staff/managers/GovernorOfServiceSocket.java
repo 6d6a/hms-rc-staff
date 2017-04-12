@@ -84,7 +84,8 @@ public class GovernorOfServiceSocket extends LordOfResources<ServiceSocket> {
             }
         }
         if (!inRange) {
-            throw new ParameterValidateException("Адрес: " + address + " не принадлежит ни к одной известной сети");
+            //TODO вернуть после загрузки адресов
+//            throw new ParameterValidateException("Адрес: " + address + " не принадлежит ни к одной известной сети");
         }
         if (port < 1 || port > 65535) {
             throw new ParameterValidateException("Значение параметра port может находиться в пределах диапазоне 1-65535");
