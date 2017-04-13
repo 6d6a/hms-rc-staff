@@ -68,7 +68,7 @@ public class ServiceSocketDBImportService {
 
         String query = "SELECT nc.id, nc.server, nc.listen, nc.redir_to, nc.flag " +
                 "FROM nginx_conf nc " +
-                "WHERE nc.server = :server";
+                "WHERE nc.server = :server AND nc.flag != 'otd_ip'";
         SqlParameterSource namedParameters1 = new MapSqlParameterSource("server", rs.getString("name") + ".majordomo.ru");
 
         namedParameterJdbcTemplate.query(query,

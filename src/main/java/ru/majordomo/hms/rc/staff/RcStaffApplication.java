@@ -52,6 +52,6 @@ public class RcStaffApplication implements CommandLineRunner {
             }
         }
         sb = sb.length() == 0 ? sb.append("No Options Specified") : sb;
-        logger.info(String.format("Launched personal manager with following options: %s", sb.toString()));
+        logger.info(String.format("Launched application with following options: %s", sb.toString()));
     }
 }
