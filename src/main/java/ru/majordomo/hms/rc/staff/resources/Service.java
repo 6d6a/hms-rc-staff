@@ -95,4 +95,14 @@ public class Service extends Resource {
         return getServiceSocketIds() != null ? getServiceSocketIds().equals(service.getServiceSocketIds()) : service.getServiceSocketIds() == null;
 
     }
+
+    @Override
+    public String toString() {
+        return "Service{" +
+                "serviceTemplate=" + serviceTemplate +
+                ", serviceSockets=" + serviceSockets +
+                ", serviceTemplateId='" + serviceTemplateId + '\'' +
+                ", serviceSocketIds=" + serviceSocketIds +
+                "} " + super.toString();
+    }
 }

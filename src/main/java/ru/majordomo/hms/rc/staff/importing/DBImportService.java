@@ -13,18 +13,21 @@ public class DBImportService {
     private final ServiceTypeDBSeedService serviceTypeDBSeedService;
     private final ConfigTemplateDBSeedService configTemplateDBSeedService;
     private final ServiceTemplateDBSeedService serviceTemplateDBSeedService;
+    private final ServiceDBSeedService serviceDBSeedService;
 
     @Autowired
     public DBImportService(
             ServiceSocketDBImportService serviceSocketDBImportService,
             ServiceTypeDBSeedService serviceTypeDBSeedService,
             ConfigTemplateDBSeedService configTemplateDBSeedService,
-            ServiceTemplateDBSeedService serviceTemplateDBSeedService
+            ServiceTemplateDBSeedService serviceTemplateDBSeedService,
+            ServiceDBSeedService serviceDBSeedService
     ) {
         this.serviceSocketDBImportService = serviceSocketDBImportService;
         this.serviceTypeDBSeedService = serviceTypeDBSeedService;
         this.configTemplateDBSeedService = configTemplateDBSeedService;
         this.serviceTemplateDBSeedService = serviceTemplateDBSeedService;
+        this.serviceDBSeedService = serviceDBSeedService;
     }
 
     public boolean seedDB() {
@@ -38,6 +41,9 @@ public class DBImportService {
 
         seeded = serviceTemplateDBSeedService.seedDB();
         logger.debug(seeded ? "serviceTemplate db_seeded" : "serviceTemplate db_not_seeded");
+
+        seeded = serviceDBSeedService.seedDB();
+        logger.debug(seeded ? "service db_seeded" : "service db_not_seeded");
 
         return true;
     }

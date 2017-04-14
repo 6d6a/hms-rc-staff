@@ -64,4 +64,12 @@ public class ServiceSocket extends Resource {
         return getPort() != null ? getPort().equals(that.getPort()) : that.getPort() == null;
 
     }
+
+    @Override
+    public String toString() {
+        return "ServiceSocket{" +
+                "address=" + address +
+                ", port=" + port +
+                "} " + super.toString();
+    }
 }

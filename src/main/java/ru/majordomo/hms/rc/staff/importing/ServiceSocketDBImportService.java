@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.regex.Pattern;
 
 import ru.majordomo.hms.rc.staff.managers.GovernorOfServiceSocket;
 import ru.majordomo.hms.rc.staff.repositories.ServiceSocketRepository;
@@ -43,6 +42,12 @@ public class ServiceSocketDBImportService {
                 "GROUP BY a.server_id";
 
         namedParameterJdbcTemplate.query(query, this::rowMap);
+
+        query = "SELECT s.id, s.name, s.out_ip " +
+                "FROM db_servers s " +
+                "WHERE s.name LIKE 'mdb4' OR s.name LIKE 'web%'";
+
+        namedParameterJdbcTemplate.query(query, this::rowMapMysql);
     }
 
     private ServiceSocket rowMap(ResultSet rs, int rowNum ) throws SQLException {
@@ -76,7 +81,7 @@ public class ServiceSocketDBImportService {
                 (rs1 -> {
                     ServiceSocket apacheServiceSocket = new ServiceSocket();
                     apacheServiceSocket.setSwitchedOn(true);
-                    String defaultInName = rs1.getString("flag").matches(".*-.*") ? "" : "-default";
+                    String defaultInName = rs1.getString("flag").matches(".*-.*|.*perl.*") ? "" : "-default";
                     apacheServiceSocket.setName("apache2-" + rs1.getString("flag") + defaultInName + "-http@" + rs.getString("name"));
 
                     String[] redirTo = rs1.getString("redir_to").split(":");
@@ -87,6 +92,21 @@ public class ServiceSocketDBImportService {
                     governorOfServiceSocket.save(apacheServiceSocket);
                 })
         );
+
+        return null;
+    }
+
+    private ServiceSocket rowMapMysql(ResultSet rs, int rowNum ) throws SQLException {
+        logger.debug("Found DBserver: " + rs.getString("name"));
+
+        ServiceSocket serviceSocket = new ServiceSocket();
+        serviceSocket.setSwitchedOn(true);
+        serviceSocket.setName("mysql-mysql@" + rs.getString("name"));
+        serviceSocket.setAddress(rs.getString("out_ip"));
+        serviceSocket.setPort(3306);
+
+        governorOfServiceSocket.isValid(serviceSocket);
+        governorOfServiceSocket.save(serviceSocket);
 
         return null;
     }
