@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +42,9 @@ public class ServiceDBSeedService {
     public boolean seedDB() {
         serviceRepository.deleteAll();
 
-        this.seed();
+        seedTestData();
+
+        seed();
 
         return true;
     }
@@ -125,7 +129,36 @@ public class ServiceDBSeedService {
 
             logger.debug(service.toString());
         }
+    }
 
-//        });
+    private void seedTestData() {
+        Service service;
+
+        service = new Service();
+        service.setId("5821f7f796ccde0001c82a5f");
+        service.setSwitchedOn(true);
+        service.setName("nginx@web99");
+        service.setServiceTemplateId("5821f7d296ccde0001c82a5d");
+        service.setServiceSocketIds(Arrays.asList("5814a90d4cedfd113e883e65", "5814a90d4cedfd113e883e64"));
+
+        serviceRepository.save(service);
+
+        service = new Service();
+        service.setId("5824b75c96ccde0001c82a65");
+        service.setSwitchedOn(true);
+        service.setName("apache2-php56-default@web99");
+        service.setServiceTemplateId("5824b74996ccde0001c82a64");
+        service.setServiceSocketIds(Collections.singletonList("5824b63c96ccde0001c82a63"));
+
+        serviceRepository.save(service);
+
+        service = new Service();
+        service.setId("5836aea296ccde0001ddca65");
+        service.setSwitchedOn(true);
+        service.setName("mysql@web99");
+        service.setServiceTemplateId("5835c2d196ccde0001ddca63");
+        service.setServiceSocketIds(Collections.singletonList("5835c28d96ccde0001ddca61"));
+
+        serviceRepository.save(service);
     }
 }

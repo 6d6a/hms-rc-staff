@@ -14,6 +14,10 @@ public class DBImportService {
     private final ConfigTemplateDBSeedService configTemplateDBSeedService;
     private final ServiceTemplateDBSeedService serviceTemplateDBSeedService;
     private final ServiceDBSeedService serviceDBSeedService;
+    private final ServerRoleDBSeedService serverRoleDBSeedService;
+    private final StorageDBImportService storageDBImportService;
+    private final ServerDBImportService serverDBImportService;
+    private final NetworkDBSeedService networkDBSeedService;
 
     @Autowired
     public DBImportService(
@@ -21,17 +25,28 @@ public class DBImportService {
             ServiceTypeDBSeedService serviceTypeDBSeedService,
             ConfigTemplateDBSeedService configTemplateDBSeedService,
             ServiceTemplateDBSeedService serviceTemplateDBSeedService,
-            ServiceDBSeedService serviceDBSeedService
+            ServiceDBSeedService serviceDBSeedService,
+            ServerRoleDBSeedService serverRoleDBSeedService,
+            StorageDBImportService storageDBImportService,
+            ServerDBImportService serverDBImportService,
+            NetworkDBSeedService networkDBSeedService
     ) {
         this.serviceSocketDBImportService = serviceSocketDBImportService;
         this.serviceTypeDBSeedService = serviceTypeDBSeedService;
         this.configTemplateDBSeedService = configTemplateDBSeedService;
         this.serviceTemplateDBSeedService = serviceTemplateDBSeedService;
         this.serviceDBSeedService = serviceDBSeedService;
+        this.serverRoleDBSeedService = serverRoleDBSeedService;
+        this.storageDBImportService = storageDBImportService;
+        this.serverDBImportService = serverDBImportService;
+        this.networkDBSeedService = networkDBSeedService;
     }
 
     public boolean seedDB() {
         boolean seeded;
+
+        seeded = networkDBSeedService.seedDB();
+        logger.debug(seeded ? "network db_seeded" : "network db_not_seeded");
 
         seeded = serviceTypeDBSeedService.seedDB();
         logger.debug(seeded ? "serviceType db_seeded" : "serviceType db_not_seeded");
@@ -45,6 +60,9 @@ public class DBImportService {
         seeded = serviceDBSeedService.seedDB();
         logger.debug(seeded ? "service db_seeded" : "service db_not_seeded");
 
+        seeded = serverRoleDBSeedService.seedDB();
+        logger.debug(seeded ? "serverRole db_seeded" : "serverRole db_not_seeded");
+
         return true;
     }
 
@@ -53,6 +71,12 @@ public class DBImportService {
 
         imported = serviceSocketDBImportService.importToMongo();
         logger.debug(imported ? "serviceSocket db_imported" : "serviceSocket db_not_imported");
+
+        imported = storageDBImportService.importToMongo();
+        logger.debug(imported ? "storage db_imported" : "storage db_not_imported");
+
+        imported = serverDBImportService.importToMongo();
+        logger.debug(imported ? "server db_imported" : "server db_not_imported");
 
         return true;
     }

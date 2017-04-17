@@ -36,9 +36,12 @@ public class ServiceSocketDBImportService {
     }
 
     private void pull() {
+        seedTestData();
+
         String query = "SELECT s.id, s.name, s.proxy " +
                 "FROM servers s " +
                 "JOIN account a ON a.server_id=s.id " +
+                "WHERE s.name = 'baton' OR s.name LIKE 'web%'" +
                 "GROUP BY a.server_id";
 
         namedParameterJdbcTemplate.query(query, this::rowMap);
@@ -109,6 +112,50 @@ public class ServiceSocketDBImportService {
         governorOfServiceSocket.save(serviceSocket);
 
         return null;
+    }
+
+    private void seedTestData() {
+        ServiceSocket serviceSocket;
+
+        serviceSocket = new ServiceSocket();
+        serviceSocket.setId("5814a90d4cedfd113e883e65");
+        serviceSocket.setSwitchedOn(true);
+        serviceSocket.setName("nginx-http@web99");
+        serviceSocket.setAddress("127.0.0.1");
+        serviceSocket.setPort(80);
+
+        governorOfServiceSocket.isValid(serviceSocket);
+        governorOfServiceSocket.save(serviceSocket);
+
+        serviceSocket = new ServiceSocket();
+        serviceSocket.setId("5814a90d4cedfd113e883e64");
+        serviceSocket.setSwitchedOn(true);
+        serviceSocket.setName("nginx-https@web99");
+        serviceSocket.setAddress("127.0.0.1");
+        serviceSocket.setPort(443);
+
+        governorOfServiceSocket.isValid(serviceSocket);
+        governorOfServiceSocket.save(serviceSocket);
+
+        serviceSocket = new ServiceSocket();
+        serviceSocket.setId("5824b63c96ccde0001c82a63");
+        serviceSocket.setSwitchedOn(true);
+        serviceSocket.setName("apache2-php56-default-http@web99");
+        serviceSocket.setAddress("127.0.0.1");
+        serviceSocket.setPort(8056);
+
+        governorOfServiceSocket.isValid(serviceSocket);
+        governorOfServiceSocket.save(serviceSocket);
+
+        serviceSocket = new ServiceSocket();
+        serviceSocket.setId("5835c28d96ccde0001ddca61");
+        serviceSocket.setSwitchedOn(true);
+        serviceSocket.setName("mysql-mysql@web99");
+        serviceSocket.setAddress("127.0.0.1");
+        serviceSocket.setPort(3306);
+
+        governorOfServiceSocket.isValid(serviceSocket);
+        governorOfServiceSocket.save(serviceSocket);
     }
 
     public boolean importToMongo() {
