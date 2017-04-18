@@ -65,6 +65,8 @@ public class ServiceSocketDBImportService {
         governorOfServiceSocket.isValid(serviceSocket);
         governorOfServiceSocket.save(serviceSocket);
 
+        logger.debug(serviceSocket.toString());
+
         serviceSocket = new ServiceSocket();
         serviceSocket.setSwitchedOn(true);
         serviceSocket.setName("nginx-https@" + rs.getString("name"));
@@ -73,6 +75,8 @@ public class ServiceSocketDBImportService {
 
         governorOfServiceSocket.isValid(serviceSocket);
         governorOfServiceSocket.save(serviceSocket);
+
+        logger.debug(serviceSocket.toString());
 
         String query = "SELECT nc.id, nc.server, nc.listen, nc.redir_to, nc.flag " +
                 "FROM nginx_conf nc " +
@@ -93,6 +97,8 @@ public class ServiceSocketDBImportService {
 
                     governorOfServiceSocket.isValid(apacheServiceSocket);
                     governorOfServiceSocket.save(apacheServiceSocket);
+
+                    logger.debug(apacheServiceSocket.toString());
                 })
         );
 
@@ -110,6 +116,8 @@ public class ServiceSocketDBImportService {
 
         governorOfServiceSocket.isValid(serviceSocket);
         governorOfServiceSocket.save(serviceSocket);
+
+        logger.debug(serviceSocket.toString());
 
         return null;
     }

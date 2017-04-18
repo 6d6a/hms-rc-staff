@@ -57,6 +57,9 @@ public class DBImportService {
         seeded = serviceTemplateDBSeedService.seedDB();
         logger.debug(seeded ? "serviceTemplate db_seeded" : "serviceTemplate db_not_seeded");
 
+        seeded = serviceSocketDBImportService.importToMongo();
+        logger.debug(seeded ? "serviceSocket db_imported" : "serviceSocket db_not_imported");
+
         seeded = serviceDBSeedService.seedDB();
         logger.debug(seeded ? "service db_seeded" : "service db_not_seeded");
 
@@ -68,9 +71,6 @@ public class DBImportService {
 
     public boolean importToMongo() {
         boolean imported;
-
-        imported = serviceSocketDBImportService.importToMongo();
-        logger.debug(imported ? "serviceSocket db_imported" : "serviceSocket db_not_imported");
 
         imported = storageDBImportService.importToMongo();
         logger.debug(imported ? "storage db_imported" : "storage db_not_imported");

@@ -28,6 +28,9 @@ public class ServiceDBSeedService {
     private final ServiceTemplateRepository serviceTemplateRepository;
     private final ServiceSocketRepository serviceSocketRepository;
 
+    List<ServiceSocket> serviceSockets;
+    List<ServiceTemplate> serviceTemplates;
+
     @Autowired
     public ServiceDBSeedService(
             ServiceRepository serviceRepository,
@@ -42,6 +45,9 @@ public class ServiceDBSeedService {
     public boolean seedDB() {
         serviceRepository.deleteAll();
 
+        serviceSockets = serviceSocketRepository.findAll();
+        serviceTemplates = serviceTemplateRepository.findAll();
+
         seedTestData();
 
         seed();
@@ -50,10 +56,12 @@ public class ServiceDBSeedService {
     }
 
     private void seed() {
-        List<ServiceSocket> serviceSockets = serviceSocketRepository.findAll();
-        List<ServiceTemplate> serviceTemplates = serviceTemplateRepository.findAll();
-
         Map<String, List<ServiceSocket>> nginxSockets = new HashMap<>();
+
+        serviceSockets.removeAll(serviceSockets.stream()
+                .filter(serviceSocket -> serviceSocket.getName().contains("web99"))
+                .collect(Collectors.toList())
+        );
 
         for (ServiceSocket serviceSocket : serviceSockets.stream()
                 .filter(serviceSocket -> serviceSocket.getName().contains("nginx"))
@@ -126,7 +134,6 @@ public class ServiceDBSeedService {
                 serviceRepository.save(service);
             }
 
-
             logger.debug(service.toString());
         }
     }
@@ -138,7 +145,15 @@ public class ServiceDBSeedService {
         service.setId("5821f7f796ccde0001c82a5f");
         service.setSwitchedOn(true);
         service.setName("nginx@web99");
-        service.setServiceTemplateId("5821f7d296ccde0001c82a5d");
+        List<ServiceTemplate> serviceTemplatesFiltered = serviceTemplates
+                .stream()
+                .filter(serviceTemplate -> serviceTemplate.getName().equals("nginx"))
+                .collect(Collectors.toList());
+
+        if (!serviceTemplatesFiltered.isEmpty()) {
+            service.setServiceTemplateId(serviceTemplatesFiltered.get(0).getId());
+        }
+
         service.setServiceSocketIds(Arrays.asList("5814a90d4cedfd113e883e65", "5814a90d4cedfd113e883e64"));
 
         serviceRepository.save(service);
@@ -147,7 +162,16 @@ public class ServiceDBSeedService {
         service.setId("5824b75c96ccde0001c82a65");
         service.setSwitchedOn(true);
         service.setName("apache2-php56-default@web99");
-        service.setServiceTemplateId("5824b74996ccde0001c82a64");
+
+        serviceTemplatesFiltered = serviceTemplates
+                .stream()
+                .filter(serviceTemplate -> serviceTemplate.getName().equals("apache2-php56-default"))
+                .collect(Collectors.toList());
+
+        if (!serviceTemplatesFiltered.isEmpty()) {
+            service.setServiceTemplateId(serviceTemplatesFiltered.get(0).getId());
+        }
+
         service.setServiceSocketIds(Collections.singletonList("5824b63c96ccde0001c82a63"));
 
         serviceRepository.save(service);
@@ -156,7 +180,16 @@ public class ServiceDBSeedService {
         service.setId("5836aea296ccde0001ddca65");
         service.setSwitchedOn(true);
         service.setName("mysql@web99");
-        service.setServiceTemplateId("5835c2d196ccde0001ddca63");
+
+        serviceTemplatesFiltered = serviceTemplates
+                .stream()
+                .filter(serviceTemplate -> serviceTemplate.getName().equals("mysql"))
+                .collect(Collectors.toList());
+
+        if (!serviceTemplatesFiltered.isEmpty()) {
+            service.setServiceTemplateId(serviceTemplatesFiltered.get(0).getId());
+        }
+
         service.setServiceSocketIds(Collections.singletonList("5835c28d96ccde0001ddca61"));
 
         serviceRepository.save(service);

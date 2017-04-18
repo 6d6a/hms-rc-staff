@@ -79,10 +79,11 @@ public class ServerDBImportService {
     }
 
     private ServiceSocket rowMap(ResultSet rs, int rowNum ) throws SQLException {
-        logger.debug("Found WebStorage: " + rs.getString("name"));
+        logger.debug("Found WebServer: " + rs.getString("name"));
 
         String name = rs.getString("name");
         Server server = new Server();
+        server.setId("web_server_" + rs.getString("id"));
         server.setSwitchedOn(true);
         server.setName(name);
         server.setServiceIds(services
@@ -110,6 +111,7 @@ public class ServerDBImportService {
         logger.debug("Found PopServer: " + rs.getString("name"));
 
         Server server = new Server();
+        server.setId("mail_server_" + rs.getString("id"));
         server.setSwitchedOn(true);
         String[] name = rs.getString("name").split("\\.");
         server.setName(name[0]);
@@ -135,6 +137,7 @@ public class ServerDBImportService {
 
         server = new Server();
         server.setSwitchedOn(true);
+        server.setId("db_server_20");
         server.setName("mdb4");
         server.setServiceIds(services
                 .stream()
