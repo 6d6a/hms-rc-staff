@@ -34,7 +34,6 @@ public class ServiceTypeDBSeedService {
     private void seed() {
         Set<String> websiteServiceTypeNames = ImmutableSet.<String>builder()
                 .add("DATABASE_MYSQL")
-                .add("MAILBOX_DOVECOT")
                 .add("STAFF_NGINX")
                 .add("WEBSITE_APACHE2_PHP4_DEFAULT")
                 .add("WEBSITE_APACHE2_PHP4_UNSAFE")

@@ -42,11 +42,12 @@ public class StorageDBImportService {
 
         namedParameterJdbcTemplate.query(query, this::rowMap);
 
-        query = "SELECT p.id, p.name, p.homedir " +
+        query = "SELECT p.id, p.name, SUBSTRING_INDEX(SUBSTRING_INDEX(a.mailspool, '/', 9), '/', 2) as homedir " +
                 "FROM poppers p " +
                 "JOIN account a ON a.popper=p.id " +
-                "WHERE p.name != 'storage.din.ru'" +
-                "GROUP BY a.popper";
+                "WHERE p.name NOT IN ('storage.din.ru', 'pop3.majordomo.ru') " +
+                "AND a.mailspool NOT IN ('', '/mail', '/homebiga/mail') " +
+                "GROUP BY p.name, homedir";
 
         namedParameterJdbcTemplate.query(query, this::rowMapPop);
     }
@@ -75,11 +76,7 @@ public class StorageDBImportService {
         storage.setName(name[0]);
         storage.setCapacity(8.589934592E12);
         storage.setCapacityUsed(1.314914304E9);
-        String mountPoint = (rs.getString("homedir") == null ||
-                rs.getString("homedir").equals("")) ?
-                "/home" :
-                rs.getString("homedir");
-        storage.setMountPoint(mountPoint);
+        storage.setMountPoint(rs.getString("homedir"));
 
         storageRepository.save(storage);
 
