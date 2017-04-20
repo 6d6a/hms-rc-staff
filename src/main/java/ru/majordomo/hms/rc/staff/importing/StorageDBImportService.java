@@ -64,6 +64,17 @@ public class StorageDBImportService {
 
         storageRepository.save(storage);
 
+        if (!rs.getString("name").equals("baton")) {
+            storage = new Storage();
+            storage.setSwitchedOn(true);
+            storage.setName(rs.getString("name"));
+            storage.setCapacity(8.589934592E12);
+            storage.setCapacityUsed(1.314914304E9);
+            storage.setMountPoint("/mysql");
+
+            storageRepository.save(storage);
+        }
+
         return null;
     }
 
@@ -89,7 +100,7 @@ public class StorageDBImportService {
         storage = new Storage();
         storage.setSwitchedOn(true);
         storage.setName("mdb4");
-        storage.setMountPoint("/home");
+        storage.setMountPoint("/mysql");
         storage.setCapacity(8.589934592E12);
         storage.setCapacityUsed(1.314914304E9);
 
