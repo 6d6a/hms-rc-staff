@@ -52,7 +52,7 @@ public class ServerRoleDBSeedService {
                         )
                 )
                 .put("mail-storage", Collections.emptyList())
-                .put("database-server", Collections.singletonList("mysql"))
+                .put("mysql-database-server", Collections.singletonList("mysql"))
                 .build();
 
         List<ServiceTemplate> serviceTemplates = serviceTemplateRepository.findAll();

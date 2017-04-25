@@ -41,16 +41,19 @@ public class ServiceSocketDBImportService {
         String query = "SELECT s.id, s.name, s.proxy " +
                 "FROM servers s " +
                 "JOIN account a ON a.server_id=s.id " +
-                "WHERE s.name = 'baton' OR s.name LIKE 'web%'" +
+                "WHERE s.name = 'baton' OR s.name = 'staff' OR s.name = 'chucho' OR s.name LIKE 'web%'" +
                 "GROUP BY a.server_id";
 
         namedParameterJdbcTemplate.query(query, this::rowMap);
 
-        query = "SELECT s.id, s.name, s.out_ip " +
-                "FROM db_servers s " +
-                "WHERE s.name LIKE 'mdb4' OR s.name LIKE 'web%'";
+        query = "SELECT ds.id, ds.name, ds.out_ip, s.id as server_id " +
+                "FROM db_servers ds " +
+                "LEFT JOIN servers s ON ds.name=s.name " +
+                "WHERE ds.name LIKE 'mdb4' OR ds.name LIKE 'web%'";
 
         namedParameterJdbcTemplate.query(query, this::rowMapMysql);
+
+        seedStaffData();
     }
 
     private ServiceSocket rowMap(ResultSet rs, int rowNum ) throws SQLException {
@@ -109,6 +112,7 @@ public class ServiceSocketDBImportService {
         logger.debug("Found DBserver: " + rs.getString("name"));
 
         ServiceSocket serviceSocket = new ServiceSocket();
+        serviceSocket.setId(rs.getString("server_id") != null ? rs.getString("server_id") + "_mysql_socket" : rs.getString("id") + "_mysql_socket");
         serviceSocket.setSwitchedOn(true);
         serviceSocket.setName("mysql-mysql@" + rs.getString("name"));
         serviceSocket.setAddress(rs.getString("out_ip"));
@@ -120,6 +124,26 @@ public class ServiceSocketDBImportService {
         logger.debug(serviceSocket.toString());
 
         return null;
+    }
+
+    private void seedStaffData() {
+        ServiceSocket serviceSocket = new ServiceSocket();
+        serviceSocket.setSwitchedOn(true);
+        serviceSocket.setName("mysql-mysql@staff");
+        serviceSocket.setAddress("127.0.0.1");
+        serviceSocket.setPort(3306);
+
+        governorOfServiceSocket.isValid(serviceSocket);
+        governorOfServiceSocket.save(serviceSocket);
+
+        serviceSocket = new ServiceSocket();
+        serviceSocket.setSwitchedOn(true);
+        serviceSocket.setName("mysql-mysql@chucho");
+        serviceSocket.setAddress("127.0.0.1");
+        serviceSocket.setPort(3306);
+
+        governorOfServiceSocket.isValid(serviceSocket);
+        governorOfServiceSocket.save(serviceSocket);
     }
 
     private void seedTestData() {

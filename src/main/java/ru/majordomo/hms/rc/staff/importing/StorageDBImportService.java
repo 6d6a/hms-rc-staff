@@ -37,7 +37,7 @@ public class StorageDBImportService {
         String query = "SELECT s.id, s.name, s.home_base " +
                 "FROM servers s " +
                 "JOIN account a ON a.server_id=s.id " +
-                "WHERE s.name = 'baton' OR s.name LIKE 'web%'" +
+                "WHERE s.name = 'baton' OR s.name = 'staff' OR s.name = 'chucho' OR s.name LIKE 'web%'" +
                 "GROUP BY a.server_id";
 
         namedParameterJdbcTemplate.query(query, this::rowMap);

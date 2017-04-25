@@ -58,13 +58,13 @@ public class ServerDBImportService {
         serverRoles = serverRoleRepository.findAll();
         services = serviceRepository.findAll();
 
-        seedDBStorage();
+        seedDBServer();
         seedTestData();
 
         String query = "SELECT s.id, s.name, s.home_base " +
                 "FROM servers s " +
                 "JOIN account a ON a.server_id=s.id " +
-                "WHERE s.name = 'baton' OR s.name LIKE 'web%'" +
+                "WHERE s.name = 'baton' OR s.name = 'staff' OR s.name LIKE 'web%'" +
                 "GROUP BY a.server_id";
 
         namedParameterJdbcTemplate.query(query, this::rowMap);
@@ -93,7 +93,7 @@ public class ServerDBImportService {
                 .collect(Collectors.toList()));
         server.setServerRoleIds(serverRoles
                 .stream()
-                .filter(serverRole -> (serverRole.getName().equals("shared-hosting") || (!name.equals("baton") && serverRole.getName().equals("database-server"))))
+                .filter(serverRole -> (serverRole.getName().equals("shared-hosting") || (!name.equals("baton") && serverRole.getName().equals("mysql-database-server"))))
                 .map(Resource::getId)
                 .collect(Collectors.toList()));
         server.setStorageIds(storages
@@ -132,7 +132,7 @@ public class ServerDBImportService {
         return null;
     }
 
-    private void seedDBStorage() {
+    private void seedDBServer() {
         Server server;
 
         server = new Server();
@@ -146,7 +146,7 @@ public class ServerDBImportService {
                 .collect(Collectors.toList()));
         server.setServerRoleIds(serverRoles
                 .stream()
-                .filter(serverRole -> serverRole.getName().equals("database-server"))
+                .filter(serverRole -> serverRole.getName().equals("mysql-database-server"))
                 .map(Resource::getId)
                 .collect(Collectors.toList()));
         server.setStorageIds(storages
@@ -172,7 +172,7 @@ public class ServerDBImportService {
                 .collect(Collectors.toList()));
         server.setServerRoleIds(serverRoles
                 .stream()
-                .filter(serverRole -> (serverRole.getName().equals("shared-hosting") || serverRole.getName().equals("database-server")))
+                .filter(serverRole -> (serverRole.getName().equals("shared-hosting") || serverRole.getName().equals("mysql-database-server")))
                 .map(Resource::getId)
                 .collect(Collectors.toList()));
         server.setStorageIds(storages

@@ -28,8 +28,8 @@ public class ServiceDBSeedService {
     private final ServiceTemplateRepository serviceTemplateRepository;
     private final ServiceSocketRepository serviceSocketRepository;
 
-    List<ServiceSocket> serviceSockets;
-    List<ServiceTemplate> serviceTemplates;
+    private List<ServiceSocket> serviceSockets;
+    private List<ServiceTemplate> serviceTemplates;
 
     @Autowired
     public ServiceDBSeedService(
@@ -112,6 +112,10 @@ public class ServiceDBSeedService {
 
         for (ServiceSocket serviceSocket : serviceSockets) {
             Service service = new Service();
+            if (serviceSocket.getId().contains("_mysql_socket")) {
+                service.setId(serviceSocket.getId().replaceAll("_mysql_socket", "_mysql_service"));
+            }
+
             String[] names = serviceSocket.getName().split("@");
             names[0] = names[0]
                     .replaceAll("-https?", "")
