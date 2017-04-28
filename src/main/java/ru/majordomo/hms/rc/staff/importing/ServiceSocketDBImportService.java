@@ -128,6 +128,7 @@ public class ServiceSocketDBImportService {
 
     private void seedStaffData() {
         ServiceSocket serviceSocket = new ServiceSocket();
+        serviceSocket.setId("124_mysql_socket");
         serviceSocket.setSwitchedOn(true);
         serviceSocket.setName("mysql-mysql@staff");
         serviceSocket.setAddress("127.0.0.1");
@@ -137,6 +138,7 @@ public class ServiceSocketDBImportService {
         governorOfServiceSocket.save(serviceSocket);
 
         serviceSocket = new ServiceSocket();
+        serviceSocket.setId("5_mysql_socket");
         serviceSocket.setSwitchedOn(true);
         serviceSocket.setName("mysql-mysql@chucho");
         serviceSocket.setAddress("127.0.0.1");
