@@ -290,8 +290,10 @@ public class GovernorOfServer extends LordOfResources<Server> {
 
             Server server = build(keyValue.get("serverId"));
             for (Service service : server.getServices()) {
-                String[] parts = service.getServiceTemplate().getServiceType().getName().split("_");
-                if (keyValue.get("service-type").toUpperCase().equals(parts[0])) {
+                String serviceType = service.getServiceTemplate().getServiceType().getName();
+                String[] parts = serviceType.split("_");
+                if (keyValue.get("service-type").toUpperCase().equals(serviceType)
+                        || keyValue.get("service-type").toUpperCase().equals(parts[0])) {
                     services.add(service);
                 }
             }

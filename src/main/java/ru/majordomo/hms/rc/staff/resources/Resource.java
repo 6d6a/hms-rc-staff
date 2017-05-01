@@ -64,4 +64,13 @@ public abstract class Resource {
         return getSwitchedOn() != null ? getSwitchedOn().equals(resource.getSwitchedOn()) : resource.getSwitchedOn() == null;
 
     }
+
+    @Override
+    public String toString() {
+        return "Resource{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", switchedOn=" + switchedOn +
+                '}';
+    }
 }
