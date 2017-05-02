@@ -66,17 +66,17 @@ public class DBImportService {
         seeded = serverRoleDBSeedService.seedDB();
         logger.debug(seeded ? "serverRole db_seeded" : "serverRole db_not_seeded");
 
+        seeded = storageDBImportService.importToMongo();
+        logger.debug(seeded ? "storage db_imported" : "storage db_not_imported");
+
+        seeded = serverDBImportService.importToMongo();
+        logger.debug(seeded ? "server db_imported" : "server db_not_imported");
+
         return true;
     }
 
     public boolean importToMongo() {
         boolean imported;
-
-        imported = storageDBImportService.importToMongo();
-        logger.debug(imported ? "storage db_imported" : "storage db_not_imported");
-
-        imported = serverDBImportService.importToMongo();
-        logger.debug(imported ? "server db_imported" : "server db_not_imported");
 
         return true;
     }

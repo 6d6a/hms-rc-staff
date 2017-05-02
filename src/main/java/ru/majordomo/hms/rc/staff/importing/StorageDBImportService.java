@@ -75,6 +75,26 @@ public class StorageDBImportService {
             storageRepository.save(storage);
         }
 
+        if (rs.getString("name").equals("web35")) {
+            storage = new Storage();
+            storage.setSwitchedOn(true);
+            storage.setName("web36");
+            storage.setCapacity(8.589934592E12);
+            storage.setCapacityUsed(1.314914304E9);
+            storage.setMountPoint(rs.getString("home_base"));
+
+            storageRepository.save(storage);
+
+            storage = new Storage();
+            storage.setSwitchedOn(true);
+            storage.setName("web36");
+            storage.setCapacity(8.589934592E12);
+            storage.setCapacityUsed(1.314914304E9);
+            storage.setMountPoint("/mysql");
+
+            storageRepository.save(storage);
+        }
+
         return null;
     }
 

@@ -60,6 +60,7 @@ public class ServerRoleDBSeedService {
         serverRoleNamesWithServiceTemplates.forEach((name, serviceTemplateNames) -> {
             ServerRole serverRole = new ServerRole();
             serverRole.setName(name);
+            serverRole.setSwitchedOn(true);
 
             List<String> serviceTemplateIds = new ArrayList<>();
 
