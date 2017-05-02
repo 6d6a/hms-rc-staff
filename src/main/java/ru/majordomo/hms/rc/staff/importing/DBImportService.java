@@ -45,29 +45,29 @@ public class DBImportService {
     public boolean seedDB() {
         boolean seeded;
 
-        seeded = networkDBSeedService.seedDB();
-        logger.debug(seeded ? "network db_seeded" : "network db_not_seeded");
+//        seeded = networkDBSeedService.seedDB();
+//        logger.debug(seeded ? "network db_seeded" : "network db_not_seeded");
 
-        seeded = serviceTypeDBSeedService.seedDB();
-        logger.debug(seeded ? "serviceType db_seeded" : "serviceType db_not_seeded");
+//        seeded = serviceTypeDBSeedService.seedDB();
+//        logger.debug(seeded ? "serviceType db_seeded" : "serviceType db_not_seeded");
 
-        seeded = configTemplateDBSeedService.seedDB();
-        logger.debug(seeded ? "configTemplate db_seeded" : "configTemplate db_not_seeded");
+//        seeded = configTemplateDBSeedService.seedDB();
+//        logger.debug(seeded ? "configTemplate db_seeded" : "configTemplate db_not_seeded");
 
-        seeded = serviceTemplateDBSeedService.seedDB();
-        logger.debug(seeded ? "serviceTemplate db_seeded" : "serviceTemplate db_not_seeded");
+//        seeded = serviceTemplateDBSeedService.seedDB();
+//        logger.debug(seeded ? "serviceTemplate db_seeded" : "serviceTemplate db_not_seeded");
 
-        seeded = serviceSocketDBImportService.importToMongo();
-        logger.debug(seeded ? "serviceSocket db_imported" : "serviceSocket db_not_imported");
+//        seeded = serviceSocketDBImportService.importToMongo();
+//        logger.debug(seeded ? "serviceSocket db_imported" : "serviceSocket db_not_imported");
 
-        seeded = serviceDBSeedService.seedDB();
-        logger.debug(seeded ? "service db_seeded" : "service db_not_seeded");
+//        seeded = serviceDBSeedService.seedDB();
+//        logger.debug(seeded ? "service db_seeded" : "service db_not_seeded");
 
         seeded = serverRoleDBSeedService.seedDB();
         logger.debug(seeded ? "serverRole db_seeded" : "serverRole db_not_seeded");
 
-        seeded = storageDBImportService.importToMongo();
-        logger.debug(seeded ? "storage db_imported" : "storage db_not_imported");
+//        seeded = storageDBImportService.importToMongo();
+//        logger.debug(seeded ? "storage db_imported" : "storage db_not_imported");
 
         seeded = serverDBImportService.importToMongo();
         logger.debug(seeded ? "server db_imported" : "server db_not_imported");

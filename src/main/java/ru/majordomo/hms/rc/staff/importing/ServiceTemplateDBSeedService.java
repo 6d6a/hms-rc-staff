@@ -60,7 +60,8 @@ public class ServiceTemplateDBSeedService {
                         "{config_base_path}/modules_conf.conf",
                         "{config_base_path}/modules_load.conf",
                         "/opt/{interpreter.name}{interpreter.version_major}{interpreter.version_minor}/etc/{name}/php.ini",
-                        "/etc/init/{name}.conf"
+                        "/etc/init/{name}.conf",
+                        "/etc/{name}/sites-available/000-default-vhost.conf"
                         )
                 )
                 .put("apache2-php4-unsafe:WEBSITE_APACHE2_PHP4_UNSAFE", Arrays.asList(
@@ -69,7 +70,8 @@ public class ServiceTemplateDBSeedService {
                         "{config_base_path}/modules_conf.conf",
                         "{config_base_path}/modules_load.conf",
                         "/opt/{interpreter.name}{interpreter.version_major}{interpreter.version_minor}/etc/{name}/php.ini",
-                        "/etc/init/{name}.conf"
+                        "/etc/init/{name}.conf",
+                        "/etc/{name}/sites-available/000-default-vhost.conf"
                 ))
                 .put("apache2-php4-hardened_nochmod:WEBSITE_APACHE2_PHP4_HARDENED_NOCHMOD", Arrays.asList(
                         "@ApacheVHost",
@@ -77,7 +79,8 @@ public class ServiceTemplateDBSeedService {
                         "{config_base_path}/modules_conf.conf",
                         "{config_base_path}/modules_load.conf",
                         "/opt/{interpreter.name}{interpreter.version_major}{interpreter.version_minor}/etc/{name}/php.ini",
-                        "/etc/init/{name}.conf"
+                        "/etc/init/{name}.conf",
+                        "/etc/{name}/sites-available/000-default-vhost.conf"
                 ))
                 .put("apache2-php4-hardened:WEBSITE_APACHE2_PHP4_HARDENED", Arrays.asList(
                         "@ApacheVHost",
@@ -85,7 +88,8 @@ public class ServiceTemplateDBSeedService {
                         "{config_base_path}/modules_conf.conf",
                         "{config_base_path}/modules_load.conf",
                         "/opt/{interpreter.name}{interpreter.version_major}{interpreter.version_minor}/etc/{name}/php.ini",
-                        "/etc/init/{name}.conf"
+                        "/etc/init/{name}.conf",
+                        "/etc/{name}/sites-available/000-default-vhost.conf"
                 ))
                 .put("apache2-php52-default:WEBSITE_APACHE2_PHP52_DEFAULT", Arrays.asList(
                         "@ApacheVHost",
@@ -93,7 +97,8 @@ public class ServiceTemplateDBSeedService {
                         "{config_base_path}/modules_conf.conf",
                         "{config_base_path}/modules_load.conf",
                         "/opt/{interpreter.name}{interpreter.version_major}{interpreter.version_minor}/etc/{name}/php.ini",
-                        "/etc/init/{name}.conf"
+                        "/etc/init/{name}.conf",
+                        "/etc/{name}/sites-available/000-default-vhost.conf"
                 ))
                 .put("apache2-php52-unsafe:WEBSITE_APACHE2_PHP52_UNSAFE", Arrays.asList(
                         "@ApacheVHost",
@@ -101,7 +106,8 @@ public class ServiceTemplateDBSeedService {
                         "{config_base_path}/modules_conf.conf",
                         "{config_base_path}/modules_load.conf",
                         "/opt/{interpreter.name}{interpreter.version_major}{interpreter.version_minor}/etc/{name}/php.ini",
-                        "/etc/init/{name}.conf"
+                        "/etc/init/{name}.conf",
+                        "/etc/{name}/sites-available/000-default-vhost.conf"
                 ))
                 .put("apache2-php52-hardened_nochmod:WEBSITE_APACHE2_PHP52_HARDENED_NOCHMOD", Arrays.asList(
                         "@ApacheVHost",
@@ -109,7 +115,8 @@ public class ServiceTemplateDBSeedService {
                         "{config_base_path}/modules_conf.conf",
                         "{config_base_path}/modules_load.conf",
                         "/opt/{interpreter.name}{interpreter.version_major}{interpreter.version_minor}/etc/{name}/php.ini",
-                        "/etc/init/{name}.conf"
+                        "/etc/init/{name}.conf",
+                        "/etc/{name}/sites-available/000-default-vhost.conf"
                 ))
                 .put("apache2-php52-hardened:WEBSITE_APACHE2_PHP52_HARDENED", Arrays.asList(
                         "@ApacheVHost",
@@ -117,7 +124,8 @@ public class ServiceTemplateDBSeedService {
                         "{config_base_path}/modules_conf.conf",
                         "{config_base_path}/modules_load.conf",
                         "/opt/{interpreter.name}{interpreter.version_major}{interpreter.version_minor}/etc/{name}/php.ini",
-                        "/etc/init/{name}.conf"
+                        "/etc/init/{name}.conf",
+                        "/etc/{name}/sites-available/000-default-vhost.conf"
                 ))
                 .put("apache2-php53-default:WEBSITE_APACHE2_PHP53_DEFAULT", Arrays.asList(
                         "@ApacheVHost",
@@ -125,7 +133,8 @@ public class ServiceTemplateDBSeedService {
                         "{config_base_path}/modules_conf.conf",
                         "{config_base_path}/modules_load.conf",
                         "/opt/{interpreter.name}{interpreter.version_major}{interpreter.version_minor}/etc/{name}/php.ini",
-                        "/etc/init/{name}.conf"
+                        "/etc/init/{name}.conf",
+                        "/etc/{name}/sites-available/000-default-vhost.conf"
                 ))
                 .put("apache2-php53-unsafe:WEBSITE_APACHE2_PHP53_UNSAFE", Arrays.asList(
                         "@ApacheVHost",
@@ -133,7 +142,8 @@ public class ServiceTemplateDBSeedService {
                         "{config_base_path}/modules_conf.conf",
                         "{config_base_path}/modules_load.conf",
                         "/opt/{interpreter.name}{interpreter.version_major}{interpreter.version_minor}/etc/{name}/php.ini",
-                        "/etc/init/{name}.conf"
+                        "/etc/init/{name}.conf",
+                        "/etc/{name}/sites-available/000-default-vhost.conf"
                 ))
                 .put("apache2-php53-hardened_nochmod:WEBSITE_APACHE2_PHP53_HARDENED_NOCHMOD", Arrays.asList(
                         "@ApacheVHost",
@@ -141,7 +151,8 @@ public class ServiceTemplateDBSeedService {
                         "{config_base_path}/modules_conf.conf",
                         "{config_base_path}/modules_load.conf",
                         "/opt/{interpreter.name}{interpreter.version_major}{interpreter.version_minor}/etc/{name}/php.ini",
-                        "/etc/init/{name}.conf"
+                        "/etc/init/{name}.conf",
+                        "/etc/{name}/sites-available/000-default-vhost.conf"
                 ))
                 .put("apache2-php53-hardened:WEBSITE_APACHE2_PHP53_HARDENED", Arrays.asList(
                         "@ApacheVHost",
@@ -149,7 +160,8 @@ public class ServiceTemplateDBSeedService {
                         "{config_base_path}/modules_conf.conf",
                         "{config_base_path}/modules_load.conf",
                         "/opt/{interpreter.name}{interpreter.version_major}{interpreter.version_minor}/etc/{name}/php.ini",
-                        "/etc/init/{name}.conf"
+                        "/etc/init/{name}.conf",
+                        "/etc/{name}/sites-available/000-default-vhost.conf"
                 ))
                 .put("apache2-php54-default:WEBSITE_APACHE2_PHP54_DEFAULT", Arrays.asList(
                         "@ApacheVHost",
@@ -157,7 +169,8 @@ public class ServiceTemplateDBSeedService {
                         "{config_base_path}/modules_conf.conf",
                         "{config_base_path}/modules_load.conf",
                         "/opt/{interpreter.name}{interpreter.version_major}{interpreter.version_minor}/etc/{name}/php.ini",
-                        "/etc/init/{name}.conf"
+                        "/etc/init/{name}.conf",
+                        "/etc/{name}/sites-available/000-default-vhost.conf"
                 ))
                 .put("apache2-php54-unsafe:WEBSITE_APACHE2_PHP54_UNSAFE", Arrays.asList(
                         "@ApacheVHost",
@@ -165,7 +178,8 @@ public class ServiceTemplateDBSeedService {
                         "{config_base_path}/modules_conf.conf",
                         "{config_base_path}/modules_load.conf",
                         "/opt/{interpreter.name}{interpreter.version_major}{interpreter.version_minor}/etc/{name}/php.ini",
-                        "/etc/init/{name}.conf"
+                        "/etc/init/{name}.conf",
+                        "/etc/{name}/sites-available/000-default-vhost.conf"
                 ))
                 .put("apache2-php54-hardened_nochmod:WEBSITE_APACHE2_PHP54_HARDENED_NOCHMOD", Arrays.asList(
                         "@ApacheVHost",
@@ -173,7 +187,8 @@ public class ServiceTemplateDBSeedService {
                         "{config_base_path}/modules_conf.conf",
                         "{config_base_path}/modules_load.conf",
                         "/opt/{interpreter.name}{interpreter.version_major}{interpreter.version_minor}/etc/{name}/php.ini",
-                        "/etc/init/{name}.conf"
+                        "/etc/init/{name}.conf",
+                        "/etc/{name}/sites-available/000-default-vhost.conf"
                 ))
                 .put("apache2-php54-hardened:WEBSITE_APACHE2_PHP54_HARDENED", Arrays.asList(
                         "@ApacheVHost",
@@ -181,7 +196,8 @@ public class ServiceTemplateDBSeedService {
                         "{config_base_path}/modules_conf.conf",
                         "{config_base_path}/modules_load.conf",
                         "/opt/{interpreter.name}{interpreter.version_major}{interpreter.version_minor}/etc/{name}/php.ini",
-                        "/etc/init/{name}.conf"
+                        "/etc/init/{name}.conf",
+                        "/etc/{name}/sites-available/000-default-vhost.conf"
                 ))
                 .put("apache2-php55-default:WEBSITE_APACHE2_PHP55_DEFAULT", Arrays.asList(
                         "@ApacheVHost",
@@ -189,7 +205,8 @@ public class ServiceTemplateDBSeedService {
                         "{config_base_path}/modules_conf.conf",
                         "{config_base_path}/modules_load.conf",
                         "/opt/{interpreter.name}{interpreter.version_major}{interpreter.version_minor}/etc/{name}/php.ini",
-                        "/etc/init/{name}.conf"
+                        "/etc/init/{name}.conf",
+                        "/etc/{name}/sites-available/000-default-vhost.conf"
                 ))
                 .put("apache2-php55-unsafe:WEBSITE_APACHE2_PHP55_UNSAFE", Arrays.asList(
                         "@ApacheVHost",
@@ -197,7 +214,8 @@ public class ServiceTemplateDBSeedService {
                         "{config_base_path}/modules_conf.conf",
                         "{config_base_path}/modules_load.conf",
                         "/opt/{interpreter.name}{interpreter.version_major}{interpreter.version_minor}/etc/{name}/php.ini",
-                        "/etc/init/{name}.conf"
+                        "/etc/init/{name}.conf",
+                        "/etc/{name}/sites-available/000-default-vhost.conf"
                 ))
                 .put("apache2-php55-hardened_nochmod:WEBSITE_APACHE2_PHP55_HARDENED_NOCHMOD", Arrays.asList(
                         "@ApacheVHost",
@@ -205,7 +223,8 @@ public class ServiceTemplateDBSeedService {
                         "{config_base_path}/modules_conf.conf",
                         "{config_base_path}/modules_load.conf",
                         "/opt/{interpreter.name}{interpreter.version_major}{interpreter.version_minor}/etc/{name}/php.ini",
-                        "/etc/init/{name}.conf"
+                        "/etc/init/{name}.conf",
+                        "/etc/{name}/sites-available/000-default-vhost.conf"
                 ))
                 .put("apache2-php55-hardened:WEBSITE_APACHE2_PHP55_HARDENED", Arrays.asList(
                         "@ApacheVHost",
@@ -213,7 +232,8 @@ public class ServiceTemplateDBSeedService {
                         "{config_base_path}/modules_conf.conf",
                         "{config_base_path}/modules_load.conf",
                         "/opt/{interpreter.name}{interpreter.version_major}{interpreter.version_minor}/etc/{name}/php.ini",
-                        "/etc/init/{name}.conf"
+                        "/etc/init/{name}.conf",
+                        "/etc/{name}/sites-available/000-default-vhost.conf"
                 ))
                 .put("apache2-php56-default:WEBSITE_APACHE2_PHP56_DEFAULT", Arrays.asList(
                         "@ApacheVHost",
@@ -221,7 +241,8 @@ public class ServiceTemplateDBSeedService {
                         "{config_base_path}/modules_conf.conf",
                         "{config_base_path}/modules_load.conf",
                         "/opt/{interpreter.name}{interpreter.version_major}{interpreter.version_minor}/etc/{name}/php.ini",
-                        "/etc/init/{name}.conf"
+                        "/etc/init/{name}.conf",
+                        "/etc/{name}/sites-available/000-default-vhost.conf"
                 ))
                 .put("apache2-php56-unsafe:WEBSITE_APACHE2_PHP56_UNSAFE", Arrays.asList(
                         "@ApacheVHost",
@@ -229,7 +250,8 @@ public class ServiceTemplateDBSeedService {
                         "{config_base_path}/modules_conf.conf",
                         "{config_base_path}/modules_load.conf",
                         "/opt/{interpreter.name}{interpreter.version_major}{interpreter.version_minor}/etc/{name}/php.ini",
-                        "/etc/init/{name}.conf"
+                        "/etc/init/{name}.conf",
+                        "/etc/{name}/sites-available/000-default-vhost.conf"
                 ))
                 .put("apache2-php56-hardened_nochmod:WEBSITE_APACHE2_PHP56_HARDENED_NOCHMOD", Arrays.asList(
                         "@ApacheVHost",
@@ -237,7 +259,8 @@ public class ServiceTemplateDBSeedService {
                         "{config_base_path}/modules_conf.conf",
                         "{config_base_path}/modules_load.conf",
                         "/opt/{interpreter.name}{interpreter.version_major}{interpreter.version_minor}/etc/{name}/php.ini",
-                        "/etc/init/{name}.conf"
+                        "/etc/init/{name}.conf",
+                        "/etc/{name}/sites-available/000-default-vhost.conf"
                 ))
                 .put("apache2-php56-hardened:WEBSITE_APACHE2_PHP56_HARDENED", Arrays.asList(
                         "@ApacheVHost",
@@ -245,7 +268,8 @@ public class ServiceTemplateDBSeedService {
                         "{config_base_path}/modules_conf.conf",
                         "{config_base_path}/modules_load.conf",
                         "/opt/{interpreter.name}{interpreter.version_major}{interpreter.version_minor}/etc/{name}/php.ini",
-                        "/etc/init/{name}.conf"
+                        "/etc/init/{name}.conf",
+                        "/etc/{name}/sites-available/000-default-vhost.conf"
                 ))
                 .put("apache2-php70-default:WEBSITE_APACHE2_PHP70_DEFAULT", Arrays.asList(
                         "@ApacheVHost",
@@ -253,7 +277,8 @@ public class ServiceTemplateDBSeedService {
                         "{config_base_path}/modules_conf.conf",
                         "{config_base_path}/modules_load.conf",
                         "/opt/{interpreter.name}{interpreter.version_major}{interpreter.version_minor}/etc/{name}/php.ini",
-                        "/etc/init/{name}.conf"
+                        "/etc/init/{name}.conf",
+                        "/etc/{name}/sites-available/000-default-vhost.conf"
                 ))
                 .put("apache2-php70-unsafe:WEBSITE_APACHE2_PHP70_UNSAFE", Arrays.asList(
                         "@ApacheVHost",
@@ -261,7 +286,8 @@ public class ServiceTemplateDBSeedService {
                         "{config_base_path}/modules_conf.conf",
                         "{config_base_path}/modules_load.conf",
                         "/opt/{interpreter.name}{interpreter.version_major}{interpreter.version_minor}/etc/{name}/php.ini",
-                        "/etc/init/{name}.conf"
+                        "/etc/init/{name}.conf",
+                        "/etc/{name}/sites-available/000-default-vhost.conf"
                 ))
                 .put("apache2-php70-hardened_nochmod:WEBSITE_APACHE2_PHP70_HARDENED_NOCHMOD", Arrays.asList(
                         "@ApacheVHost",
@@ -269,7 +295,8 @@ public class ServiceTemplateDBSeedService {
                         "{config_base_path}/modules_conf.conf",
                         "{config_base_path}/modules_load.conf",
                         "/opt/{interpreter.name}{interpreter.version_major}{interpreter.version_minor}/etc/{name}/php.ini",
-                        "/etc/init/{name}.conf"
+                        "/etc/init/{name}.conf",
+                        "/etc/{name}/sites-available/000-default-vhost.conf"
                 ))
                 .put("apache2-php70-hardened:WEBSITE_APACHE2_PHP70_HARDENED", Arrays.asList(
                         "@ApacheVHost",
@@ -277,7 +304,8 @@ public class ServiceTemplateDBSeedService {
                         "{config_base_path}/modules_conf.conf",
                         "{config_base_path}/modules_load.conf",
                         "/opt/{interpreter.name}{interpreter.version_major}{interpreter.version_minor}/etc/{name}/php.ini",
-                        "/etc/init/{name}.conf"
+                        "/etc/init/{name}.conf",
+                        "/etc/{name}/sites-available/000-default-vhost.conf"
                 ))
                 .put("apache2-perl518:WEBSITE_APACHE2_PERL518", Arrays.asList(
                         "@ApacheVHost",
@@ -285,7 +313,8 @@ public class ServiceTemplateDBSeedService {
                         "{config_base_path}/modules_conf.conf",
                         "{config_base_path}/modules_load.conf",
                         "/opt/{interpreter.name}{interpreter.version_major}{interpreter.version_minor}/etc/{name}/php.ini",
-                        "/etc/init/{name}.conf"
+                        "/etc/init/{name}.conf",
+                        "/etc/{name}/sites-available/000-default-vhost.conf"
                 ))
                 .build();
 
