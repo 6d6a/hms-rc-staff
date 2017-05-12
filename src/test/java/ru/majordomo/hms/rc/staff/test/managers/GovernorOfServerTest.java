@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
+import ru.majordomo.hms.rc.staff.event.server.listener.ServerMongoEventListener;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfServer;
 import ru.majordomo.hms.rc.staff.repositories.*;
@@ -16,18 +17,24 @@ import ru.majordomo.hms.rc.staff.resources.*;
 import ru.majordomo.hms.rc.staff.test.config.ConfigOfGovernors;
 import ru.majordomo.hms.rc.staff.test.config.EmbeddedServletContainerConfig;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
+import ru.majordomo.hms.rc.staff.test.config.ValidationConfig;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.validation.ConstraintViolationException;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(
         classes = {
                 RepositoriesConfig.class,
                 ConfigOfGovernors.class,
-                EmbeddedServletContainerConfig.class
+                EmbeddedServletContainerConfig.class,
+                ValidationConfig.class,
+                ServerMongoEventListener.class
         },
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = {
@@ -59,12 +66,16 @@ public class GovernorOfServerTest {
 
     private ServiceMessage generateServiceMessage(String name, Boolean switchedOn,
                                                   List<Service> services, List<ServerRole> serverRoles, List<Storage> storages) {
+        List<String> serviceIds = services.stream().map(Resource::getId).collect(Collectors.toList());
+        List<String> serverRoleIds = serverRoles.stream().map(Resource::getId).collect(Collectors.toList());
+        List<String> storageIds = storages.stream().map(Resource::getId).collect(Collectors.toList());
+
         ServiceMessage serviceMessage = new ServiceMessage();
         serviceMessage.addParam("name", name);
         serviceMessage.addParam("switchedOn", switchedOn);
-        serviceMessage.addParam("services", services);
-        serviceMessage.addParam("serverRoles", serverRoles);
-        serviceMessage.addParam("storages", storages);
+        serviceMessage.addParam("serviceIds", serviceIds);
+        serviceMessage.addParam("serverRoleIds", serverRoleIds);
+        serviceMessage.addParam("storageIds", storageIds);
 
         return serviceMessage;
     }
@@ -207,46 +218,46 @@ public class GovernorOfServerTest {
         Assert.assertNotNull(buildedStorage);
     }
 
-    @Test(expected = ParameterValidateException.class)
-    public void createWithUnknownService() throws ParameterValidateException {
+    @Test(expected = ConstraintViolationException.class)
+    public void createWithUnknownService() {
         List<String> unknownService = new ArrayList<>();
         unknownService.add(ObjectId.get().toString());
-        testServiceMessage.addParam("services", unknownService);
+        testServiceMessage.addParam("serviceIds", unknownService);
         governor.createResource(testServiceMessage);
     }
 
-    @Test(expected = ParameterValidateException.class)
-    public void validateWithEmptyService() throws ParameterValidateException {
+    @Test(expected = ConstraintViolationException.class)
+    public void validateWithEmptyService() {
         List<Service> emptyService = new ArrayList<>();
         testServer.setServices(emptyService);
         governor.isValid(testServer);
     }
 
-    @Test(expected = ParameterValidateException.class)
-    public void createWithUnknownStorage() throws ParameterValidateException {
+    @Test(expected = ConstraintViolationException.class)
+    public void createWithUnknownStorage() {
         List<String> unknownStorage = new ArrayList<>();
         unknownStorage.add(ObjectId.get().toString());
-        testServiceMessage.addParam("storages", unknownStorage);
+        testServiceMessage.addParam("storageIds", unknownStorage);
         governor.createResource(testServiceMessage);
     }
 
-    @Test(expected = ParameterValidateException.class)
-    public void validateWithEmptyStorage() throws ParameterValidateException {
+    @Test(expected = ConstraintViolationException.class)
+    public void validateWithEmptyStorage() {
         List<Storage> emptyStorage = new ArrayList<>();
         testServer.setStorages(emptyStorage);
         governor.isValid(testServer);
     }
 
-    @Test(expected = ParameterValidateException.class)
-    public void createWithUnknownServerRole() throws ParameterValidateException {
+    @Test(expected = ConstraintViolationException.class)
+    public void createWithUnknownServerRole() {
         List<String> unknownServerRoles = new ArrayList<>();
         unknownServerRoles.add(ObjectId.get().toString());
-        testServiceMessage.addParam("serverRoles", unknownServerRoles);
+        testServiceMessage.addParam("serverRoleIds", unknownServerRoles);
         governor.createResource(testServiceMessage);
     }
 
-    @Test(expected = ParameterValidateException.class)
-    public void validateWithEmptyServerRoles() throws ParameterValidateException {
+    @Test(expected = ConstraintViolationException.class)
+    public void validateWithEmptyServerRoles() {
         List<ServerRole> emptyserverRoles = new ArrayList<>();
         testServer.setServerRoles(emptyserverRoles);
         governor.isValid(testServer);

@@ -7,6 +7,11 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
 
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.resources.*;
@@ -14,29 +19,19 @@ import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.repositories.ServiceRepository;
+import ru.majordomo.hms.rc.staff.resources.validation.group.ServiceChecks;
 
 @Component
 public class GovernorOfService extends LordOfResources<Service> {
 
     private ServiceRepository repository;
-    private GovernorOfServiceTemplate governorOfServiceTemplate;
-    private GovernorOfServiceSocket governorOfServiceSocket;
     private GovernorOfServer governorOfServer;
     private Cleaner cleaner;
+    private Validator validator;
 
     @Autowired
     public void setRepository(ServiceRepository repository) {
         this.repository = repository;
-    }
-
-    @Autowired
-    public void setGovernorOfServiceTemplate(GovernorOfServiceTemplate governorOfServiceTemplate) {
-        this.governorOfServiceTemplate = governorOfServiceTemplate;
-    }
-
-    @Autowired
-    public void setGovernorOfServiceSocket(GovernorOfServiceSocket governorOfServiceSocket) {
-        this.governorOfServiceSocket = governorOfServiceSocket;
     }
 
     @Autowired
@@ -49,15 +44,20 @@ public class GovernorOfService extends LordOfResources<Service> {
         this.cleaner = cleaner;
     }
 
+    @Autowired
+    public void setValidator(Validator validator) {
+        this.validator = validator;
+    }
+
     @Override
     public Service createResource(ServiceMessage serviceMessage) throws ParameterValidateException {
         Service service = new Service();
         try {
             LordOfResources.setResourceParams(service, serviceMessage, cleaner);
-            ServiceTemplate serviceTemplate = (ServiceTemplate) serviceMessage.getParam("serviceTemplate");
-            @SuppressWarnings("unchecked") List<ServiceSocket> serviceSockets = (List<ServiceSocket>) serviceMessage.getParam("serviceSockets");
-            service.setServiceTemplate(serviceTemplate);
-            service.setServiceSockets(serviceSockets);
+            String serviceTemplateId = (String) serviceMessage.getParam("serviceTemplateId");
+            @SuppressWarnings("unchecked") List<String> serviceSocketIds = (List<String>) serviceMessage.getParam("serviceSocketIds");
+            service.setServiceTemplateId(serviceTemplateId);
+            service.setServiceSocketIds(serviceSocketIds);
             isValid(service);
             save(service);
         } catch (ClassCastException e) {
@@ -68,35 +68,13 @@ public class GovernorOfService extends LordOfResources<Service> {
 
 
     @Override
-    public void isValid(Service resource) throws ParameterValidateException {
-        if (resource.getServiceTemplate() == null || resource.getServiceTemplate().getId() == null || resource.getServiceTemplateId() == null) {
-            throw new ParameterValidateException("Отсутствует ServiceTemplate");
-        }
-        if (resource.getServiceSockets().isEmpty() || resource.getServiceSocketIds().isEmpty()) {
-            throw new ParameterValidateException("Не найден ни один ServiceSocket");
-        }
+    public void isValid(Service service) throws ParameterValidateException {
+        Set<ConstraintViolation<Service>> constraintViolations = validator.validate(service, ServiceChecks.class);
 
-        //Валидация ServiceTemplate
-        ServiceTemplate serviceTemplateToValidate = resource.getServiceTemplate();
-        ServiceTemplate serviceTemplateFromRepository = governorOfServiceTemplate.build(serviceTemplateToValidate.getId());
-        if (serviceTemplateFromRepository == null) {
-            throw new ParameterValidateException("ServiceTemplate с ID: " + serviceTemplateToValidate.getId() + " не найден");
+        if (!constraintViolations.isEmpty()) {
+            logger.error("service: " + service + " constraintViolations: " + constraintViolations.toString());
+            throw new ConstraintViolationException(constraintViolations);
         }
-        if (!serviceTemplateFromRepository.equals(serviceTemplateToValidate)) {
-            throw new ParameterValidateException("ServiceTemplate с ID: " + serviceTemplateToValidate.getId() + " задан некорректно");
-        }
-
-        //Валидация ServiceSockets
-        for (ServiceSocket serviceSocketToValidate : resource.getServiceSockets()) {
-            ServiceSocket serviceSocketFromRepository = governorOfServiceSocket.build(serviceSocketToValidate.getId());
-            if (serviceSocketFromRepository == null) {
-                throw new ParameterValidateException("ServiceSocket с ID: " + serviceSocketToValidate.getId() + " не найден");
-            }
-            if (!serviceSocketFromRepository.equals(serviceSocketToValidate)) {
-                throw new ParameterValidateException("ServiceSocket с ID: " + serviceSocketToValidate.getId() + " задан некорректно");
-            }
-        }
-
     }
 
     @Override
@@ -105,14 +83,6 @@ public class GovernorOfService extends LordOfResources<Service> {
         if (service == null) {
             throw new ResourceNotFoundException("Service с ID:" + resourceId + " не найден");
         }
-
-        for (String serviceSocketId : service.getServiceSocketIds()) {
-            ServiceSocket serviceSocket = governorOfServiceSocket.build(serviceSocketId);
-            service.addServiceSocket(serviceSocket);
-        }
-
-        ServiceTemplate serviceTemplate = governorOfServiceTemplate.build(service.getServiceTemplateId());
-        service.setServiceTemplate(serviceTemplate);
 
         return service;
     }
@@ -178,5 +148,4 @@ public class GovernorOfService extends LordOfResources<Service> {
         preDelete(resourceId);
         repository.delete(resourceId);
     }
-
 }

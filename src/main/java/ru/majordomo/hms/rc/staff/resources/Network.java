@@ -5,14 +5,29 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
 import org.apache.commons.net.util.SubnetUtils;
+import org.hibernate.validator.constraints.Range;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document
-public class Network extends Resource {
+import javax.validation.constraints.NotNull;
 
+import ru.majordomo.hms.rc.staff.resources.validation.ValidNetwork;
+
+@Document
+@ValidNetwork
+public class Network extends Resource {
+    @Range(max = 4294967295L, message = "параметр address указан неверно (должно быть между {min} и {max} в формате Long)")
+    @NotNull
     private Long address;
+
+    @Range(max = 30L, message = "значение параметра mask должно находиться в диапазоне от {min} до {max})")
+    @NotNull
     private Integer mask;
+
+    @NotNull
     private Long gatewayAddress;
+
+    @Range(max = 4096L, message = "значение параметра vlanNumber должно находиться в диапазоне от {min} до {max})")
+    @NotNull
     private Integer vlanNumber;
 
     @Override
@@ -125,6 +140,5 @@ public class Network extends Resource {
         if (getGatewayAddress() != null ? !getGatewayAddress().equals(network.getGatewayAddress()) : network.getGatewayAddress() != null)
             return false;
         return getVlanNumber() != null ? getVlanNumber().equals(network.getVlanNumber()) : network.getVlanNumber() == null;
-
     }
 }

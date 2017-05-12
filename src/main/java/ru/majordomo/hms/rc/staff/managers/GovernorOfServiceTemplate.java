@@ -25,8 +25,6 @@ import javax.validation.Validator;
 public class GovernorOfServiceTemplate extends LordOfResources<ServiceTemplate> {
     private Cleaner cleaner;
     private ServiceTemplateRepository serviceTemplateRepository;
-//    private GovernorOfConfigTemplate governorOfConfigTemplate;
-//    private GovernorOfServiceType governorOfServiceType;
     private GovernorOfService governorOfService;
     private GovernorOfServerRole governorOfServerRole;
     private Validator validator;
@@ -40,16 +38,6 @@ public class GovernorOfServiceTemplate extends LordOfResources<ServiceTemplate> 
     public void setServiceTemplateRepository(ServiceTemplateRepository serviceTemplateRepository) {
         this.serviceTemplateRepository = serviceTemplateRepository;
     }
-
-//    @Autowired
-//    public void setGovernorOfConfigTemplate(GovernorOfConfigTemplate governorOfConfigTemplate) {
-//        this.governorOfConfigTemplate = governorOfConfigTemplate;
-//    }
-
-//    @Autowired
-//    public void setGovernorOfServiceType(GovernorOfServiceType governorOfServiceType) {
-//        this.governorOfServiceType = governorOfServiceType;
-//    }
 
     @Autowired
     public void setGovernorOfService(GovernorOfService governorOfService) {
@@ -72,12 +60,8 @@ public class GovernorOfServiceTemplate extends LordOfResources<ServiceTemplate> 
 
         LordOfResources.setResourceParams(serviceTemplate, serviceMessage, cleaner);
 
-//        @SuppressWarnings("unchecked") List<ConfigTemplate> configTemplates = (List<ConfigTemplate>)serviceMessage.getParam("configTemplates");
-//        ServiceType serviceType = (ServiceType) serviceMessage.getParam("serviceType");
-//        serviceTemplate.setConfigTemplates(configTemplates);
         @SuppressWarnings("unchecked") List<String> configTemplateIds = (List<String>) serviceMessage.getParam("configTemplateIds");
         serviceTemplate.setConfigTemplateIds(configTemplateIds);
-//        serviceTemplate.setServiceType(serviceType);
         serviceTemplate.setServiceTypeName((String) serviceMessage.getParam("serviceTypeName"));
         isValid(serviceTemplate);
         save(serviceTemplate);
@@ -93,35 +77,6 @@ public class GovernorOfServiceTemplate extends LordOfResources<ServiceTemplate> 
             logger.error("serviceTemplate: " + serviceTemplate + " constraintViolations: " + constraintViolations.toString());
             throw new ConstraintViolationException(constraintViolations);
         }
-
-//        if (serviceTemplate.getConfigTemplates().isEmpty()) {
-//            throw new ParameterValidateException("Не найден ни один ConfigTemplate");
-//        }
-//        if (serviceTemplate.getConfigTemplateIds().isEmpty()) {
-//            throw new ParameterValidateException("Не найден ни один ConfigTemplateId");
-//        }
-//        if (serviceTemplate.getServiceType() == null || serviceTemplate.getServiceTypeName() == null || serviceTemplate.getServiceTypeName().equals("")) {
-//            throw new ParameterValidateException("Отсутствует ServiceType");
-//        }
-
-        //Валидация ConfigTemplate
-//        for (ConfigTemplate configTemplateToValidate : serviceTemplate.getConfigTemplates()) {
-//            ConfigTemplate configTemplateFromRepository = governorOfConfigTemplate.build(configTemplateToValidate.getId());
-//            if (configTemplateFromRepository == null) {
-//                throw new ParameterValidateException("ConfigTemplate с ID: " + configTemplateToValidate.getId() + " не найден");
-//            }
-//            if(!configTemplateFromRepository.equals(configTemplateToValidate)) {
-//                throw new ParameterValidateException("ConfigTemplate с ID: " + configTemplateToValidate.getId() + " задан некорректно");
-//            }
-//        }
-
-        //Валидация ServiceType
-//        try {
-//            governorOfServiceType.build(serviceTemplate.getServiceType().getName());
-//        } catch (ResourceNotFoundException e)  {
-//            throw new ParameterValidateException("ServiceType с именем: " + serviceTemplate.getServiceType().getName() + " не найден");
-//        }
-
     }
 
     @Override
@@ -130,16 +85,10 @@ public class GovernorOfServiceTemplate extends LordOfResources<ServiceTemplate> 
         if (serviceTemplate == null) {
             throw new ResourceNotFoundException("ServiceTemplate с ID:" + resourceId + " не найден");
         }
-//        for (String configTemplateId : serviceTemplate.getConfigTemplateIds()) {
-//            ConfigTemplate configTemplate = governorOfConfigTemplate.build(configTemplateId);
-//            serviceTemplate.addConfigTemplate(configTemplate);
-//        }
 
         if (serviceTemplate.getServiceTypeName() == null) {
             throw new ParameterValidateException("ServiceTypeName отсутствует");
         }
-//        ServiceType serviceType = governorOfServiceType.build(serviceTemplate.getServiceTypeName());
-//        serviceTemplate.setServiceType(serviceType);
 
         return serviceTemplate;
     }

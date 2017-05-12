@@ -8,10 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -23,6 +20,9 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.majordomo.hms.rc.staff.event.server.listener.ServerMongoEventListener;
+import ru.majordomo.hms.rc.staff.event.serverRole.listener.ServerRoleMongoEventListener;
+import ru.majordomo.hms.rc.staff.event.service.listener.ServiceMongoEventListener;
 import ru.majordomo.hms.rc.staff.event.serviceTemplate.listener.ServiceTemplateMongoEventListener;
 import ru.majordomo.hms.rc.staff.repositories.*;
 import ru.majordomo.hms.rc.staff.resources.*;
@@ -41,31 +41,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-//@SpringBootTest(
-//        classes = {
-//                RepositoriesConfig.class,
-//                ConfigOfRestControllers.class,
-//                ConfigOfGovernors.class,
-//                ValidationConfig.class,
-//                ServiceTemplateMongoEventListener.class
-//        },
-//        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-//        properties = {
-//                "server.active.name.shared-hosting:web99",
-//                "server.active.name.mail-storage:pop99",
-//                "server.active.name.mysql-database-server:mdb99",
-//                "server.active.mail-storage.active-storage-mountpoint:/homebig"
-//        }
-//)
-@ContextConfiguration(classes = {
-        RepositoriesConfig.class,
-        ConfigOfRestControllers.class,
-        ConfigOfGovernors.class,
-        ValidationConfig.class,
-        ServiceTemplateMongoEventListener.class
-})
-@WebAppConfiguration
+@RunWith(SpringRunner.class)
+@SpringBootTest(
+        classes = {
+                RepositoriesConfig.class,
+                ConfigOfRestControllers.class,
+                ConfigOfGovernors.class,
+                ValidationConfig.class,
+                ServiceTemplateMongoEventListener.class,
+                ServerMongoEventListener.class,
+                ServiceMongoEventListener.class,
+                ServerRoleMongoEventListener.class
+        },
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = {
+                "server.active.name.shared-hosting:web99",
+                "server.active.name.mail-storage:pop99",
+                "server.active.name.mysql-database-server:mdb99",
+                "server.active.mail-storage.active-storage-mountpoint:/homebig"
+        }
+)
 public class ServerRestControllerTest {
     @Rule
     public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("build/generated-snippets");

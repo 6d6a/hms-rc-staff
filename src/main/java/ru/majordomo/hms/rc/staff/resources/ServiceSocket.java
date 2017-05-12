@@ -4,12 +4,22 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
+import org.hibernate.validator.constraints.Range;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document
-public class ServiceSocket extends Resource {
+import javax.validation.constraints.NotNull;
 
+import ru.majordomo.hms.rc.staff.resources.validation.ValidServiceSocket;
+
+@Document
+@ValidServiceSocket
+public class ServiceSocket extends Resource {
+    @NotNull
+    @Range(max = 4294967295L, message = "параметр address указан неверно (должно быть между {min} и {max} в формате Long)")
     private Long address;
+
+    @NotNull
+    @Range(min = 1L, max = 65535L, message = "Значение параметра port может находиться в пределах диапазоне 1-65535")
     private Integer port;
 
     @Override
@@ -62,7 +72,6 @@ public class ServiceSocket extends Resource {
 
         if (getAddress() != null ? !getAddress().equals(that.getAddress()) : that.getAddress() != null) return false;
         return getPort() != null ? getPort().equals(that.getPort()) : that.getPort() == null;
-
     }
 
     @Override

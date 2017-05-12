@@ -4,11 +4,14 @@ import org.apache.commons.lang.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
 
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
@@ -17,12 +20,14 @@ import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
 import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
 import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
+import ru.majordomo.hms.rc.staff.resources.validation.group.ConfigTemplateChecks;
 
 @Component
 public class GovernorOfConfigTemplate extends LordOfResources<ConfigTemplate> {
     private Cleaner cleaner;
     private ConfigTemplateRepository configTemplateRepository;
     private GovernorOfServiceTemplate governorOfServiceTemplate;
+    private Validator validator;
 
     @Autowired
     public void setConfigTemplateRepository(ConfigTemplateRepository configTemplateRepository) {
@@ -39,10 +44,13 @@ public class GovernorOfConfigTemplate extends LordOfResources<ConfigTemplate> {
         this.cleaner = cleaner;
     }
 
+    @Autowired
+    public void setValidator(Validator validator) {
+        this.validator = validator;
+    }
+
     @Override
     public ConfigTemplate createResource(ServiceMessage serviceMessage) throws ParameterValidateException {
-        String loggerPrefix = "OPERATION IDENTITY:" + serviceMessage.getOperationIdentity() + " ACTION IDENTITY:" + serviceMessage.getActionIdentity() + " ";
-
         ConfigTemplate configTemplate = new ConfigTemplate();
         LordOfResources.setResourceParams(configTemplate, serviceMessage, cleaner);
         String fileLink = cleaner.cleanString((String)serviceMessage.getParam("fileLink"));
@@ -53,16 +61,12 @@ public class GovernorOfConfigTemplate extends LordOfResources<ConfigTemplate> {
     }
 
     @Override
-    public void isValid(ConfigTemplate resource) throws ParameterValidateException {
-        String fileLink = resource.getFileLink();
-        if (fileLink.equals("")) {
-            throw new ParameterValidateException("Адрес не может быть пустым");
-        }
-        try {
-            URL url = new URL(fileLink);
-        } catch (MalformedURLException e) {
-            throw new ParameterValidateException("Параметр fileLink содержит некорретный URL:'"
-                                                    + fileLink + "'");
+    public void isValid(ConfigTemplate configTemplate) throws ParameterValidateException {
+        Set<ConstraintViolation<ConfigTemplate>> constraintViolations = validator.validate(configTemplate, ConfigTemplateChecks.class);
+
+        if (!constraintViolations.isEmpty()) {
+            logger.error("configTemplate: " + configTemplate + " constraintViolations: " + constraintViolations.toString());
+            throw new ConstraintViolationException(constraintViolations);
         }
     }
 
@@ -133,5 +137,4 @@ public class GovernorOfConfigTemplate extends LordOfResources<ConfigTemplate> {
         preDelete(resourceId);
         configTemplateRepository.delete(resourceId);
     }
-
 }

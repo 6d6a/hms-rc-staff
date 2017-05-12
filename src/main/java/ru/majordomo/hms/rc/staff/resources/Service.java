@@ -2,22 +2,33 @@ package ru.majordomo.hms.rc.staff.resources;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+
+import ru.majordomo.hms.rc.staff.resources.validation.ObjectId;
+import ru.majordomo.hms.rc.staff.resources.validation.ObjectIdCollection;
+
 @Document
 public class Service extends Resource {
+    @NotNull(message = "Отсутствует ServiceTemplate")
+    @ObjectId(ServiceTemplate.class)
+    private String serviceTemplateId;
+
+    @NotEmpty(message = "Не найден ни один ServiceSocket")
+    @ObjectIdCollection(ServiceSocket.class)
+    private List<String> serviceSocketIds = new ArrayList<>();
 
     @Transient
     private ServiceTemplate serviceTemplate;
+
     @Transient
     private List<ServiceSocket> serviceSockets = new ArrayList<>();
-
-    private String serviceTemplateId;
-    private List<String> serviceSocketIds = new ArrayList<>();
 
     @Override
     public void switchResource() {
@@ -86,14 +97,9 @@ public class Service extends Resource {
 
         Service service = (Service) o;
 
-        if (getServiceTemplate() != null ? !getServiceTemplate().equals(service.getServiceTemplate()) : service.getServiceTemplate() != null)
-            return false;
-        if (getServiceSockets() != null ? !getServiceSockets().equals(service.getServiceSockets()) : service.getServiceSockets() != null)
-            return false;
         if (getServiceTemplateId() != null ? !getServiceTemplateId().equals(service.getServiceTemplateId()) : service.getServiceTemplateId() != null)
             return false;
         return getServiceSocketIds() != null ? getServiceSocketIds().equals(service.getServiceSocketIds()) : service.getServiceSocketIds() == null;
-
     }
 
     @Override

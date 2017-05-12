@@ -7,6 +7,11 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
 
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
@@ -16,14 +21,14 @@ import ru.majordomo.hms.rc.staff.repositories.NetworkRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceSocketRepository;
 import ru.majordomo.hms.rc.staff.resources.Network;
 import ru.majordomo.hms.rc.staff.resources.ServiceSocket;
+import ru.majordomo.hms.rc.staff.resources.validation.group.ServiceSocketChecks;
 
 @Service
 public class GovernorOfServiceSocket extends LordOfResources<ServiceSocket> {
-
     private Cleaner cleaner;
-    private NetworkRepository networkRepository;
     private ServiceSocketRepository serviceSocketRepository;
     private GovernorOfService governorOfService;
+    private Validator validator;
 
     @Autowired
     public void setCleaner(Cleaner cleaner) {
@@ -36,19 +41,17 @@ public class GovernorOfServiceSocket extends LordOfResources<ServiceSocket> {
     }
 
     @Autowired
-    public void setNetworkRepository(NetworkRepository networkRepository) {
-        this.networkRepository = networkRepository;
-    }
-
-    @Autowired
     public void setGovernorOfService(GovernorOfService governorOfService) {
         this.governorOfService = governorOfService;
     }
 
+    @Autowired
+    public void setValidator(Validator validator) {
+        this.validator = validator;
+    }
+
     @Override
     public ServiceSocket createResource(ServiceMessage serviceMessage) throws ParameterValidateException {
-
-        String loggerPrefix = "OPERATION IDENTITY:" + serviceMessage.getOperationIdentity() + " ACTION IDENTITY:" + serviceMessage.getActionIdentity() + " ";
         ServiceSocket serviceSocket = new ServiceSocket();
         LordOfResources.setResourceParams(serviceSocket, serviceMessage, cleaner);
 
@@ -66,26 +69,13 @@ public class GovernorOfServiceSocket extends LordOfResources<ServiceSocket> {
     }
 
     @Override
-    public void isValid(ServiceSocket resource) throws ParameterValidateException {
-        String address = resource.getAddressAsString();
-        Integer port = resource.getPort();
-        Boolean inRange = Boolean.FALSE;
-        List<Network> networkList;
-        networkList = networkRepository.findAll();
+    public void isValid(ServiceSocket serviceSocket) throws ParameterValidateException {
+        Set<ConstraintViolation<ServiceSocket>> constraintViolations = validator.validate(serviceSocket, ServiceSocketChecks.class);
 
-        for (Network network : networkList) {
-            if (network.isAddressIn(address)) {
-                inRange = Boolean.TRUE;
-                break;
-            }
+        if (!constraintViolations.isEmpty()) {
+            logger.error("serviceSocket: " + serviceSocket + " constraintViolations: " + constraintViolations.toString());
+            throw new ConstraintViolationException(constraintViolations);
         }
-        if (!inRange) {
-            throw new ParameterValidateException("Адрес: " + address + " не принадлежит ни к одной известной сети");
-        }
-        if (port < 1 || port > 65535) {
-            throw new ParameterValidateException("Значение параметра port может находиться в пределах диапазоне 1-65535");
-        }
-
     }
 
     @Override

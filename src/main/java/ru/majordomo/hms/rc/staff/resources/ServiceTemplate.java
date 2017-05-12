@@ -38,9 +38,9 @@ public class ServiceTemplate extends Resource {
     }
 
     public void setConfigTemplates(List<ConfigTemplate> configTemplates) {
-//        for (ConfigTemplate configTemplate: configTemplates) {
-//            this.configTemplateIds.add(configTemplate.getId());
-//        }
+        for (ConfigTemplate configTemplate: configTemplates) {
+            this.configTemplateIds.add(configTemplate.getId());
+        }
         this.configTemplates = configTemplates;
     }
 
@@ -51,7 +51,7 @@ public class ServiceTemplate extends Resource {
     public void setServiceType(ServiceType serviceType) {
         if (serviceType != null) {
             this.serviceType = serviceType;
-//            this.serviceTypeName = serviceType.getName();
+            this.serviceTypeName = serviceType.getName();
         }
     }
 
@@ -93,12 +93,9 @@ public class ServiceTemplate extends Resource {
 
         ServiceTemplate that = (ServiceTemplate) o;
 
-        return (getConfigTemplateIds() != null ?
+        return getConfigTemplateIds() != null ?
                 getConfigTemplateIds().equals(that.getConfigTemplateIds()) :
-                that.getConfigTemplateIds() == null) &&
-                (getConfigTemplates() != null ?
-                        getConfigTemplates().equals(that.getConfigTemplates()) :
-                        that.getConfigTemplates() == null);
+                that.getConfigTemplateIds() == null;
     }
 
     @Override

@@ -40,7 +40,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         classes = {
                 RepositoriesConfig.class,
                 ConfigOfRestControllers.class,
-                ConfigOfGovernors.class
+                ConfigOfGovernors.class,
+                ValidationConfig.class
         },
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
@@ -50,14 +51,17 @@ public class StorageRestControllerTest {
 
     @Autowired
     private StorageRepository repository;
-    @Autowired
-    private TestRestTemplate testRestTemplate;
+
     @Autowired
     private WebApplicationContext ctx;
+
     private MockMvc mockMvc;
+
     @Value("${spring.application.name}")
     private String applicationName;
+
     private String resourceName = "storage";
+
     private List<Storage> storages = new ArrayList<>();
 
     private RestDocumentationResultHandler document;
@@ -73,6 +77,7 @@ public class StorageRestControllerTest {
             storage.setSwitchedOn(switchedOn);
             storage.setCapacity(capacity);
             storage.setCapacityUsed(used);
+            storage.setMountPoint("/home/");
             repository.save(storage);
             storages.add(storage);
         }
