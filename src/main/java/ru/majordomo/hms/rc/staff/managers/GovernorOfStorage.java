@@ -1,8 +1,6 @@
 package ru.majordomo.hms.rc.staff.managers;
 
 import org.apache.commons.lang.NotImplementedException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,8 +37,6 @@ public class GovernorOfStorage extends LordOfResources<Storage> {
     public void setGovernorOfServer(GovernorOfServer governorOfServer) {
         this.governorOfServer = governorOfServer;
     }
-
-    private static final Logger logger = LoggerFactory.getLogger(GovernorOfStorage.class);
 
     @Override
     public Storage createResource(ServiceMessage serviceMessage) throws ParameterValidateException {

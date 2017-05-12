@@ -1,4 +1,4 @@
-package ru.majordomo.hms.rc.staff;
+package ru.majordomo.hms.rc.staff.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

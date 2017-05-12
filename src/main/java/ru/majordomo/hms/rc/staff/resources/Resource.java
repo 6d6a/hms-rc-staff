@@ -2,14 +2,24 @@ package ru.majordomo.hms.rc.staff.resources;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 
 public abstract class Resource {
     @Id
+    @Indexed
     private String id;
+
+    @Indexed
+    @NotBlank
     private String name;
+
+    @Indexed
+    @NotNull
     public Boolean switchedOn;
 
     public abstract void switchResource();

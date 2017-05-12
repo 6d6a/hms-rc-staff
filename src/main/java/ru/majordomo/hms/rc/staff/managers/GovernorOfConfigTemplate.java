@@ -1,8 +1,6 @@
 package ru.majordomo.hms.rc.staff.managers;
 
 import org.apache.commons.lang.NotImplementedException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -22,8 +20,6 @@ import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 
 @Component
 public class GovernorOfConfigTemplate extends LordOfResources<ConfigTemplate> {
-    private static final Logger logger = LoggerFactory.getLogger(GovernorOfConfigTemplate.class);
-
     private Cleaner cleaner;
     private ConfigTemplateRepository configTemplateRepository;
     private GovernorOfServiceTemplate governorOfServiceTemplate;

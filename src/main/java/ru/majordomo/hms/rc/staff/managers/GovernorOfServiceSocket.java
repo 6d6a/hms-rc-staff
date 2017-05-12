@@ -1,8 +1,6 @@
 package ru.majordomo.hms.rc.staff.managers;
 
 import org.apache.commons.lang.NotImplementedException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,8 +24,6 @@ public class GovernorOfServiceSocket extends LordOfResources<ServiceSocket> {
     private NetworkRepository networkRepository;
     private ServiceSocketRepository serviceSocketRepository;
     private GovernorOfService governorOfService;
-
-    private static final Logger logger = LoggerFactory.getLogger(GovernorOfServiceSocket.class);
 
     @Autowired
     public void setCleaner(Cleaner cleaner) {

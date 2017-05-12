@@ -8,7 +8,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -20,6 +23,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.majordomo.hms.rc.staff.event.serviceTemplate.listener.ServiceTemplateMongoEventListener;
 import ru.majordomo.hms.rc.staff.repositories.*;
 import ru.majordomo.hms.rc.staff.resources.*;
 import ru.majordomo.hms.rc.staff.test.config.*;
@@ -37,21 +41,31 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(
-        classes = {
-                RepositoriesConfig.class,
-                ConfigOfRestControllers.class,
-                ConfigOfGovernors.class
-        },
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = {
-                "server.active.name.shared-hosting:web99",
-                "server.active.name.mail-storage:pop99",
-                "server.active.name.mysql-database-server:mdb99",
-                "server.active.mail-storage.active-storage-mountpoint:/homebig"
-        }
-)
+@RunWith(SpringJUnit4ClassRunner.class)
+//@SpringBootTest(
+//        classes = {
+//                RepositoriesConfig.class,
+//                ConfigOfRestControllers.class,
+//                ConfigOfGovernors.class,
+//                ValidationConfig.class,
+//                ServiceTemplateMongoEventListener.class
+//        },
+//        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+//        properties = {
+//                "server.active.name.shared-hosting:web99",
+//                "server.active.name.mail-storage:pop99",
+//                "server.active.name.mysql-database-server:mdb99",
+//                "server.active.mail-storage.active-storage-mountpoint:/homebig"
+//        }
+//)
+@ContextConfiguration(classes = {
+        RepositoriesConfig.class,
+        ConfigOfRestControllers.class,
+        ConfigOfGovernors.class,
+        ValidationConfig.class,
+        ServiceTemplateMongoEventListener.class
+})
+@WebAppConfiguration
 public class ServerRestControllerTest {
     @Rule
     public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("build/generated-snippets");
@@ -115,7 +129,8 @@ public class ServerRestControllerTest {
 
             ServiceTemplate serviceTemplate = new ServiceTemplate();
             serviceTemplate.addConfigTemplate(configTemplate);
-            serviceTemplate.setServiceType(serviceType);
+//            serviceTemplate.setServiceType(serviceType);
+            serviceTemplate.setServiceTypeName(serviceType.getName());
             serviceTemplateRepository.save(serviceTemplate);
 
             ServerRole serverRole = new ServerRole();
@@ -208,7 +223,9 @@ public class ServerRestControllerTest {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testServers.get(0).getId()).accept(APPLICATION_JSON_UTF8);
 
         try {
-            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(APPLICATION_JSON_UTF8))
+            mockMvc.perform(request)
+                    .andExpect(status().isOk())
+                    .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                     .andDo(this.document)
                     .andDo(this.document.document(
                     responseFields(

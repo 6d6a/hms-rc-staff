@@ -1,4 +1,4 @@
-package ru.majordomo.hms.rc.staff;
+package ru.majordomo.hms.rc.staff.config;
 
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.rabbit.annotation.RabbitListenerConfigurer;
@@ -17,7 +17,7 @@ import org.springframework.messaging.handler.annotation.support.DefaultMessageHa
 import org.springframework.retry.interceptor.RetryOperationsInterceptor;
 
 @Configuration
-public class RabbitMQConfiguration implements RabbitListenerConfigurer {
+public class RabbitMQConfig implements RabbitListenerConfigurer {
 
     @Value("${spring.rabbitmq.host}")
     private String rabbitHost;

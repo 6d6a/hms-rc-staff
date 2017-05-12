@@ -1,22 +1,17 @@
 package ru.majordomo.hms.rc.staff.resources;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import ru.majordomo.hms.rc.staff.resources.validation.UniqueNameResource;
 
 import java.io.IOException;
 
 @Document
-public class ServiceType {
-    @Indexed
-    private String name;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+@UniqueNameResource(ServiceType.class)
+public class ServiceType extends Resource {
+    @Override
+    public void switchResource() {
+        switchedOn = !switchedOn;
     }
 
     public String toJson() {
