@@ -4,12 +4,10 @@ import org.apache.commons.lang.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.resources.*;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
@@ -24,7 +22,6 @@ import javax.validation.Validator;
 @Component
 public class GovernorOfServiceTemplate extends LordOfResources<ServiceTemplate> {
     private Cleaner cleaner;
-    private ServiceTemplateRepository serviceTemplateRepository;
     private GovernorOfService governorOfService;
     private GovernorOfServerRole governorOfServerRole;
     private Validator validator;
@@ -35,8 +32,8 @@ public class GovernorOfServiceTemplate extends LordOfResources<ServiceTemplate> 
     }
 
     @Autowired
-    public void setServiceTemplateRepository(ServiceTemplateRepository serviceTemplateRepository) {
-        this.serviceTemplateRepository = serviceTemplateRepository;
+    public void setServiceTemplateRepository(ServiceTemplateRepository repository) {
+        this.repository = repository;
     }
 
     @Autowired
@@ -80,62 +77,8 @@ public class GovernorOfServiceTemplate extends LordOfResources<ServiceTemplate> 
     }
 
     @Override
-    public ServiceTemplate build(String resourceId) throws ResourceNotFoundException {
-        ServiceTemplate serviceTemplate = serviceTemplateRepository.findOne(resourceId);
-        if (serviceTemplate == null) {
-            throw new ResourceNotFoundException("ServiceTemplate с ID:" + resourceId + " не найден");
-        }
-
-        if (serviceTemplate.getServiceTypeName() == null) {
-            throw new ParameterValidateException("ServiceTypeName отсутствует");
-        }
-
-        return serviceTemplate;
-    }
-
-    @Override
     public ServiceTemplate build(Map<String, String> keyValue) throws NotImplementedException {
         throw new NotImplementedException();
-    }
-
-    @Override
-    public List<ServiceTemplate> buildAll(Map<String, String> keyValue) {
-
-        List<ServiceTemplate> buildedServiceTemplates = new ArrayList<>();
-
-        Boolean byName = false;
-
-        for (Map.Entry<String, String> entry : keyValue.entrySet()) {
-            if (entry.getKey().equals("name")) {
-                byName = true;
-            }
-        }
-
-        if (byName) {
-            for (ServiceTemplate serviceTemplate : serviceTemplateRepository.findByName(keyValue.get("name"))) {
-                buildedServiceTemplates.add(build(serviceTemplate.getId()));
-            }
-        } else {
-            for (ServiceTemplate serviceTemplate : serviceTemplateRepository.findAll()) {
-                buildedServiceTemplates.add(build(serviceTemplate.getId()));
-            }
-        }
-
-        return buildedServiceTemplates;
-    }
-
-    @Override
-    public List<ServiceTemplate> buildAll() {
-        List<ServiceTemplate> buildedServiceTemplates = new ArrayList<>();
-        for (ServiceTemplate serviceTemplate : serviceTemplateRepository.findAll()) {
-            buildedServiceTemplates.add(build(serviceTemplate.getId()));
-        }
-        return buildedServiceTemplates;
-    }
-
-    @Override
-    public void save(ServiceTemplate resource) {
-        serviceTemplateRepository.save(resource);
     }
 
     @Override
@@ -157,11 +100,4 @@ public class GovernorOfServiceTemplate extends LordOfResources<ServiceTemplate> 
             }
         }
     }
-
-    @Override
-    public void delete(String resourceId) {
-        preDelete(resourceId);
-        serviceTemplateRepository.delete(resourceId);
-    }
-
 }

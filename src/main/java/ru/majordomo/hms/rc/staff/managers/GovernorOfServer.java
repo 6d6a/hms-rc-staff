@@ -1,7 +1,10 @@
 package ru.majordomo.hms.rc.staff.managers;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
@@ -27,7 +30,6 @@ import javax.validation.Validator;
 
 @Component
 public class GovernorOfServer extends LordOfResources<Server> {
-    private ServerRepository serverRepository;
     private ServerRoleRepository serverRoleRepository;
     private Cleaner cleaner;
     private Validator validator;
@@ -65,7 +67,7 @@ public class GovernorOfServer extends LordOfResources<Server> {
 
     @Autowired
     public void setRepository(ServerRepository repository) {
-        this.serverRepository = repository;
+        this.repository = repository;
     }
 
     @Autowired
@@ -117,16 +119,6 @@ public class GovernorOfServer extends LordOfResources<Server> {
         }
     }
 
-    @Override
-    public Server build(String resourceId) throws ResourceNotFoundException {
-        Server server = serverRepository.findOne(resourceId);
-        if (server == null) {
-            throw new ResourceNotFoundException("Server с ID:" + resourceId + " не найден");
-        }
-
-        return server;
-    }
-
     public Server build(Map<String, String> keyValue) throws ResourceNotFoundException {
         Server server = new Server();
 
@@ -158,7 +150,7 @@ public class GovernorOfServer extends LordOfResources<Server> {
             if (!(keyValue.get("state").equals("active"))) {
                 throw new ResourceNotFoundException("State указан некорректно.");
             }
-            ServerRole serverRole = serverRoleRepository.findByName(keyValue.get("server-role"));
+            ServerRole serverRole = serverRoleRepository.findOneByName(keyValue.get("server-role"));
             if (serverRole == null) {
                 throw new ResourceNotFoundException("ServerRole с именем: " + keyValue.get("server-role") + " не найдена");
             }
@@ -180,12 +172,12 @@ public class GovernorOfServer extends LordOfResources<Server> {
                 default:
                     throw new ResourceNotFoundException("По ServerRole: " + keyValue.get("server-role") + " отсутствует фильтр");
             }
-            server = serverRepository.findByServerRoleIdsAndName(serverRole.getId(), activeServerName);
+            server = ((ServerRepository) repository).findByServerRoleIdsAndName(serverRole.getId(), activeServerName);
         }
 
         if (byServiceId) {
             String serviceId = keyValue.get("service-id");
-            server = serverRepository.findByServiceIds(serviceId);
+            server = ((ServerRepository) repository).findByServiceIds(serviceId);
         }
 
         if (findStorage && byServerId) {
@@ -219,7 +211,7 @@ public class GovernorOfServer extends LordOfResources<Server> {
         }
 
         if (byName) {
-            for (Server server : serverRepository.findByName(keyValue.get("name"))) {
+            for (Server server : repository.findByName(keyValue.get("name"))) {
                 buildedServers.add(build(server.getId()));
             }
         }
@@ -245,26 +237,12 @@ public class GovernorOfServer extends LordOfResources<Server> {
     }
 
     @Override
-    public List<Server> buildAll() {
-        List<Server> buildedServers = new ArrayList<>();
-        for (Server server : serverRepository.findAll()) {
-            buildedServers.add(build(server.getId()));
-        }
-        return buildedServers;
+    public Page<Server> buildAllPageable(Pageable pageable) {
+        throw new NotImplementedException();
     }
 
     @Override
-    public void save(Server resource) {
-        serverRepository.save(resource);
-    }
-
-    @Override
-    public void preDelete(String resourceId) {
-
-    }
-
-    @Override
-    public void delete(String resourceId) {
-        serverRepository.delete(resourceId);
+    public Page<Server> buildAllPageable(Map<String, String> keyValue, Pageable pageable) {
+        throw new NotImplementedException();
     }
 }

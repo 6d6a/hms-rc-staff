@@ -19,7 +19,6 @@ import ru.majordomo.hms.rc.staff.managers.GovernorOfService;
 import ru.majordomo.hms.rc.staff.resources.Service;
 
 @RestController
-@RequestMapping("/service")
 public class ServiceRestController extends RestControllerTemplate<Service> {
 
     @Autowired
@@ -28,13 +27,13 @@ public class ServiceRestController extends RestControllerTemplate<Service> {
     }
 
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVICE_VIEW')")
-    @RequestMapping(value = "/{serviceId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/service/{serviceId}", method = RequestMethod.GET)
     public Service readOne(@PathVariable String serviceId) {
         return processReadOneQuery(serviceId);
     }
 
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVICE_VIEW')")
-    @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
+    @RequestMapping(value = {"/service", "/service/"}, method = RequestMethod.GET)
     public Collection<Service> readAll(@RequestParam(required=false, defaultValue="") String name) {
         Map<String, String> keyValue = new HashMap<>();
         if (!name.isEmpty()) {
@@ -48,21 +47,33 @@ public class ServiceRestController extends RestControllerTemplate<Service> {
     }
 
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVICE_CREATE')")
-    @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
+    @RequestMapping(value = {"/service", "/service/"}, method = RequestMethod.POST)
     public ResponseEntity<Service> create(@RequestBody Service service) throws ParameterValidateException {
         return processCreateQuery(service);
     }
 
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVICE_EDIT')")
-    @RequestMapping(value = "/{serviceId}", method = {RequestMethod.PATCH, RequestMethod.PUT})
+    @RequestMapping(value = "/service/{serviceId}", method = {RequestMethod.PATCH, RequestMethod.PUT})
     public ResponseEntity<Service> update(@PathVariable String serviceId,
                                     @RequestBody Service service) throws ParameterValidateException {
         return processUpdateQuery(serviceId, service);
     }
 
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVICE_DELETE')")
-    @RequestMapping(value = "/{serviceId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/service/{serviceId}", method = RequestMethod.DELETE)
     public ResponseEntity<Void> delete(@PathVariable String serviceId) throws ParameterValidateException {
         return processDeleteQuery(serviceId);
+    }
+
+    //Возвращает список объектов Service
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    @RequestMapping(value = "/server/{serverId}/services", method = RequestMethod.GET)
+    public Collection<Service> readAllServicesByServerId(
+            @PathVariable String serverId,
+            @RequestParam Map<String,String> requestParams
+    ) {
+        requestParams.put("serverId", serverId);
+
+        return processReadAllWithParamsQuery(requestParams);
     }
 }

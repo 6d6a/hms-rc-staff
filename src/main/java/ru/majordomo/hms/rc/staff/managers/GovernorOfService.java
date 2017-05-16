@@ -2,6 +2,8 @@ package ru.majordomo.hms.rc.staff.managers;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -13,7 +15,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 
-import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.resources.*;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
@@ -23,8 +24,6 @@ import ru.majordomo.hms.rc.staff.resources.validation.group.ServiceChecks;
 
 @Component
 public class GovernorOfService extends LordOfResources<Service> {
-
-    private ServiceRepository repository;
     private GovernorOfServer governorOfServer;
     private Cleaner cleaner;
     private Validator validator;
@@ -78,58 +77,24 @@ public class GovernorOfService extends LordOfResources<Service> {
     }
 
     @Override
-    public Service build(String resourceId) throws ResourceNotFoundException {
-        Service service = repository.findOne(resourceId);
-        if (service == null) {
-            throw new ResourceNotFoundException("Service с ID:" + resourceId + " не найден");
-        }
-
-        return service;
-    }
-
-    @Override
     public Service build(Map<String, String> keyValue) throws NotImplementedException {
         throw new NotImplementedException();
     }
 
     @Override
     public List<Service> buildAll(Map<String, String> keyValue) {
-
-        List<Service> buildedServices = new ArrayList<>();
-
-        Boolean byName = false;
-
-        for (Map.Entry<String, String> entry : keyValue.entrySet()) {
-            if (entry.getKey().equals("name")) {
-                byName = true;
-            }
-        }
-
-        if (byName) {
-            for (Service service : repository.findByName(keyValue.get("name"))) {
-                buildedServices.add(build(service.getId()));
+        if (keyValue.get("name") != null) {
+            return repository.findByName(keyValue.get("name"));
+        } else if (keyValue.get("serverId") != null) {
+            Server server = governorOfServer.build(keyValue.get("serverId"));
+            if (server != null) {
+                return server.getServices();
             }
         } else {
-            for (Service service : repository.findAll()) {
-                buildedServices.add(build(service.getId()));
-            }
+            return repository.findAll();
         }
 
-        return buildedServices;
-    }
-
-    @Override
-    public List<Service> buildAll() {
-        List<Service> buildedServices = new ArrayList<>();
-        for (Service service : repository.findAll()) {
-            buildedServices.add(build(service.getId()));
-        }
-        return buildedServices;
-    }
-
-    @Override
-    public void save(Service resource) {
-        repository.save(resource);
+        return new ArrayList<>();
     }
 
     @Override
@@ -141,11 +106,5 @@ public class GovernorOfService extends LordOfResources<Service> {
                         + ", именуемый " + server.getName() + ", так вот в нём имеется удаляемый Service.");
             }
         }
-    }
-
-    @Override
-    public void delete(String resourceId) {
-        preDelete(resourceId);
-        repository.delete(resourceId);
     }
 }

@@ -4,7 +4,6 @@ import org.apache.commons.lang.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,20 +12,16 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 
-import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
-import ru.majordomo.hms.rc.staff.repositories.NetworkRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceSocketRepository;
-import ru.majordomo.hms.rc.staff.resources.Network;
 import ru.majordomo.hms.rc.staff.resources.ServiceSocket;
 import ru.majordomo.hms.rc.staff.resources.validation.group.ServiceSocketChecks;
 
 @Service
 public class GovernorOfServiceSocket extends LordOfResources<ServiceSocket> {
     private Cleaner cleaner;
-    private ServiceSocketRepository serviceSocketRepository;
     private GovernorOfService governorOfService;
     private Validator validator;
 
@@ -36,8 +31,8 @@ public class GovernorOfServiceSocket extends LordOfResources<ServiceSocket> {
     }
 
     @Autowired
-    public void setServiceSocketRepository(ServiceSocketRepository serviceSocketRepository) {
-        this.serviceSocketRepository = serviceSocketRepository;
+    public void setServiceSocketRepository(ServiceSocketRepository repository) {
+        this.repository = repository;
     }
 
     @Autowired
@@ -79,53 +74,8 @@ public class GovernorOfServiceSocket extends LordOfResources<ServiceSocket> {
     }
 
     @Override
-    public ServiceSocket build(String resourceId) throws ResourceNotFoundException {
-        ServiceSocket serviceSocket = serviceSocketRepository.findOne(resourceId);
-        if (serviceSocket == null) {
-            throw new ResourceNotFoundException("ServiceSocket с ID:" + resourceId + " не найден");
-        }
-        return serviceSocket;
-    }
-
-    @Override
     public ServiceSocket build(Map<String, String> keyValue) throws NotImplementedException {
         throw new NotImplementedException();
-    }
-
-    @Override
-    public List<ServiceSocket> buildAll(Map<String, String> keyValue) {
-
-        List<ServiceSocket> buildedServiceSockets = new ArrayList<>();
-
-        Boolean byName = false;
-
-        for (Map.Entry<String, String> entry : keyValue.entrySet()) {
-            if (entry.getKey().equals("name")) {
-                byName = true;
-            }
-        }
-
-        if (byName) {
-            for (ServiceSocket serviceSocket : serviceSocketRepository.findByName(keyValue.get("name"))) {
-                buildedServiceSockets.add(build(serviceSocket.getId()));
-            }
-        } else {
-            for (ServiceSocket serviceSocket : serviceSocketRepository.findAll()) {
-                buildedServiceSockets.add(build(serviceSocket.getId()));
-            }
-        }
-
-        return buildedServiceSockets;
-    }
-
-    @Override
-    public List<ServiceSocket> buildAll() {
-        return serviceSocketRepository.findAll();
-    }
-
-    @Override
-    public void save(ServiceSocket resource) {
-        serviceSocketRepository.save(resource);
     }
 
     @Override
@@ -138,11 +88,4 @@ public class GovernorOfServiceSocket extends LordOfResources<ServiceSocket> {
             }
         }
     }
-
-    @Override
-    public void delete(String resourceId) {
-        preDelete(resourceId);
-        serviceSocketRepository.delete(resourceId);
-    }
-
 }

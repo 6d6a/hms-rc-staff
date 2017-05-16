@@ -39,19 +39,6 @@ public class ServerRestController extends RestControllerTemplate<Server> {
         return processReadOneQuery(serverId);
     }
 
-    //Возвращает список объектов Service
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
-    @RequestMapping(value = "/{serverId}/services", method = RequestMethod.GET)
-    public Collection<Service> readAllServices(@PathVariable String serverId, @RequestParam Map<String,String> requestParams) {
-        requestParams.put("serverId", serverId);
-        Collection<Server> servers = processReadAllWithParamsQuery(requestParams);
-        Collection<Service> services = new ArrayList<>();
-        for (Server server : servers) {
-            services.addAll(server.getServices());
-        }
-        return services;
-    }
-
     //Возвращает ActiveMailboxStorage
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     @RequestMapping(value = "/{serverId}/active-storage", method = RequestMethod.GET)

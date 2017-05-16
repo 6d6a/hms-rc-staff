@@ -4,7 +4,6 @@ import org.apache.commons.lang.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,7 +12,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 
-import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
@@ -24,14 +22,13 @@ import ru.majordomo.hms.rc.staff.resources.validation.group.NetworkChecks;
 
 @Component
 public class GovernorOfNetwork extends LordOfResources<Network> {
-    private NetworkRepository networkRepository;
     private GovernorOfServiceSocket governorOfServiceSocket;
     private Cleaner cleaner;
     private Validator validator;
 
     @Autowired
     public void setRepository(NetworkRepository repository) {
-        this.networkRepository = repository;
+        this.repository = repository;
     }
 
     @Autowired
@@ -69,7 +66,7 @@ public class GovernorOfNetwork extends LordOfResources<Network> {
             throw new ParameterValidateException("один из параметров указан неверно:" + e.getMessage());
         }
 
-        networkRepository.save(network);
+        repository.save(network);
 
         return network;
     }
@@ -85,58 +82,13 @@ public class GovernorOfNetwork extends LordOfResources<Network> {
     }
 
     @Override
-    public Network build(String resourceId) throws ResourceNotFoundException {
-        Network network = networkRepository.findOne(resourceId);
-        if (network == null) {
-            throw new ResourceNotFoundException("Network с ID:" + resourceId + " не найден");
-        }
-        return network;
-    }
-
-    @Override
     public Network build(Map<String, String> keyValue) throws NotImplementedException {
         throw new NotImplementedException();
     }
 
     @Override
-    public List<Network> buildAll(Map<String, String> keyValue) {
-
-        List<Network> buildedNetworks = new ArrayList<>();
-
-        Boolean byName = false;
-
-        for (Map.Entry<String, String> entry : keyValue.entrySet()) {
-            if (entry.getKey().equals("name")) {
-                byName = true;
-            }
-        }
-
-        if (byName) {
-            for (Network network : networkRepository.findByName(keyValue.get("name"))) {
-                buildedNetworks.add(build(network.getId()));
-            }
-        } else {
-            for (Network network : networkRepository.findAll()) {
-                buildedNetworks.add(build(network.getId()));
-            }
-        }
-
-        return buildedNetworks;
-    }
-
-    @Override
-    public List<Network> buildAll() {
-        return networkRepository.findAll();
-    }
-
-    @Override
-    public void save(Network resource) {
-        networkRepository.save(resource);
-    }
-
-    @Override
     public void preDelete(String resourceId) {
-        Network network = networkRepository.findOne(resourceId);
+        Network network = repository.findOne(resourceId);
         List<ServiceSocket> sockets = governorOfServiceSocket.buildAll();
         for (ServiceSocket socket : sockets) {
             if (network.isAddressIn(socket.getAddressAsString())) {
@@ -144,11 +96,5 @@ public class GovernorOfNetwork extends LordOfResources<Network> {
                         + ", именуемый " + socket.getName() + ", он так то в удаляемом Network");
             }
         }
-    }
-
-    @Override
-    public void delete(String resourceId) {
-        preDelete(resourceId);
-        networkRepository.delete(resourceId);
     }
 }

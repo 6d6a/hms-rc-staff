@@ -4,7 +4,6 @@ import org.apache.commons.lang.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
@@ -13,7 +12,6 @@ import ru.majordomo.hms.rc.staff.resources.Server;
 import ru.majordomo.hms.rc.staff.resources.Storage;
 import ru.majordomo.hms.rc.staff.resources.validation.group.StorageChecks;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,7 +22,6 @@ import javax.validation.Validator;
 
 @Service
 public class GovernorOfStorage extends LordOfResources<Storage> {
-    private StorageRepository repository;
     private GovernorOfServer governorOfServer;
     private Cleaner cleaner;
     private Validator validator;
@@ -83,53 +80,8 @@ public class GovernorOfStorage extends LordOfResources<Storage> {
     }
 
     @Override
-    public Storage build(String resourceId) throws ResourceNotFoundException {
-        Storage storage = repository.findOne(resourceId);
-        if (storage == null) {
-            throw new ResourceNotFoundException("Storage с ID:" + resourceId + " не найден");
-        }
-        return storage;
-    }
-
-    @Override
     public Storage build(Map<String, String> keyValue) throws NotImplementedException {
         throw new NotImplementedException();
-    }
-
-    @Override
-    public List<Storage> buildAll(Map<String, String> keyValue) {
-
-        List<Storage> buildedStorages = new ArrayList<>();
-
-        Boolean byName = false;
-
-        for (Map.Entry<String, String> entry : keyValue.entrySet()) {
-            if (entry.getKey().equals("name")) {
-                byName = true;
-            }
-        }
-
-        if (byName) {
-            for (Storage storage : repository.findByName(keyValue.get("name"))) {
-                buildedStorages.add(build(storage.getId()));
-            }
-        } else {
-            for (Storage storage : repository.findAll()) {
-                buildedStorages.add(build(storage.getId()));
-            }
-        }
-
-        return buildedStorages;
-    }
-
-    @Override
-    public List<Storage> buildAll() {
-        return repository.findAll();
-    }
-
-    @Override
-    public void save(Storage resource) {
-        repository.save(resource);
     }
 
     @Override
@@ -144,12 +96,5 @@ public class GovernorOfStorage extends LordOfResources<Storage> {
                 }
             }
         }
-
-    }
-
-    @Override
-    public void delete(String resourceId) {
-        preDelete(resourceId);
-        repository.delete(resourceId);
     }
 }

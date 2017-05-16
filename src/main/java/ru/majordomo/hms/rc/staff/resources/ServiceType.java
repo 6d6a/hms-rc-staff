@@ -9,6 +9,10 @@ import java.io.IOException;
 @Document
 @UniqueNameResource(ServiceType.class)
 public class ServiceType extends Resource {
+    public ServiceType() {
+        switchedOn = true;
+    }
+
     @Override
     public void switchResource() {
         switchedOn = !switchedOn;

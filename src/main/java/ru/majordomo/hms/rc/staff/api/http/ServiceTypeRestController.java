@@ -39,8 +39,7 @@ public class ServiceTypeRestController {
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVICE_TYPE_CREATE')")
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
     public ResponseEntity<?> create (@RequestBody ServiceType serviceType) throws ParameterValidateException {
-        governorOfServiceType.isValid(serviceType);
-        governorOfServiceType.save(serviceType);
+        governorOfServiceType.validateAndStore(serviceType);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{serviceTypeName}")

@@ -2,6 +2,8 @@ package ru.majordomo.hms.rc.staff.managers;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -13,7 +15,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 
-import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
@@ -24,14 +25,13 @@ import ru.majordomo.hms.rc.staff.resources.validation.group.ServerRoleChecks;
 
 @Component
 public class GovernorOfServerRole extends LordOfResources<ServerRole> {
-    private ServerRoleRepository serverRoleRepository;
     private GovernorOfServer governorOfServer;
     private Cleaner cleaner;
     private Validator validator;
 
     @Autowired
-    public void setServerRoleRepository(ServerRoleRepository serverRoleRepository) {
-        this.serverRoleRepository = serverRoleRepository;
+    public void setServerRoleRepository(ServerRoleRepository repository) {
+        this.repository = repository;
     }
 
     @Autowired
@@ -77,16 +77,6 @@ public class GovernorOfServerRole extends LordOfResources<ServerRole> {
     }
 
     @Override
-    public ServerRole build(String resourceId) throws ResourceNotFoundException {
-        ServerRole serverRole = serverRoleRepository.findOne(resourceId);
-        if (serverRole == null) {
-            throw new ResourceNotFoundException("ServerRole с ID:" + resourceId + " не найден");
-        }
-
-        return serverRole;
-    }
-
-    @Override
     public ServerRole build(Map<String, String> keyValue) throws NotImplementedException {
         throw new NotImplementedException();
     }
@@ -105,11 +95,11 @@ public class GovernorOfServerRole extends LordOfResources<ServerRole> {
         }
 
         if (byName) {
-            ServerRole serverRole = serverRoleRepository.findByName(keyValue.get("name"));
+            ServerRole serverRole = repository.findOneByName(keyValue.get("name"));
             buildedServerRoles.add(build(serverRole.getId()));
 
         } else {
-            ServerRole serverRole = serverRoleRepository.findByName(keyValue.get("name"));
+            ServerRole serverRole = repository.findOneByName(keyValue.get("name"));
             buildedServerRoles.add(build(serverRole.getId()));
         }
 
@@ -117,18 +107,15 @@ public class GovernorOfServerRole extends LordOfResources<ServerRole> {
     }
 
     @Override
-    public List<ServerRole> buildAll() {
-        List<ServerRole> buildedServerRoles = new ArrayList<>();
-        for (ServerRole serverRole : serverRoleRepository.findAll()) {
-            buildedServerRoles.add(build(serverRole.getId()));
-        }
-        return buildedServerRoles;
+    public Page<ServerRole> buildAllPageable(Pageable pageable) {
+        throw new NotImplementedException();
     }
 
     @Override
-    public void save(ServerRole resource) {
-        serverRoleRepository.save(resource);
+    public Page<ServerRole> buildAllPageable(Map<String, String> keyValue, Pageable pageable) {
+        throw new NotImplementedException();
     }
+
 
     @Override
     public void preDelete(String resourceId) {
@@ -139,11 +126,5 @@ public class GovernorOfServerRole extends LordOfResources<ServerRole> {
                         + ", именуемый " + server.getName() + ", так вот в нём имеется удаляемый ServerRole.");
             }
         }
-    }
-
-    @Override
-    public void delete(String resourceId) {
-        preDelete(resourceId);
-        serverRoleRepository.delete(resourceId);
     }
 }

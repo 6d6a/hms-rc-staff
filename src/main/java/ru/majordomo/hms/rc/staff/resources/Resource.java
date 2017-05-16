@@ -7,7 +7,11 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+
 import java.io.IOException;
+
+import ru.majordomo.hms.rc.staff.resources.validation.group.ServiceTypeChecks;
 
 public abstract class Resource {
     @Id
@@ -16,6 +20,7 @@ public abstract class Resource {
 
     @Indexed
     @NotBlank
+    @Pattern(regexp = "(?ui)(DATABASE_[A-Z]+|WEBSITE_[A-Z0-9]+_[A-Z0-9]+_[A-Z0-9]+|MAILBOX_[A-Z]+)", groups = {ServiceTypeChecks.class})
     private String name;
 
     @Indexed
