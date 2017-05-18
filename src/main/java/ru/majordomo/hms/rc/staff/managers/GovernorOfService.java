@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -85,6 +86,22 @@ public class GovernorOfService extends LordOfResources<Service> {
     public List<Service> buildAll(Map<String, String> keyValue) {
         if (keyValue.get("name") != null) {
             return repository.findByName(keyValue.get("name"));
+        } else if (keyValue.get("serverId") != null && keyValue.get("service-type") != null) {
+            List<Service> services = new ArrayList<>();
+
+            Server server = governorOfServer.build(keyValue.get("serverId"));
+            if (server != null) {
+                for (Service service : server.getServices()) {
+                    String serviceType = service.getServiceTemplate().getServiceType().getName();
+                    String[] parts = serviceType.split("_");
+                    if (keyValue.get("service-type").toUpperCase().equals(serviceType)
+                            || keyValue.get("service-type").toUpperCase().equals(parts[0])) {
+                        services.add(service);
+                    }
+                }
+            }
+
+            return services;
         } else if (keyValue.get("serverId") != null) {
             Server server = governorOfServer.build(keyValue.get("serverId"));
             if (server != null) {
@@ -99,12 +116,14 @@ public class GovernorOfService extends LordOfResources<Service> {
 
     @Override
     public void preDelete(String resourceId) {
-        List<Server> servers = governorOfServer.buildAll();
-        for (Server server : servers) {
-            if (server.getServiceIds().contains(resourceId)) {
-                throw new ParameterValidateException("Я нашла Server с ID " + server.getId()
-                        + ", именуемый " + server.getName() + ", так вот в нём имеется удаляемый Service.");
-            }
+        Map<String, String> keyValue = new HashMap<>();
+        keyValue.put("service-id", resourceId);
+
+        Server server = governorOfServer.build(keyValue);
+
+        if (server != null) {
+            throw new ParameterValidateException("Я нашла Server с ID " + server.getId()
+                    + ", именуемый " + server.getName() + ", так вот в нём имеется удаляемый Service.");
         }
     }
 }

@@ -52,11 +52,11 @@ public abstract class LordOfResources<T extends Resource> {
         }
     }
 
-    public Page<T> buildAllPageable(Pageable pageable) {
+    public Page<T> buildAll(Pageable pageable) {
         return repository.findAll(pageable);
     }
 
-    public Page<T> buildAllPageable(Map<String, String> keyValue, Pageable pageable) {
+    public Page<T> buildAll(Map<String, String> keyValue, Pageable pageable) {
         if (keyValue.get("name") != null) {
             return repository.findByName(keyValue.get("name"), pageable);
         } else {
@@ -81,6 +81,10 @@ public abstract class LordOfResources<T extends Resource> {
         preValidate(resource);
         isValid(resource);
         save(resource);
+    }
+
+    public boolean exists(String resourceId) {
+        return repository.exists(resourceId);
     }
 
     public static Resource setResourceParams(Resource resource, ServiceMessage serviceMessage, Cleaner cleaner) throws ClassCastException{

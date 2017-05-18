@@ -18,6 +18,8 @@ import ru.majordomo.hms.rc.staff.test.config.ValidationConfig;
 
 import java.util.List;
 
+import javax.validation.ConstraintViolationException;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
         RepositoriesConfig.class,
@@ -65,16 +67,16 @@ public class GovernorOfServiceTypeTest {
         }
     }
 
-    @Test(expected = ParameterValidateException.class)
-    public void validateWithDuplicateName() throws ParameterValidateException {
+    @Test(expected = ConstraintViolationException.class)
+    public void validateWithDuplicateName() {
         serviceTypeRepository.save(testServiceType);
         ServiceType serviceType = new ServiceType();
         serviceType.setName("DATABASE_MYSQL");
         governor.isValid(serviceType);
     }
 
-    @Test(expected = ParameterValidateException.class)
-    public void validateWithInvalidName() throws ParameterValidateException {
+    @Test(expected = ConstraintViolationException.class)
+    public void validateWithInvalidName() {
         serviceTypeRepository.save(testServiceType);
         ServiceType serviceType = new ServiceType();
         serviceType.setName("WRONG_BASE");

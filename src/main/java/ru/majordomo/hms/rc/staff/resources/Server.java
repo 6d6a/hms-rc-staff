@@ -91,32 +91,26 @@ public class Server extends Resource {
         return null;
     }
 
-    @JsonIgnore
     public List<String> getServiceIds() {
         return serviceIds;
     }
 
-    @JsonIgnore
     public void setServiceIds(List<String> serviceIds) {
         this.serviceIds = serviceIds;
     }
 
-    @JsonIgnore
     public List<String> getServerRoleIds() {
         return serverRoleIds;
     }
 
-    @JsonIgnore
     public void setServerRoleIds(List<String> serverRoleIds) {
         this.serverRoleIds = serverRoleIds;
     }
 
-    @JsonIgnore
     public List<String> getStorageIds() {
         return storageIds;
     }
 
-    @JsonIgnore
     public void setStorageIds(List<String> storageIds) {
         this.storageIds = storageIds;
     }

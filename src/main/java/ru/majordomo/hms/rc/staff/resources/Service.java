@@ -35,22 +35,18 @@ public class Service extends Resource {
         switchedOn = !switchedOn;
     }
 
-    @JsonIgnore
     public String getServiceTemplateId() {
         return serviceTemplateId;
     }
 
-    @JsonIgnore
     public void setServiceTemplateId(String serviceTemplateId) {
         this.serviceTemplateId = serviceTemplateId;
     }
 
-    @JsonIgnore
     public List<String> getServiceSocketIds() {
         return serviceSocketIds;
     }
 
-    @JsonIgnore
     public void setServiceSocketIds(List<String> serviceSocketIds) {
         this.serviceSocketIds = serviceSocketIds;
     }

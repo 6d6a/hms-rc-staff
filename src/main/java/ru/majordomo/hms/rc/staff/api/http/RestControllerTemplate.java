@@ -1,5 +1,7 @@
 package ru.majordomo.hms.rc.staff.api.http;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +25,16 @@ abstract public class RestControllerTemplate<T extends Resource> {
         return governor.buildAll();
     }
 
+    protected Page<T> processReadAllQuery(Pageable pageable) {
+        return governor.buildAll(pageable);
+    }
+
     protected Collection<T> processReadAllWithParamsQuery(Map<String, String> keyValue) {
         return governor.buildAll(keyValue);
+    }
+
+    protected Page<T> processReadAllWithParamsQuery(Map<String, String> keyValue, Pageable pageable) {
+        return governor.buildAll(keyValue, pageable);
     }
 
     protected T processReadOneWithParamsQuery(Map<String, String> keyValue) {
@@ -42,16 +52,22 @@ abstract public class RestControllerTemplate<T extends Resource> {
     }
 
     protected ResponseEntity<T> processUpdateQuery(String resourceId, T resource) throws ParameterValidateException {
-        governor.isValid(resource);
-        Resource storedResource = governor.build(resourceId);
-        resource.setId(storedResource.getId());
-        governor.save(resource);
-        return new ResponseEntity<>(HttpStatus.OK);
+        if (governor.exists(resourceId)) {
+            resource.setId(resourceId);
+            governor.isValid(resource);
+            governor.save(resource);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     protected ResponseEntity<Void> processDeleteQuery(String resourceId) {
-        Resource storedResource = governor.build(resourceId);
-        governor.delete(resourceId);
-        return new ResponseEntity<>(HttpStatus.OK);
+        if (governor.exists(resourceId)) {
+            governor.delete(resourceId);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }

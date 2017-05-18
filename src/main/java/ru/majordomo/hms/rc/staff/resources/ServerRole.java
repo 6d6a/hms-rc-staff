@@ -38,12 +38,10 @@ public class ServerRole extends Resource {
         this.serviceTemplates = serviceTemplates;
     }
 
-    @JsonIgnore
     public List<String> getServiceTemplateIds() {
         return serviceTemplateIds;
     }
 
-    @JsonIgnore
     public void setServiceTemplateIds(List<String> serviceTemplateIds) {
         this.serviceTemplateIds = serviceTemplateIds;
     }

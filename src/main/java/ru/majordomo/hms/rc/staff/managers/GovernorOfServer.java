@@ -184,65 +184,8 @@ public class GovernorOfServer extends LordOfResources<Server> {
             server = build(keyValue.get("server-id"));
 
             server.setActiveMailboxStorageMountPoint(activeMailboxStorageMountPoint);
-
-            return server;
-        }
-        return build(server.getId());
-    }
-
-    @Override
-    public List<Server> buildAll(Map<String, String> keyValue) {
-        List<Server> buildedServers = new ArrayList<>();
-
-        Boolean byName = false;
-        Boolean byServerId = false;
-        Boolean ByServiceType = false;
-
-        for (Map.Entry<String, String> entry : keyValue.entrySet()) {
-            if (entry.getKey().equals("name")) {
-                byName = true;
-            }
-            if (entry.getKey().equals("serverId")) {
-                byServerId = true;
-            }
-            if (entry.getKey().equals("service-type")) {
-                ByServiceType = true;
-            }
         }
 
-        if (byName) {
-            for (Server server : repository.findByName(keyValue.get("name"))) {
-                buildedServers.add(build(server.getId()));
-            }
-        }
-        if (byServerId && ByServiceType) {
-            List<Service> services = new ArrayList<>();
-
-            Server server = build(keyValue.get("serverId"));
-            for (Service service : server.getServices()) {
-                String serviceType = service.getServiceTemplate().getServiceType().getName();
-                String[] parts = serviceType.split("_");
-                if (keyValue.get("service-type").toUpperCase().equals(serviceType)
-                        || keyValue.get("service-type").toUpperCase().equals(parts[0])) {
-                    services.add(service);
-                }
-            }
-
-            server.setServices(services);
-
-            return Collections.singletonList(server);
-        }
-
-        return buildedServers;
-    }
-
-    @Override
-    public Page<Server> buildAllPageable(Pageable pageable) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public Page<Server> buildAllPageable(Map<String, String> keyValue, Pageable pageable) {
-        throw new NotImplementedException();
+        return server;
     }
 }

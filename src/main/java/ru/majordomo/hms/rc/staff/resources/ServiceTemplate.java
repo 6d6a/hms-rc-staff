@@ -18,7 +18,7 @@ public class ServiceTemplate extends Resource {
     @NotEmpty(message = "Не найден ни один ConfigTemplateId")
     private List<String> configTemplateIds = new ArrayList<>();
 
-    @NotBlank(message = "Отсутствует ServiceType")
+    @NotBlank(message = "Отсутствует serviceTypeName")
     @ObjectId(value = ServiceType.class, fieldName = "name", message = "ServiceType с указанным именем не найден в БД")
     private String serviceTypeName;
 
@@ -55,22 +55,26 @@ public class ServiceTemplate extends Resource {
         }
     }
 
-    @JsonIgnore
     public List<String> getConfigTemplateIds() {
         return configTemplateIds;
     }
 
-    @JsonIgnore
     public void setConfigTemplateIds(List<String> configTemplateIds) {
         this.configTemplateIds = configTemplateIds;
     }
 
-    @JsonIgnore
+    public void addConfigTemplateId(String configTemplateId) {
+        if (configTemplateId != null) {
+            if (!configTemplateIds.contains(configTemplateId)) {
+                this.configTemplateIds.add(configTemplateId);
+            }
+        }
+    }
+
     public String getServiceTypeName() {
         return serviceTypeName;
     }
 
-    @JsonIgnore
     public void setServiceTypeName(String serviceTypeName) {
         this.serviceTypeName = serviceTypeName;
     }

@@ -1,6 +1,8 @@
 package ru.majordomo.hms.rc.staff.api.http;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,6 +46,23 @@ public class ServiceTemplateRestController extends RestControllerTemplate<Servic
             return processReadAllWithParamsQuery(keyValue);
         } else {
             return processReadAllQuery();
+        }
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVICE_TEMPLATE_VIEW')")
+    @RequestMapping(value = {"/",""}, method = RequestMethod.GET, headers = "X-HMS-Pageable=true")
+    public Page<ServiceTemplate> readAll(
+            @RequestParam(required=false, defaultValue="") String name,
+            Pageable pageable
+    ) {
+        Map<String, String> keyValue = new HashMap<>();
+        if (!name.isEmpty()) {
+            keyValue.put("name", name);
+        }
+        if (!keyValue.isEmpty()) {
+            return processReadAllWithParamsQuery(keyValue, pageable);
+        } else {
+            return processReadAllQuery(pageable);
         }
     }
 

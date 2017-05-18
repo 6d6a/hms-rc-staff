@@ -53,8 +53,11 @@ public class NetworkValidator implements ConstraintValidator<ValidNetwork, Netwo
                         .addConstraintViolation();
             }
         } catch (RuntimeException e) {
-            System.out.println(e.toString());
             isValid = false;
+            constraintValidatorContext.disableDefaultConstraintViolation();
+            constraintValidatorContext
+                    .buildConstraintViolationWithTemplate("Объект Network заполнен некорректно")
+                    .addConstraintViolation();
         }
 
         return isValid;

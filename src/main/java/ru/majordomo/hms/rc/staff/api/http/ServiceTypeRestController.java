@@ -1,6 +1,8 @@
 package ru.majordomo.hms.rc.staff.api.http;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +36,14 @@ public class ServiceTypeRestController {
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
     public Collection<ServiceType> readAll() {
         return governorOfServiceType.buildAll();
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVICE_TYPE_VIEW')")
+    @RequestMapping(value = {"", "/"}, method = RequestMethod.GET, headers = "X-HMS-Pageable=true")
+    public Page<ServiceType> readAll(
+            Pageable pageable
+    ) {
+        return governorOfServiceType.buildAll(pageable);
     }
 
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVICE_TYPE_CREATE')")

@@ -82,42 +82,6 @@ public class GovernorOfServerRole extends LordOfResources<ServerRole> {
     }
 
     @Override
-    public List<ServerRole> buildAll(Map<String, String> keyValue) {
-
-        List<ServerRole> buildedServerRoles = new ArrayList<>();
-
-        Boolean byName = false;
-
-        for (Map.Entry<String, String> entry : keyValue.entrySet()) {
-            if (entry.getKey().equals("name")) {
-                byName = true;
-            }
-        }
-
-        if (byName) {
-            ServerRole serverRole = repository.findOneByName(keyValue.get("name"));
-            buildedServerRoles.add(build(serverRole.getId()));
-
-        } else {
-            ServerRole serverRole = repository.findOneByName(keyValue.get("name"));
-            buildedServerRoles.add(build(serverRole.getId()));
-        }
-
-        return buildedServerRoles;
-    }
-
-    @Override
-    public Page<ServerRole> buildAllPageable(Pageable pageable) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public Page<ServerRole> buildAllPageable(Map<String, String> keyValue, Pageable pageable) {
-        throw new NotImplementedException();
-    }
-
-
-    @Override
     public void preDelete(String resourceId) {
         List<Server> servers = governorOfServer.buildAll();
         for (Server server : servers) {
