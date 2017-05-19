@@ -66,6 +66,12 @@ public class ServerRoleRestController extends RestControllerTemplate<ServerRole>
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVER_ROLE_VIEW')")
+    @RequestMapping(value = {"", "/"}, method = RequestMethod.GET, headers = "X-HMS-Projection=OnlyIdAndName")
+    public Collection<ServerRole> readAll() {
+        return processReadAllQueryOnlyIdAndName();
+    }
+
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVER_ROLE_CREATE')")
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
     public ResponseEntity<ServerRole> create (@RequestBody ServerRole serverRole) throws ParameterValidateException {

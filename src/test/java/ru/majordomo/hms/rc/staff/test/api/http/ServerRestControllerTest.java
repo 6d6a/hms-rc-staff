@@ -228,8 +228,11 @@ public class ServerRestControllerTest {
                             fieldWithPath("name").description("Имя Server"),
                             fieldWithPath("switchedOn").description("Статус Server"),
                             fieldWithPath("services").description("Список Service для Server"),
+                            fieldWithPath("serviceIds").description("Список serviceIds для Server"),
                             fieldWithPath("serverRoles").description("Список ServerRoles для Server"),
-                            fieldWithPath("storages").description("Список Storages для Server")
+                            fieldWithPath("serverRoleIds").description("Список serverRoleIds для Server"),
+                            fieldWithPath("storages").description("Список Storages для Server"),
+                            fieldWithPath("storageIds").description("Список storageIds для Server")
                     )
             ));
         } catch (Exception e) {
@@ -253,8 +256,11 @@ public class ServerRestControllerTest {
                                     fieldWithPath("[].name").description("Имя Server"),
                                     fieldWithPath("[].switchedOn").description("Статус Server"),
                                     fieldWithPath("[].services").description("Список Service для Server"),
+                                    fieldWithPath("[].serviceIds").description("Список serviceIds для Server"),
                                     fieldWithPath("[].serverRoles").description("Список ServerRoles для Server"),
-                                    fieldWithPath("[].storages").description("Список Storages для Server")
+                                    fieldWithPath("[].serverRoleIds").description("Список serverRoleIds для Server"),
+                                    fieldWithPath("[].storages").description("Список Storages для Server"),
+                                    fieldWithPath("[].storageIds").description("Список storageIds для Server")
                             )
                     ));
         } catch (Exception e) {
@@ -324,8 +330,11 @@ public class ServerRestControllerTest {
                                     fieldWithPath("[].name").description("Имя Server"),
                                     fieldWithPath("[].switchedOn").description("Статус Server"),
                                     fieldWithPath("[].services").description("Список Service для Server"),
+                                    fieldWithPath("[].serviceIds").description("Список serviceIds для Server"),
                                     fieldWithPath("[].serverRoles").description("Список ServerRoles для Server"),
-                                    fieldWithPath("[].storages").description("Список Storages для Server")
+                                    fieldWithPath("[].serverRoleIds").description("Список serverRoleIds для Server"),
+                                    fieldWithPath("[].storages").description("Список Storages для Server"),
+                                    fieldWithPath("[].storageIds").description("Список storageIds для Server")
                             )
                     ));
         } catch (Exception e) {
@@ -456,8 +465,11 @@ public class ServerRestControllerTest {
                                     fieldWithPath("name").description("Имя Server"),
                                     fieldWithPath("switchedOn").description("Статус Server"),
                                     fieldWithPath("services").description("Список Service для Server"),
+                                    fieldWithPath("serviceIds").description("Список serviceIds для Server"),
                                     fieldWithPath("serverRoles").description("Список ServerRoles для Server"),
-                                    fieldWithPath("storages").description("Список Storages для Server")
+                                    fieldWithPath("serverRoleIds").description("Список serverRoleIds для Server"),
+                                    fieldWithPath("storages").description("Список Storages для Server"),
+                                    fieldWithPath("storageIds").description("Список storageIds для Server")
                             )
                     ));
         } catch (Exception e) {

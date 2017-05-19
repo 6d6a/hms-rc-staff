@@ -66,6 +66,12 @@ public class ConfigTemplateRestController extends RestControllerTemplate<ConfigT
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('CONFIG_TEMPLATE_VIEW')")
+    @RequestMapping(value = {"", "/"}, method = RequestMethod.GET, headers = "X-HMS-Projection=OnlyIdAndName")
+    public Collection<ConfigTemplate> readAll() {
+        return processReadAllQueryOnlyIdAndName();
+    }
+
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('CONFIG_TEMPLATE_CREATE')")
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
     public ResponseEntity<ConfigTemplate> create(@RequestBody ConfigTemplate configTemplate) throws ParameterValidateException {

@@ -74,6 +74,12 @@ public class ServerRestController extends RestControllerTemplate<Server> {
     }
 
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVER_VIEW')")
+    @RequestMapping(value = {"", "/"}, method = RequestMethod.GET, headers = "X-HMS-Projection=OnlyIdAndName")
+    public Collection<Server> readAll() {
+        return processReadAllQueryOnlyIdAndName();
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVER_VIEW')")
     @RequestMapping(value = {"/filter"}, method = RequestMethod.GET)
     public Server readOneFilter(@RequestParam() Map<String,String> requestParams) {
         return processReadOneWithParamsQuery(requestParams);

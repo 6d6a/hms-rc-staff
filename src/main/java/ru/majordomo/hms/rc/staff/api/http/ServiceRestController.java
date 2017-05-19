@@ -18,6 +18,7 @@ import java.util.Map;
 
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfService;
+import ru.majordomo.hms.rc.staff.resources.ServerRole;
 import ru.majordomo.hms.rc.staff.resources.Service;
 
 @RestController
@@ -63,6 +64,12 @@ public class ServiceRestController extends RestControllerTemplate<Service> {
         } else {
             return processReadAllQuery(pageable);
         }
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVICE_VIEW')")
+    @RequestMapping(value = {"/service", "/service/"}, method = RequestMethod.GET, headers = "X-HMS-Projection=OnlyIdAndName")
+    public Collection<Service> readAll() {
+        return processReadAllQueryOnlyIdAndName();
     }
 
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVICE_CREATE')")

@@ -132,7 +132,9 @@ public class ServiceTemplateRestControllerTest {
                                     fieldWithPath("name").description("Имя ServiceTemplate"),
                                     fieldWithPath("switchedOn").description("Статус ServiceTemplate"),
                                     fieldWithPath("configTemplates").description("Список СonfigTemplates для ServiceTemplate"),
-                                    fieldWithPath("serviceType").description("ServiceType, к которому относится данный ServiceTemplate")
+                                    fieldWithPath("configTemplateIds").description("Список configTemplateIds для ServiceTemplate"),
+                                    fieldWithPath("serviceType").description("ServiceType, к которому относится данный ServiceTemplate"),
+                                    fieldWithPath("serviceTypeName").description("serviceTypeName, к которому относится данный ServiceTemplate")
                             )
                     ));
         } catch (Exception e) {
@@ -156,7 +158,9 @@ public class ServiceTemplateRestControllerTest {
                                     fieldWithPath("[].name").description("Имя ServiceTemplate"),
                                     fieldWithPath("[].switchedOn").description("Статус ServiceTemplate"),
                                     fieldWithPath("[].configTemplates").description("Список СonfigTemplates для ServiceTemplate"),
-                                    fieldWithPath("[].serviceType").description("ServiceType, к которому относится данный ServiceTemplate")
+                                    fieldWithPath("[].configTemplateIds").description("Список configTemplateIds для ServiceTemplate"),
+                                    fieldWithPath("[].serviceType").description("ServiceType, к которому относится данный ServiceTemplate"),
+                                    fieldWithPath("[].serviceTypeName").description("serviceTypeName, к которому относится данный ServiceTemplate")
                             )
                     ));
         } catch (Exception e) {
@@ -180,7 +184,9 @@ public class ServiceTemplateRestControllerTest {
                                     fieldWithPath("[].name").description("Имя ServiceTemplate"),
                                     fieldWithPath("[].switchedOn").description("Статус ServiceTemplate"),
                                     fieldWithPath("[].configTemplates").description("Список СonfigTemplates для ServiceTemplate"),
-                                    fieldWithPath("[].serviceType").description("ServiceType, к которому относится данный ServiceTemplate")
+                                    fieldWithPath("[].configTemplateIds").description("Список configTemplateIds для ServiceTemplate"),
+                                    fieldWithPath("[].serviceType").description("ServiceType, к которому относится данный ServiceTemplate"),
+                                    fieldWithPath("[].serviceTypeName").description("serviceTypeName, к которому относится данный ServiceTemplate")
                             )
                     ));
         } catch (Exception e) {
@@ -208,7 +214,9 @@ public class ServiceTemplateRestControllerTest {
                                     fieldWithPath("name").description("Имя ServiceTemplate"),
                                     fieldWithPath("switchedOn").description("Статус ServiceTemplate"),
                                     fieldWithPath("configTemplates").description("Список СonfigTemplates для ServiceTemplate"),
-                                    fieldWithPath("serviceType").description("ServiceType, к которому относится данный ServiceTemplate")
+                                    fieldWithPath("configTemplateIds").description("Список configTemplateIds для ServiceTemplate"),
+                                    fieldWithPath("serviceType").description("ServiceType, к которому относится данный ServiceTemplate"),
+                                    fieldWithPath("serviceTypeName").description("serviceTypeName, к которому относится данный ServiceTemplate")
                             )
                     ));
         } catch (Exception e) {

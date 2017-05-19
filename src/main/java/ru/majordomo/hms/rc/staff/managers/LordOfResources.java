@@ -44,6 +44,10 @@ public abstract class LordOfResources<T extends Resource> {
         return repository.findAll();
     }
 
+    public List<T> buildAllOnlyIdAndName()  {
+        return repository.findOnlyIdAndName();
+    }
+
     public List<T> buildAll(Map<String, String> keyValue) {
         if (keyValue.get("name") != null) {
             return repository.findByName(keyValue.get("name"));

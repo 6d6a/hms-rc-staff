@@ -135,7 +135,8 @@ public class ServerRoleRestControllerTest {
                                     fieldWithPath("id").description("ServerRole ID"),
                                     fieldWithPath("name").description("Имя ServerRole"),
                                     fieldWithPath("switchedOn").description("Статус ServerRole"),
-                                    fieldWithPath("serviceTemplates").description("Список ServiceTemplates для ServerRole")
+                                    fieldWithPath("serviceTemplates").description("Список ServiceTemplates для ServerRole"),
+                                    fieldWithPath("serviceTemplateIds").description("Список serviceTemplateIds для ServerRole")
                             )
                     ));
         } catch (Exception e) {
@@ -158,7 +159,8 @@ public class ServerRoleRestControllerTest {
                             fieldWithPath("[].id").description("ServerRole ID"),
                             fieldWithPath("[].name").description("Имя ServerRole"),
                             fieldWithPath("[].switchedOn").description("Статус ServerRole"),
-                            fieldWithPath("[].serviceTemplates").description("Список ServiceTemplates для ServerRole")
+                            fieldWithPath("[].serviceTemplates").description("Список ServiceTemplates для ServerRole"),
+                            fieldWithPath("[].serviceTemplateIds").description("Список serviceTemplateIds для ServerRole")
                     )
             ));
         } catch (Exception e) {
@@ -181,7 +183,8 @@ public class ServerRoleRestControllerTest {
                                     fieldWithPath("[].id").description("ServerRole ID"),
                                     fieldWithPath("[].name").description("Имя ServerRole"),
                                     fieldWithPath("[].switchedOn").description("Статус ServerRole"),
-                                    fieldWithPath("[].serviceTemplates").description("Список ServiceTemplates для ServerRole")
+                                    fieldWithPath("[].serviceTemplates").description("Список ServiceTemplates для ServerRole"),
+                                    fieldWithPath("[].serviceTemplateIds").description("Список serviceTemplateIds для ServerRole")
                             )
                     ));
         } catch (Exception e) {
@@ -207,7 +210,8 @@ public class ServerRoleRestControllerTest {
                                     fieldWithPath("id").description("ServerRole ID"),
                                     fieldWithPath("name").description("Имя ServerRole"),
                                     fieldWithPath("switchedOn").description("Статус ServerRole"),
-                                    fieldWithPath("serviceTemplates").description("Список ServiceTemplates для ServerRole")
+                                    fieldWithPath("serviceTemplates").description("Список ServiceTemplates для ServerRole"),
+                                    fieldWithPath("serviceTemplateIds").description("Список serviceTemplateIds для ServerRole")
                             )
                     ));
         } catch (Exception e) {

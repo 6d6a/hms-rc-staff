@@ -66,6 +66,12 @@ public class NetworkRestController extends RestControllerTemplate<Network> {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('NETWORK_VIEW')")
+    @RequestMapping(value = {"", "/"}, method = RequestMethod.GET, headers = "X-HMS-Projection=OnlyIdAndName")
+    public Collection<Network> readAll() {
+        return processReadAllQueryOnlyIdAndName();
+    }
+
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('NETWORK_CREATE')")
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
     public ResponseEntity<Network> create (@RequestBody Network network) throws ParameterValidateException {

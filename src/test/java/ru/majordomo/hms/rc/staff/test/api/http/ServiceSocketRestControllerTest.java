@@ -20,7 +20,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.majordomo.hms.rc.staff.exception.handler.GlobalExceptionHandler;
+import ru.majordomo.hms.rc.staff.exception.handler.RestResponseEntityExceptionHandler;
 import ru.majordomo.hms.rc.staff.repositories.NetworkRepository;
 import ru.majordomo.hms.rc.staff.resources.Network;
 import ru.majordomo.hms.rc.staff.test.config.*;
@@ -45,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 ConfigOfRestControllers.class,
                 ConfigOfGovernors.class,
                 ValidationConfig.class,
-                GlobalExceptionHandler.class
+                RestResponseEntityExceptionHandler.class
         },
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )

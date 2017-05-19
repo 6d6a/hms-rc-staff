@@ -66,6 +66,12 @@ public class StorageRestController extends RestControllerTemplate<Storage> {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('STORAGE_VIEW')")
+    @RequestMapping(value = {"", "/"}, method = RequestMethod.GET, headers = "X-HMS-Projection=OnlyIdAndName")
+    public Collection<Storage> readAll() {
+        return processReadAllQueryOnlyIdAndName();
+    }
+
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('STORAGE_CREATE')")
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
     public ResponseEntity<Storage> create (@RequestBody Storage storage) throws ParameterValidateException {

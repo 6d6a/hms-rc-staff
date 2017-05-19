@@ -35,6 +35,8 @@ public class ServerRoleMongoEventListener extends AbstractMongoEventListener<Ser
     }
 
     private void buildServiceTemplate(ServerRole serverRole) {
-        serverRole.setServiceTemplates(mongoOperations.find(new Query(where("_id").in(serverRole.getServiceTemplateIds())), ServiceTemplate.class));
+        if (!serverRole.getServiceTemplateIds().isEmpty()) {
+            serverRole.setServiceTemplates(mongoOperations.find(new Query(where("_id").in(serverRole.getServiceTemplateIds())), ServiceTemplate.class));
+        }
     }
 }

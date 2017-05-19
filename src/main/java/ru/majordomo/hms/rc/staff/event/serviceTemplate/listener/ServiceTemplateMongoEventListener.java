@@ -36,7 +36,11 @@ public class ServiceTemplateMongoEventListener extends AbstractMongoEventListene
     }
 
     private void buildServiceTemplate(ServiceTemplate serviceTemplate) {
-        serviceTemplate.setServiceType(mongoOperations.findOne(new Query(where("name").is(serviceTemplate.getServiceTypeName())), ServiceType.class));
-        serviceTemplate.setConfigTemplates(mongoOperations.find(new Query(where("_id").in(serviceTemplate.getConfigTemplateIds())), ConfigTemplate.class));
+        if (serviceTemplate.getServiceTypeName() != null) {
+            serviceTemplate.setServiceType(mongoOperations.findOne(new Query(where("name").is(serviceTemplate.getServiceTypeName())), ServiceType.class));
+        }
+        if (!serviceTemplate.getConfigTemplateIds().isEmpty()) {
+            serviceTemplate.setConfigTemplates(mongoOperations.find(new Query(where("_id").in(serviceTemplate.getConfigTemplateIds())), ConfigTemplate.class));
+        }
     }
 }

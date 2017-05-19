@@ -66,6 +66,12 @@ public class ServiceTemplateRestController extends RestControllerTemplate<Servic
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVICE_TEMPLATE_VIEW')")
+    @RequestMapping(value = {"", "/"}, method = RequestMethod.GET, headers = "X-HMS-Projection=OnlyIdAndName")
+    public Collection<ServiceTemplate> readAll() {
+        return processReadAllQueryOnlyIdAndName();
+    }
+
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVICE_TEMPLATE_CREATE')")
     @RequestMapping(value = {"", ""}, method = RequestMethod.POST)
     public ResponseEntity<ServiceTemplate> create(@RequestBody ServiceTemplate serviceTemplate) throws ParameterValidateException {

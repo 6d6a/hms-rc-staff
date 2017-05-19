@@ -66,6 +66,12 @@ public class ServiceSocketRestController extends RestControllerTemplate<ServiceS
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVICE_SOCKET_VIEW')")
+    @RequestMapping(value = {"", "/"}, method = RequestMethod.GET, headers = "X-HMS-Projection=OnlyIdAndName")
+    public Collection<ServiceSocket> readAll() {
+        return processReadAllQueryOnlyIdAndName();
+    }
+
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVICE_SOCKET_CREATE')")
     @RequestMapping(value = {"", "/"}, method = RequestMethod.POST)
     public ResponseEntity<ServiceSocket> create(@RequestBody ServiceSocket socket) throws ParameterValidateException {

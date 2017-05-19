@@ -36,7 +36,11 @@ public class ServiceMongoEventListener extends AbstractMongoEventListener<Servic
     }
 
     private void buildServiceTemplate(Service service) {
-        service.setServiceTemplate(mongoOperations.findOne(new Query(where("_id").is(service.getServiceTemplateId())), ServiceTemplate.class));
-        service.setServiceSockets(mongoOperations.find(new Query(where("_id").in(service.getServiceSocketIds())), ServiceSocket.class));
+        if (service.getServiceTemplateId() != null) {
+            service.setServiceTemplate(mongoOperations.findOne(new Query(where("_id").is(service.getServiceTemplateId())), ServiceTemplate.class));
+        }
+        if (!service.getServiceSocketIds().isEmpty()) {
+            service.setServiceSockets(mongoOperations.find(new Query(where("_id").in(service.getServiceSocketIds())), ServiceSocket.class));
+        }
     }
 }

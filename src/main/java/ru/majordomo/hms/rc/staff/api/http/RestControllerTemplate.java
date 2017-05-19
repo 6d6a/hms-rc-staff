@@ -25,6 +25,10 @@ abstract public class RestControllerTemplate<T extends Resource> {
         return governor.buildAll();
     }
 
+    protected Collection<T> processReadAllQueryOnlyIdAndName() {
+        return governor.buildAllOnlyIdAndName();
+    }
+
     protected Page<T> processReadAllQuery(Pageable pageable) {
         return governor.buildAll(pageable);
     }

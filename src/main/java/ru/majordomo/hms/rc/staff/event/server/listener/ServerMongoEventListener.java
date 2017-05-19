@@ -37,8 +37,14 @@ public class ServerMongoEventListener extends AbstractMongoEventListener<Server>
     }
 
     private void buildServiceTemplate(Server server) {
-        server.setServices(mongoOperations.find(new Query(where("_id").is(server.getServiceIds())), Service.class));
-        server.setStorages(mongoOperations.find(new Query(where("_id").in(server.getStorageIds())), Storage.class));
-        server.setServerRoles(mongoOperations.find(new Query(where("_id").in(server.getServerRoleIds())), ServerRole.class));
+        if(!server.getServiceIds().isEmpty()) {
+            server.setServices(mongoOperations.find(new Query(where("_id").is(server.getServiceIds())), Service.class));
+        }
+        if(!server.getStorageIds().isEmpty()) {
+            server.setStorages(mongoOperations.find(new Query(where("_id").in(server.getStorageIds())), Storage.class));
+        }
+        if(!server.getServerRoleIds().isEmpty()) {
+            server.setServerRoles(mongoOperations.find(new Query(where("_id").in(server.getServerRoleIds())), ServerRole.class));
+        }
     }
 }
