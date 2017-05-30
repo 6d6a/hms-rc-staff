@@ -15,13 +15,17 @@ import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfNetwork;
 import ru.majordomo.hms.rc.staff.repositories.NetworkRepository;
 import ru.majordomo.hms.rc.staff.resources.Network;
+import ru.majordomo.hms.rc.staff.test.config.ValidationConfig;
 
 import java.util.List;
+
+import javax.validation.ConstraintViolationException;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
         RepositoriesConfig.class,
-        ConfigOfGovernors.class
+        ConfigOfGovernors.class,
+        ValidationConfig.class
 })
 public class GovernorOfNetworkTest {
 
@@ -143,50 +147,50 @@ public class GovernorOfNetworkTest {
         governorOfNetwork.createResource(serviceMessage);
     }
 
-    @Test(expected = ParameterValidateException.class)
-    public void createResourceWithGatewayNotInNetwork() throws ParameterValidateException {
+    @Test(expected = ConstraintViolationException.class)
+    public void createResourceWithGatewayNotInNetwork() {
         serviceMessage = createServiceMessage(name, switchedOn, address, mask, "10.10.10.1", vlanNumber);
         governorOfNetwork.createResource(serviceMessage);
     }
 
-    @Test(expected = ParameterValidateException.class)
-    public void createResourceWithMaskOutOfRange() throws ParameterValidateException {
+    @Test(expected = ConstraintViolationException.class)
+    public void createResourceWithMaskOutOfRange() {
         serviceMessage = createServiceMessage(name, switchedOn, address, 101, gatewayAddress, vlanNumber);
         governorOfNetwork.createResource(serviceMessage);
     }
 
-    @Test(expected = ParameterValidateException.class)
-    public void createResourceWithVlanOutOfRange() throws ParameterValidateException {
+    @Test(expected = ConstraintViolationException.class)
+    public void createResourceWithVlanOutOfRange() {
         serviceMessage = createServiceMessage(name, switchedOn, address, mask, gatewayAddress, -1);
         governorOfNetwork.createResource(serviceMessage);
     }
 
-    @Test(expected = ParameterValidateException.class)
-    public void validateWithInvalidAddress() throws ParameterValidateException {
+    @Test(expected = ConstraintViolationException.class)
+    public void validateWithInvalidAddress() {
         serviceMessage = createServiceMessage(name, switchedOn, address, mask, gatewayAddress, vlanNumber);
         Network network = governorOfNetwork.createResource(serviceMessage);
         network.setAddress(-1L);
         governorOfNetwork.isValid(network);
     }
 
-    @Test(expected = ParameterValidateException.class)
-    public void validateWithInvalidGatewayNotInNetwork() throws ParameterValidateException {
+    @Test(expected = ConstraintViolationException.class)
+    public void validateWithInvalidGatewayNotInNetwork() {
         serviceMessage = createServiceMessage(name, switchedOn, address, mask, gatewayAddress, 103);
         Network network = governorOfNetwork.createResource(serviceMessage);
         network.setGatewayAddress("10.10.10.1");
         governorOfNetwork.isValid(network);
     }
 
-    @Test(expected = ParameterValidateException.class)
-    public void validateWithMaskOutOfRange() throws ParameterValidateException {
+    @Test(expected = ConstraintViolationException.class)
+    public void validateWithMaskOutOfRange() {
         serviceMessage = createServiceMessage(name, switchedOn, address, mask, gatewayAddress, vlanNumber);
         Network network = governorOfNetwork.createResource(serviceMessage);
         network.setMask(101);
         governorOfNetwork.isValid(network);
     }
 
-    @Test(expected = ParameterValidateException.class)
-    public void validateWithVlanOutOfRange() throws ParameterValidateException {
+    @Test(expected = ConstraintViolationException.class)
+    public void validateWithVlanOutOfRange() {
         serviceMessage = createServiceMessage(name, switchedOn, address, mask, gatewayAddress, vlanNumber);
         Network network = governorOfNetwork.createResource(serviceMessage);
         network.setVlanNumber(-1);

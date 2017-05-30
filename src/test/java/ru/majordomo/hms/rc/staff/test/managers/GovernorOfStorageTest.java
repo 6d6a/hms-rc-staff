@@ -15,20 +15,24 @@ import ru.majordomo.hms.rc.staff.repositories.StorageRepository;
 import ru.majordomo.hms.rc.staff.resources.Storage;
 import ru.majordomo.hms.rc.staff.test.config.ConfigOfGovernors;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
+import ru.majordomo.hms.rc.staff.test.config.ValidationConfig;
 
 import java.util.List;
+
+import javax.validation.ConstraintViolationException;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
         RepositoriesConfig.class,
-        ConfigOfGovernors.class
+        ConfigOfGovernors.class,
+        ValidationConfig.class
 })
 public class GovernorOfStorageTest {
     @Autowired
-    GovernorOfStorage governor;
+    private GovernorOfStorage governor;
 
-    ServiceMessage testServiceMessage;
-    Storage testStorage;
+    private ServiceMessage testServiceMessage;
+    private Storage testStorage;
 
     @Autowired
     private StorageRepository storageRepository;
@@ -113,41 +117,40 @@ public class GovernorOfStorageTest {
         }
     }
 
-    @Test(expected = ParameterValidateException.class)
-    public void createResourceWithInvalidCapacity() throws ParameterValidateException {
+    @Test(expected = ConstraintViolationException.class)
+    public void createResourceWithInvalidCapacity() {
         testServiceMessage = generateServiceMessage("Хранилище 2", Boolean.TRUE, 0.0, 3 * Math.pow(10, 12), "/home/");
         governor.createResource(testServiceMessage);
     }
 
-    @Test(expected = ParameterValidateException.class)
-    public void createResourceWithInvalidCapacityUsed() throws ParameterValidateException {
+    @Test(expected = ConstraintViolationException.class)
+    public void createResourceWithInvalidCapacityUsed() {
         testServiceMessage = generateServiceMessage("Хранилище 3", Boolean.TRUE, 5 * Math.pow(10, 12), -10.0, "/home/");
         governor.createResource(testServiceMessage);
     }
 
-    @Test(expected = ParameterValidateException.class)
-    public void createResourceWithCapacityUsedBiggerThenCapacity() throws ParameterValidateException {
+    @Test(expected = ConstraintViolationException.class)
+    public void createResourceWithCapacityUsedBiggerThenCapacity() {
         testServiceMessage = generateServiceMessage("Хранилище 4", Boolean.TRUE, 3 * Math.pow(10, 12), 5 * Math.pow(10, 12), "/home/");
         governor.createResource(testServiceMessage);
     }
 
-    @Test(expected = ParameterValidateException.class)
-    public void validateWithInvalidCapacity() throws ParameterValidateException {
+    @Test(expected = ConstraintViolationException.class)
+    public void validateWithInvalidCapacity() {
         testStorage.setCapacity(0.0);
         governor.isValid(testStorage);
     }
 
-    @Test(expected = ParameterValidateException.class)
-    public void validateWithInvalidCapacityUsed() throws ParameterValidateException {
+    @Test(expected = ConstraintViolationException.class)
+    public void validateWithInvalidCapacityUsed() {
         testStorage.setCapacityUsed(-10.0);
         governor.isValid(testStorage);
     }
 
-    @Test(expected = ParameterValidateException.class)
-    public void validateWithInvalidCapacityUsedBiggerThenCapacity() throws ParameterValidateException {
+    @Test(expected = ConstraintViolationException.class)
+    public void validateWithInvalidCapacityUsedBiggerThenCapacity() {
         testStorage.setCapacity(3 * Math.pow(10, 12));
         testStorage.setCapacityUsed(5 * Math.pow(10, 12));
         governor.isValid(testStorage);
     }
-
 }

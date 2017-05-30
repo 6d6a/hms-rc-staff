@@ -17,24 +17,28 @@ import ru.majordomo.hms.rc.staff.repositories.NetworkRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceSocketRepository;
 import ru.majordomo.hms.rc.staff.resources.Network;
 import ru.majordomo.hms.rc.staff.resources.ServiceSocket;
+import ru.majordomo.hms.rc.staff.test.config.ValidationConfig;
 
 import java.util.List;
+
+import javax.validation.ConstraintViolationException;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
         RepositoriesConfig.class,
-        ConfigOfGovernors.class
+        ConfigOfGovernors.class,
+        ValidationConfig.class
 })
 public class GovernorOfServiceSocketTest {
     @Autowired
-    GovernorOfServiceSocket governor;
+    private GovernorOfServiceSocket governor;
     @Autowired
-    ServiceSocketRepository repository;
+    private ServiceSocketRepository repository;
     @Autowired
-    NetworkRepository networkRepository;
+    private NetworkRepository networkRepository;
 
-    ServiceSocket testServiceSocket;
-    ServiceMessage testServiceMessage;
+    private ServiceSocket testServiceSocket;
+    private ServiceMessage testServiceMessage;
 
     private ServiceMessage generateServiceMessage(String name, Boolean switchedOn,
                                                   String address, Integer port) {
@@ -120,22 +124,22 @@ public class GovernorOfServiceSocketTest {
         }
     }
 
-    @Test(expected = ParameterValidateException.class)
-    public void createWithBadAddressHigher() throws ParameterValidateException {
+    @Test(expected = ConstraintViolationException.class)
+    public void createWithBadAddressHigher() {
         ServiceMessage badAddressServiceMessage = testServiceMessage;
         badAddressServiceMessage.addParam("address", "11.20.30.40");
         governor.createResource(badAddressServiceMessage);
     }
 
-    @Test(expected = ParameterValidateException.class)
-    public void createWithBadAddressLower() throws ParameterValidateException {
+    @Test(expected = ConstraintViolationException.class)
+    public void createWithBadAddressLower() {
         ServiceMessage badAddressServiceMessage = testServiceMessage;
         badAddressServiceMessage.addParam("address", "9.20.30.40");
         governor.createResource(badAddressServiceMessage);
     }
 
-    @Test(expected = ParameterValidateException.class)
-    public void createWithBadPort() throws ParameterValidateException {
+    @Test(expected = ConstraintViolationException.class)
+    public void createWithBadPort() {
         ServiceMessage badPortServiceMessage = testServiceMessage;
         badPortServiceMessage.addParam("port", -1);
         governor.createResource(badPortServiceMessage);

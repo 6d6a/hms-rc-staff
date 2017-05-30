@@ -3,6 +3,8 @@ package ru.majordomo.hms.rc.staff.api.http;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +21,6 @@ import java.util.Map;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfServer;
 import ru.majordomo.hms.rc.staff.resources.Server;
-import ru.majordomo.hms.rc.staff.resources.Service;
 import ru.majordomo.hms.rc.staff.resources.Storage;
 
 @RestController
@@ -37,19 +37,6 @@ public class ServerRestController extends RestControllerTemplate<Server> {
     @RequestMapping(value = "/{serverId}", method = RequestMethod.GET)
     public Server readOne(@PathVariable String serverId) {
         return processReadOneQuery(serverId);
-    }
-
-    //Возвращает список объектов Service
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
-    @RequestMapping(value = "/{serverId}/services", method = RequestMethod.GET)
-    public Collection<Service> readAllServices(@PathVariable String serverId, @RequestParam Map<String,String> requestParams) {
-        requestParams.put("serverId", serverId);
-        Collection<Server> servers = processReadAllWithParamsQuery(requestParams);
-        Collection<Service> services = new ArrayList<>();
-        for (Server server : servers) {
-            services.addAll(server.getServices());
-        }
-        return services;
     }
 
     //Возвращает ActiveMailboxStorage
@@ -71,6 +58,25 @@ public class ServerRestController extends RestControllerTemplate<Server> {
         } else {
             return processReadAllQuery();
         }
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVER_VIEW')")
+    @RequestMapping(value = {"", "/"}, method = RequestMethod.GET, headers = "X-HMS-Pageable=true")
+    public Page<Server> readAll(
+            @RequestParam(required=false) Map<String,String> requestParams,
+            Pageable pageable
+    ) {
+        if (!requestParams.isEmpty()) {
+            return processReadAllWithParamsQuery(requestParams, pageable);
+        } else {
+            return processReadAllQuery(pageable);
+        }
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVER_VIEW')")
+    @RequestMapping(value = {"", "/"}, method = RequestMethod.GET, headers = "X-HMS-Projection=OnlyIdAndName")
+    public Collection<Server> readAll() {
+        return processReadAllQueryOnlyIdAndName();
     }
 
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVER_VIEW')")

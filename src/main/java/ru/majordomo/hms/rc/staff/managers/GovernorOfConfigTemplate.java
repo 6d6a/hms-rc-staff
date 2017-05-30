@@ -1,36 +1,34 @@
 package ru.majordomo.hms.rc.staff.managers;
 
 import org.apache.commons.lang.NotImplementedException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
+
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
 import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
 import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
+import ru.majordomo.hms.rc.staff.resources.validation.group.ConfigTemplateChecks;
 
 @Component
 public class GovernorOfConfigTemplate extends LordOfResources<ConfigTemplate> {
-    private static final Logger logger = LoggerFactory.getLogger(GovernorOfConfigTemplate.class);
-
     private Cleaner cleaner;
-    private ConfigTemplateRepository configTemplateRepository;
     private GovernorOfServiceTemplate governorOfServiceTemplate;
+    private Validator validator;
 
     @Autowired
-    public void setConfigTemplateRepository(ConfigTemplateRepository configTemplateRepository) {
-        this.configTemplateRepository = configTemplateRepository;
+    public void setConfigTemplateRepository(ConfigTemplateRepository repository) {
+        this.repository = repository;
     }
 
     @Autowired
@@ -43,10 +41,13 @@ public class GovernorOfConfigTemplate extends LordOfResources<ConfigTemplate> {
         this.cleaner = cleaner;
     }
 
+    @Autowired
+    public void setValidator(Validator validator) {
+        this.validator = validator;
+    }
+
     @Override
     public ConfigTemplate createResource(ServiceMessage serviceMessage) throws ParameterValidateException {
-        String loggerPrefix = "OPERATION IDENTITY:" + serviceMessage.getOperationIdentity() + " ACTION IDENTITY:" + serviceMessage.getActionIdentity() + " ";
-
         ConfigTemplate configTemplate = new ConfigTemplate();
         LordOfResources.setResourceParams(configTemplate, serviceMessage, cleaner);
         String fileLink = cleaner.cleanString((String)serviceMessage.getParam("fileLink"));
@@ -57,67 +58,18 @@ public class GovernorOfConfigTemplate extends LordOfResources<ConfigTemplate> {
     }
 
     @Override
-    public void isValid(ConfigTemplate resource) throws ParameterValidateException {
-        String fileLink = resource.getFileLink();
-        if (fileLink.equals("")) {
-            throw new ParameterValidateException("Адрес не может быть пустым");
-        }
-        try {
-            URL url = new URL(fileLink);
-        } catch (MalformedURLException e) {
-            throw new ParameterValidateException("Параметр fileLink содержит некорретный URL:'"
-                                                    + fileLink + "'");
-        }
-    }
+    public void isValid(ConfigTemplate configTemplate) throws ParameterValidateException {
+        Set<ConstraintViolation<ConfigTemplate>> constraintViolations = validator.validate(configTemplate, ConfigTemplateChecks.class);
 
-    @Override
-    public ConfigTemplate build(String resourceId) throws ResourceNotFoundException {
-        ConfigTemplate configTemplate = configTemplateRepository.findOne(resourceId);
-        if (configTemplate == null) {
-            throw new ResourceNotFoundException("ConfigTemplate с ID:" + resourceId + " не найден");
+        if (!constraintViolations.isEmpty()) {
+            logger.error("configTemplate: " + configTemplate + " constraintViolations: " + constraintViolations.toString());
+            throw new ConstraintViolationException(constraintViolations);
         }
-        return configTemplate;
     }
 
     @Override
     public ConfigTemplate build(Map<String, String> keyValue) throws NotImplementedException {
         throw new NotImplementedException();
-    }
-
-    @Override
-    public List<ConfigTemplate> buildAll(Map<String, String> keyValue) {
-
-        List<ConfigTemplate> buildedConfigTemplates = new ArrayList<>();
-
-        Boolean byName = false;
-
-        for (Map.Entry<String, String> entry : keyValue.entrySet()) {
-            if (entry.getKey().equals("name")) {
-                byName = true;
-            }
-        }
-
-        if (byName) {
-            for (ConfigTemplate configTemplate : configTemplateRepository.findByName(keyValue.get("name"))) {
-                buildedConfigTemplates.add(build(configTemplate.getId()));
-            }
-        } else {
-            for (ConfigTemplate configTemplate : configTemplateRepository.findAll()) {
-                buildedConfigTemplates.add(build(configTemplate.getId()));
-            }
-        }
-
-        return buildedConfigTemplates;
-    }
-
-    @Override
-    public List<ConfigTemplate> buildAll() {
-        return configTemplateRepository.findAll();
-    }
-
-    @Override
-    public void save(ConfigTemplate resource) {
-        configTemplateRepository.save(resource);
     }
 
     @Override
@@ -131,11 +83,4 @@ public class GovernorOfConfigTemplate extends LordOfResources<ConfigTemplate> {
             }
         }
     }
-
-    @Override
-    public void delete(String resourceId) {
-        preDelete(resourceId);
-        configTemplateRepository.delete(resourceId);
-    }
-
 }

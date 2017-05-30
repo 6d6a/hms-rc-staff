@@ -20,6 +20,10 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.majordomo.hms.rc.staff.event.server.listener.ServerMongoEventListener;
+import ru.majordomo.hms.rc.staff.event.serverRole.listener.ServerRoleMongoEventListener;
+import ru.majordomo.hms.rc.staff.event.service.listener.ServiceMongoEventListener;
+import ru.majordomo.hms.rc.staff.event.serviceTemplate.listener.ServiceTemplateMongoEventListener;
 import ru.majordomo.hms.rc.staff.repositories.*;
 import ru.majordomo.hms.rc.staff.resources.*;
 import ru.majordomo.hms.rc.staff.test.config.*;
@@ -42,7 +46,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         classes = {
                 RepositoriesConfig.class,
                 ConfigOfRestControllers.class,
-                ConfigOfGovernors.class
+                ConfigOfGovernors.class,
+                ValidationConfig.class,
+                ServiceTemplateMongoEventListener.class,
+                ServerMongoEventListener.class,
+                ServiceMongoEventListener.class,
+                ServerRoleMongoEventListener.class
         },
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = {
@@ -115,7 +124,8 @@ public class ServerRestControllerTest {
 
             ServiceTemplate serviceTemplate = new ServiceTemplate();
             serviceTemplate.addConfigTemplate(configTemplate);
-            serviceTemplate.setServiceType(serviceType);
+//            serviceTemplate.setServiceType(serviceType);
+            serviceTemplate.setServiceTypeName(serviceType.getName());
             serviceTemplateRepository.save(serviceTemplate);
 
             ServerRole serverRole = new ServerRole();
@@ -208,7 +218,9 @@ public class ServerRestControllerTest {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testServers.get(0).getId()).accept(APPLICATION_JSON_UTF8);
 
         try {
-            mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(APPLICATION_JSON_UTF8))
+            mockMvc.perform(request)
+                    .andExpect(status().isOk())
+                    .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                     .andDo(this.document)
                     .andDo(this.document.document(
                     responseFields(
@@ -216,8 +228,11 @@ public class ServerRestControllerTest {
                             fieldWithPath("name").description("Имя Server"),
                             fieldWithPath("switchedOn").description("Статус Server"),
                             fieldWithPath("services").description("Список Service для Server"),
+                            fieldWithPath("serviceIds").description("Список serviceIds для Server"),
                             fieldWithPath("serverRoles").description("Список ServerRoles для Server"),
-                            fieldWithPath("storages").description("Список Storages для Server")
+                            fieldWithPath("serverRoleIds").description("Список serverRoleIds для Server"),
+                            fieldWithPath("storages").description("Список Storages для Server"),
+                            fieldWithPath("storageIds").description("Список storageIds для Server")
                     )
             ));
         } catch (Exception e) {
@@ -241,8 +256,11 @@ public class ServerRestControllerTest {
                                     fieldWithPath("[].name").description("Имя Server"),
                                     fieldWithPath("[].switchedOn").description("Статус Server"),
                                     fieldWithPath("[].services").description("Список Service для Server"),
+                                    fieldWithPath("[].serviceIds").description("Список serviceIds для Server"),
                                     fieldWithPath("[].serverRoles").description("Список ServerRoles для Server"),
-                                    fieldWithPath("[].storages").description("Список Storages для Server")
+                                    fieldWithPath("[].serverRoleIds").description("Список serverRoleIds для Server"),
+                                    fieldWithPath("[].storages").description("Список Storages для Server"),
+                                    fieldWithPath("[].storageIds").description("Список storageIds для Server")
                             )
                     ));
         } catch (Exception e) {
@@ -312,8 +330,11 @@ public class ServerRestControllerTest {
                                     fieldWithPath("[].name").description("Имя Server"),
                                     fieldWithPath("[].switchedOn").description("Статус Server"),
                                     fieldWithPath("[].services").description("Список Service для Server"),
+                                    fieldWithPath("[].serviceIds").description("Список serviceIds для Server"),
                                     fieldWithPath("[].serverRoles").description("Список ServerRoles для Server"),
-                                    fieldWithPath("[].storages").description("Список Storages для Server")
+                                    fieldWithPath("[].serverRoleIds").description("Список serverRoleIds для Server"),
+                                    fieldWithPath("[].storages").description("Список Storages для Server"),
+                                    fieldWithPath("[].storageIds").description("Список storageIds для Server")
                             )
                     ));
         } catch (Exception e) {
@@ -444,8 +465,11 @@ public class ServerRestControllerTest {
                                     fieldWithPath("name").description("Имя Server"),
                                     fieldWithPath("switchedOn").description("Статус Server"),
                                     fieldWithPath("services").description("Список Service для Server"),
+                                    fieldWithPath("serviceIds").description("Список serviceIds для Server"),
                                     fieldWithPath("serverRoles").description("Список ServerRoles для Server"),
-                                    fieldWithPath("storages").description("Список Storages для Server")
+                                    fieldWithPath("serverRoleIds").description("Список serverRoleIds для Server"),
+                                    fieldWithPath("storages").description("Список Storages для Server"),
+                                    fieldWithPath("storageIds").description("Список storageIds для Server")
                             )
                     ));
         } catch (Exception e) {

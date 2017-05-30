@@ -12,28 +12,37 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.validation.ConstraintViolationException;
 
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
-import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
+import ru.majordomo.hms.rc.staff.event.serverRole.listener.ServerRoleMongoEventListener;
+import ru.majordomo.hms.rc.staff.event.serviceTemplate.listener.ServiceTemplateMongoEventListener;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfServerRole;
 import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServerRoleRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceTemplateRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceTypeRepository;
 import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
+import ru.majordomo.hms.rc.staff.resources.Resource;
 import ru.majordomo.hms.rc.staff.resources.ServerRole;
 import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 import ru.majordomo.hms.rc.staff.resources.ServiceType;
 import ru.majordomo.hms.rc.staff.test.config.ConfigOfGovernors;
 import ru.majordomo.hms.rc.staff.test.config.EmbeddedServletContainerConfig;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
+import ru.majordomo.hms.rc.staff.test.config.ValidationConfig;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(
         classes = {
                 RepositoriesConfig.class,
                 ConfigOfGovernors.class,
-                EmbeddedServletContainerConfig.class
+                EmbeddedServletContainerConfig.class,
+                ValidationConfig.class,
+                ServiceTemplateMongoEventListener.class,
+                ServerRoleMongoEventListener.class
         },
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
@@ -54,10 +63,12 @@ public class GovernorOfServerRoleTest {
 
     private ServiceMessage generateServiceMessage(String name, Boolean switchedOn,
                                                   List<ServiceTemplate> serviceTemplates) {
+        List<String> serviceTemplateIds = serviceTemplates.stream().map(Resource::getId).collect(Collectors.toList());
+
         ServiceMessage serviceMessage = new ServiceMessage();
         serviceMessage.addParam("name", name);
         serviceMessage.addParam("switchedOn", switchedOn);
-        serviceMessage.addParam("serviceTemplates", serviceTemplates);
+        serviceMessage.addParam("serviceTemplateIds", serviceTemplateIds);
 
         return serviceMessage;
     }
@@ -83,7 +94,7 @@ public class GovernorOfServerRoleTest {
         ServiceType serviceType = new ServiceType();
         serviceType.setName("DATABASE_MYSQL");
         serviceTypeRepository.save(serviceType);
-        serviceTemplate.setServiceType(serviceType);
+        serviceTemplate.setServiceTypeName(serviceType.getName());
         serviceTemplateRepository.save(serviceTemplate);
 
         // Создать сервер роль и сервисное сообщение
@@ -139,18 +150,18 @@ public class GovernorOfServerRoleTest {
         }
     }
 
-    @Test(expected = ParameterValidateException.class)
-    public void createWithUnknownServiceTemplate() throws ParameterValidateException {
+    @Test(expected = ConstraintViolationException.class)
+    public void createWithUnknownServiceTemplate() {
         List<String> unknownServiceTemplates = new ArrayList<>();
         unknownServiceTemplates.add(ObjectId.get().toString());
-        testServiceMessage.addParam("serviceTemplates", unknownServiceTemplates);
+        testServiceMessage.addParam("serviceTemplateIds", unknownServiceTemplates);
         governor.createResource(testServiceMessage);
     }
 
-    @Test(expected = ParameterValidateException.class)
-    public void validateWithEmptyServiceTemplate() throws ParameterValidateException {
-        List<ServiceTemplate> emptyServiceTemplates = new ArrayList<>();
-        testServerRole.setServiceTemplates(emptyServiceTemplates);
+    @Test(expected = ConstraintViolationException.class)
+    public void validateWithEmptyServiceTemplate() {
+        List<String> emptyServiceTemplates = new ArrayList<>();
+        testServerRole.setServiceTemplateIds(emptyServiceTemplates);
         governor.isValid(testServerRole);
     }
 

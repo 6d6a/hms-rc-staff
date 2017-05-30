@@ -12,8 +12,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.validation.ConstraintViolationException;
 
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
+import ru.majordomo.hms.rc.staff.event.service.listener.ServiceMongoEventListener;
+import ru.majordomo.hms.rc.staff.event.serviceTemplate.listener.ServiceTemplateMongoEventListener;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfService;
 import ru.majordomo.hms.rc.staff.repositories.*;
@@ -21,13 +26,17 @@ import ru.majordomo.hms.rc.staff.resources.*;
 import ru.majordomo.hms.rc.staff.test.config.ConfigOfGovernors;
 import ru.majordomo.hms.rc.staff.test.config.EmbeddedServletContainerConfig;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
+import ru.majordomo.hms.rc.staff.test.config.ValidationConfig;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(
         classes = {
                 RepositoriesConfig.class,
                 ConfigOfGovernors.class,
-                EmbeddedServletContainerConfig.class
+                EmbeddedServletContainerConfig.class,
+                ValidationConfig.class,
+                ServiceMongoEventListener.class,
+                ServiceTemplateMongoEventListener.class
         },
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
@@ -45,17 +54,19 @@ public class GovernorOfServiceTest {
     @Autowired
     private ServiceTypeRepository serviceTypeRepository;
 
-    ServiceMessage testServiceMessage;
-    Service testService;
+    private ServiceMessage testServiceMessage;
+    private Service testService;
 
     private ServiceMessage generateServiceMessage(String name, Boolean switchedOn,
                                                   ServiceTemplate serviceTemplate,
                                                   List<ServiceSocket> serviceSockets) {
+        List<String> serviceSocketIds = serviceSockets.stream().map(Resource::getId).collect(Collectors.toList());
+
         ServiceMessage serviceMessage = new ServiceMessage();
         serviceMessage.addParam("name", name);
         serviceMessage.addParam("switchedOn", switchedOn);
-        serviceMessage.addParam("serviceTemplate", serviceTemplate);
-        serviceMessage.addParam("serviceSockets", serviceSockets);
+        serviceMessage.addParam("serviceTemplateId", serviceTemplate.getId());
+        serviceMessage.addParam("serviceSocketIds", serviceSocketIds);
 
         return serviceMessage;
     }
@@ -63,11 +74,13 @@ public class GovernorOfServiceTest {
     private Service generateService(String name, Boolean switchedOn,
                                     ServiceTemplate serviceTemplate,
                                     List<ServiceSocket> serviceSockets) {
+        List<String> serviceSocketIds = serviceSockets.stream().map(Resource::getId).collect(Collectors.toList());
+
         Service service = new Service();
         service.setName(name);
         service.setSwitchedOn(switchedOn);
         service.setServiceTemplate(serviceTemplate);
-        service.setServiceSockets(serviceSockets);
+        service.setServiceSocketIds(serviceSocketIds);
 
         return service;
     }
@@ -147,19 +160,19 @@ public class GovernorOfServiceTest {
         }
     }
 
-    @Test(expected = ParameterValidateException.class)
-    public void createWithUnknownSocket() throws ParameterValidateException {
+    @Test(expected = ConstraintViolationException.class)
+    public void createWithUnknownSocket() {
         List<String> unknownSocketList = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             unknownSocketList.add(ObjectId.get().toString());
         }
-        testServiceMessage.addParam("serviceSockets", unknownSocketList);
+        testServiceMessage.addParam("serviceSocketIds", unknownSocketList);
         governor.createResource(testServiceMessage);
     }
 
-    @Test(expected = ParameterValidateException.class)
-    public void createWithUnknownTemplate() throws ParameterValidateException {
-        testServiceMessage.addParam("serviceTemplate", ObjectId.get().toString());
+    @Test(expected = ConstraintViolationException.class)
+    public void createWithUnknownTemplate() {
+        testServiceMessage.addParam("serviceTemplateId", ObjectId.get().toString());
         governor.createResource(testServiceMessage);
     }
 

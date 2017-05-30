@@ -6,7 +6,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
@@ -21,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.majordomo.hms.rc.staff.test.config.*;
-import ru.majordomo.hms.rc.staff.managers.GovernorOfNetwork;
 import ru.majordomo.hms.rc.staff.repositories.NetworkRepository;
 import ru.majordomo.hms.rc.staff.resources.Network;
 
@@ -41,7 +39,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         classes = {
                 RepositoriesConfig.class,
                 ConfigOfRestControllers.class,
-                ConfigOfGovernors.class
+                ConfigOfGovernors.class,
+                ValidationConfig.class
         },
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
@@ -50,12 +49,7 @@ public class NetworkRestControllerTest {
     public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("build/generated-snippets");
 
     @Autowired
-    private GovernorOfNetwork governorOfNetwork;
-    @Autowired
     private NetworkRepository networkRepository;
-
-    @Autowired
-    private TestRestTemplate restTemplate;
 
     @Autowired
     private WebApplicationContext webApplicationContext;

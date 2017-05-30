@@ -19,6 +19,8 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.majordomo.hms.rc.staff.event.service.listener.ServiceMongoEventListener;
+import ru.majordomo.hms.rc.staff.event.serviceTemplate.listener.ServiceTemplateMongoEventListener;
 import ru.majordomo.hms.rc.staff.repositories.*;
 import ru.majordomo.hms.rc.staff.resources.*;
 import ru.majordomo.hms.rc.staff.test.config.*;
@@ -40,7 +42,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         classes = {
                 RepositoriesConfig.class,
                 ConfigOfRestControllers.class,
-                ConfigOfGovernors.class
+                ConfigOfGovernors.class,
+                ValidationConfig.class,
+                ServiceMongoEventListener.class,
+                ServiceTemplateMongoEventListener.class
         },
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
@@ -49,7 +54,7 @@ public class ServiceRestControllerTest {
     public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("build/generated-snippets");
 
     @Autowired
-    WebApplicationContext ctx;
+    private WebApplicationContext ctx;
     @Autowired
     private ServiceRepository serviceRepository;
     @Autowired
@@ -137,7 +142,9 @@ public class ServiceRestControllerTest {
                             fieldWithPath("name").description("Имя Service"),
                             fieldWithPath("switchedOn").description("Статус Service"),
                             fieldWithPath("serviceSockets").description("Список serviceSockets для Service"),
-                            fieldWithPath("serviceTemplate").description("serviceTemplate для Service")
+                            fieldWithPath("serviceSocketIds").description("Список serviceSocketIds для Service"),
+                            fieldWithPath("serviceTemplate").description("serviceTemplate для Service"),
+                            fieldWithPath("serviceTemplateId").description("serviceTemplateId для Service")
                     )
             ));
         } catch (Exception e) {
@@ -161,7 +168,9 @@ public class ServiceRestControllerTest {
                             fieldWithPath("[].name").description("Имя Service"),
                             fieldWithPath("[].switchedOn").description("Статус Service"),
                             fieldWithPath("[].serviceSockets").description("Список serviceSockets для Service"),
-                            fieldWithPath("[].serviceTemplate").description("serviceTemplate для Service")
+                            fieldWithPath("[].serviceSocketIds").description("Список serviceSocketIds для Service"),
+                            fieldWithPath("[].serviceTemplate").description("serviceTemplate для Service"),
+                            fieldWithPath("[].serviceTemplateId").description("serviceTemplateId для Service")
                     )
             ));
         } catch (Exception e) {
@@ -185,7 +194,9 @@ public class ServiceRestControllerTest {
                                     fieldWithPath("[].name").description("Имя Service"),
                                     fieldWithPath("[].switchedOn").description("Статус Service"),
                                     fieldWithPath("[].serviceSockets").description("Список serviceSockets для Service"),
-                                    fieldWithPath("[].serviceTemplate").description("serviceTemplate для Service")
+                                    fieldWithPath("[].serviceSocketIds").description("Список serviceSocketIds для Service"),
+                                    fieldWithPath("[].serviceTemplate").description("serviceTemplate для Service"),
+                                    fieldWithPath("[].serviceTemplateId").description("serviceTemplateId для Service")
                             )
                     ));
         } catch (Exception e) {
@@ -213,7 +224,9 @@ public class ServiceRestControllerTest {
                                     fieldWithPath("name").description("Имя Service"),
                                     fieldWithPath("switchedOn").description("Статус Service"),
                                     fieldWithPath("serviceSockets").description("Список serviceSockets для Service"),
-                                    fieldWithPath("serviceTemplate").description("serviceTemplate для Service")
+                                    fieldWithPath("serviceSocketIds").description("Список serviceSocketIds для Service"),
+                                    fieldWithPath("serviceTemplate").description("serviceTemplate для Service"),
+                                    fieldWithPath("serviceTemplateId").description("serviceTemplateId для Service")
                             )
                     ));
         } catch (Exception e) {

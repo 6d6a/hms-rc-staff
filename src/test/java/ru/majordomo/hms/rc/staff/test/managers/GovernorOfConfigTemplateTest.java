@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import ru.majordomo.hms.rc.staff.event.serviceTemplate.listener.ServiceTemplateMongoEventListener;
 import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
 import ru.majordomo.hms.rc.staff.test.config.ConfigOfGovernors;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
@@ -16,13 +17,17 @@ import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfConfigTemplate;
 import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
+import ru.majordomo.hms.rc.staff.test.config.ValidationConfig;
 
 import java.util.List;
+
+import javax.validation.ConstraintViolationException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {
         RepositoriesConfig.class,
-        ConfigOfGovernors.class
+        ConfigOfGovernors.class,
+        ValidationConfig.class
 })
 public class GovernorOfConfigTemplateTest {
     @Autowired
@@ -96,8 +101,8 @@ public class GovernorOfConfigTemplateTest {
 
     }
 
-    @Test(expected = ParameterValidateException.class)
-    public void createWithBadUrl() throws ParameterValidateException {
+    @Test(expected = ConstraintViolationException.class)
+    public void createWithBadUrl()  {
         String fileName = "apache.conf";
         String fileLink = "/file/" + ObjectId.get().toString();
         Boolean switchedOn = Boolean.TRUE;

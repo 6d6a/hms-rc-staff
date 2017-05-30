@@ -1,6 +1,8 @@
 package ru.majordomo.hms.rc.staff.api.http;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Collection;
@@ -45,6 +47,29 @@ public class ServerRoleRestController extends RestControllerTemplate<ServerRole>
         } else {
             return processReadAllQuery();
         }
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVER_ROLE_VIEW')")
+    @RequestMapping(value = {"", "/"}, method = RequestMethod.GET, headers = "X-HMS-Pageable=true")
+    public Page<ServerRole> readAll(
+            @RequestParam(required=false, defaultValue="") String name,
+            Pageable pageable
+    ) {
+        Map<String, String> keyValue = new HashMap<>();
+        if (!name.isEmpty()) {
+            keyValue.put("name", name);
+        }
+        if (!keyValue.isEmpty()) {
+            return processReadAllWithParamsQuery(keyValue, pageable);
+        } else {
+            return processReadAllQuery(pageable);
+        }
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVER_ROLE_VIEW')")
+    @RequestMapping(value = {"", "/"}, method = RequestMethod.GET, headers = "X-HMS-Projection=OnlyIdAndName")
+    public Collection<ServerRole> readAll() {
+        return processReadAllQueryOnlyIdAndName();
     }
 
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVER_ROLE_CREATE')")

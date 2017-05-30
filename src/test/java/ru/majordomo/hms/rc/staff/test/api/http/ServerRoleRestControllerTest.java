@@ -21,6 +21,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.majordomo.hms.rc.staff.event.serverRole.listener.ServerRoleMongoEventListener;
 import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServerRoleRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceTemplateRepository;
@@ -47,7 +48,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         classes = {
                 RepositoriesConfig.class,
                 ConfigOfRestControllers.class,
-                ConfigOfGovernors.class
+                ConfigOfGovernors.class,
+                ValidationConfig.class,
+                ServerRoleMongoEventListener.class
         },
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
@@ -56,7 +59,7 @@ public class ServerRoleRestControllerTest {
     public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("build/generated-snippets");
 
     @Autowired
-    WebApplicationContext ctx;
+    private WebApplicationContext ctx;
     @Autowired
     private ServerRoleRepository serverRoleRepository;
     @Autowired
@@ -132,7 +135,8 @@ public class ServerRoleRestControllerTest {
                                     fieldWithPath("id").description("ServerRole ID"),
                                     fieldWithPath("name").description("Имя ServerRole"),
                                     fieldWithPath("switchedOn").description("Статус ServerRole"),
-                                    fieldWithPath("serviceTemplates").description("Список ServiceTemplates для ServerRole")
+                                    fieldWithPath("serviceTemplates").description("Список ServiceTemplates для ServerRole"),
+                                    fieldWithPath("serviceTemplateIds").description("Список serviceTemplateIds для ServerRole")
                             )
                     ));
         } catch (Exception e) {
@@ -155,7 +159,8 @@ public class ServerRoleRestControllerTest {
                             fieldWithPath("[].id").description("ServerRole ID"),
                             fieldWithPath("[].name").description("Имя ServerRole"),
                             fieldWithPath("[].switchedOn").description("Статус ServerRole"),
-                            fieldWithPath("[].serviceTemplates").description("Список ServiceTemplates для ServerRole")
+                            fieldWithPath("[].serviceTemplates").description("Список ServiceTemplates для ServerRole"),
+                            fieldWithPath("[].serviceTemplateIds").description("Список serviceTemplateIds для ServerRole")
                     )
             ));
         } catch (Exception e) {
@@ -178,7 +183,8 @@ public class ServerRoleRestControllerTest {
                                     fieldWithPath("[].id").description("ServerRole ID"),
                                     fieldWithPath("[].name").description("Имя ServerRole"),
                                     fieldWithPath("[].switchedOn").description("Статус ServerRole"),
-                                    fieldWithPath("[].serviceTemplates").description("Список ServiceTemplates для ServerRole")
+                                    fieldWithPath("[].serviceTemplates").description("Список ServiceTemplates для ServerRole"),
+                                    fieldWithPath("[].serviceTemplateIds").description("Список serviceTemplateIds для ServerRole")
                             )
                     ));
         } catch (Exception e) {
@@ -204,7 +210,8 @@ public class ServerRoleRestControllerTest {
                                     fieldWithPath("id").description("ServerRole ID"),
                                     fieldWithPath("name").description("Имя ServerRole"),
                                     fieldWithPath("switchedOn").description("Статус ServerRole"),
-                                    fieldWithPath("serviceTemplates").description("Список ServiceTemplates для ServerRole")
+                                    fieldWithPath("serviceTemplates").description("Список ServiceTemplates для ServerRole"),
+                                    fieldWithPath("serviceTemplateIds").description("Список serviceTemplateIds для ServerRole")
                             )
                     ));
         } catch (Exception e) {
@@ -217,6 +224,7 @@ public class ServerRoleRestControllerTest {
     public void create() {
         ServerRole serverRole = testServerRoles.get(0);
         serverRole.setId(null);
+        serverRole.setName(serverRole.getName() + "_test");
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/" + resourceName)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(serverRole.toJson());

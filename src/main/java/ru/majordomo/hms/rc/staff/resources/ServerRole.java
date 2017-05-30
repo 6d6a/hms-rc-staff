@@ -2,16 +2,23 @@ package ru.majordomo.hms.rc.staff.resources;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Document
-public class ServerRole extends Resource {
+import ru.majordomo.hms.rc.staff.resources.validation.ObjectIdCollection;
+import ru.majordomo.hms.rc.staff.resources.validation.UniqueNameResource;
 
+@Document
+@UniqueNameResource(value = ServerRole.class)
+public class ServerRole extends Resource {
+    @NotEmpty(message = "Не найден ни один ServiceTemplateId")
+    @ObjectIdCollection(ServiceTemplate.class)
     private List<String> serviceTemplateIds = new ArrayList<>();
+
     @Transient
     private List<ServiceTemplate> serviceTemplates = new ArrayList<>();
 
@@ -31,12 +38,10 @@ public class ServerRole extends Resource {
         this.serviceTemplates = serviceTemplates;
     }
 
-    @JsonIgnore
     public List<String> getServiceTemplateIds() {
         return serviceTemplateIds;
     }
 
-    @JsonIgnore
     public void setServiceTemplateIds(List<String> serviceTemplateIds) {
         this.serviceTemplateIds = serviceTemplateIds;
     }
@@ -57,9 +62,6 @@ public class ServerRole extends Resource {
 
         ServerRole that = (ServerRole) o;
 
-        if (getServiceTemplateIds() != null ? !getServiceTemplateIds().equals(that.getServiceTemplateIds()) : that.getServiceTemplateIds() != null)
-            return false;
-        return getServiceTemplates() != null ? getServiceTemplates().equals(that.getServiceTemplates()) : that.getServiceTemplates() == null;
-
+        return getServiceTemplateIds() != null ? getServiceTemplateIds().equals(that.getServiceTemplateIds()) : that.getServiceTemplateIds() == null;
     }
 }

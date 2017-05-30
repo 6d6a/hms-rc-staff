@@ -1,30 +1,30 @@
 package ru.majordomo.hms.rc.staff.managers;
 
 import org.apache.commons.lang.NotImplementedException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.resources.*;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.repositories.ServiceTemplateRepository;
+import ru.majordomo.hms.rc.staff.resources.validation.group.ServiceTemplateChecks;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
 
 @Component
 public class GovernorOfServiceTemplate extends LordOfResources<ServiceTemplate> {
     private Cleaner cleaner;
-    private ServiceTemplateRepository serviceTemplateRepository;
-    private GovernorOfConfigTemplate governorOfConfigTemplate;
-    private GovernorOfServiceType governorOfServiceType;
     private GovernorOfService governorOfService;
     private GovernorOfServerRole governorOfServerRole;
+    private Validator validator;
 
     @Autowired
     public void setCleaner(Cleaner cleaner) {
@@ -32,18 +32,8 @@ public class GovernorOfServiceTemplate extends LordOfResources<ServiceTemplate> 
     }
 
     @Autowired
-    public void setServiceTemplateRepository(ServiceTemplateRepository serviceTemplateRepository) {
-        this.serviceTemplateRepository = serviceTemplateRepository;
-    }
-
-    @Autowired
-    public void setGovernorOfConfigTemplate(GovernorOfConfigTemplate governorOfConfigTemplate) {
-        this.governorOfConfigTemplate = governorOfConfigTemplate;
-    }
-
-    @Autowired
-    public void setGovernorOfServiceType(GovernorOfServiceType governorOfServiceType) {
-        this.governorOfServiceType = governorOfServiceType;
+    public void setServiceTemplateRepository(ServiceTemplateRepository repository) {
+        this.repository = repository;
     }
 
     @Autowired
@@ -56,19 +46,20 @@ public class GovernorOfServiceTemplate extends LordOfResources<ServiceTemplate> 
         this.governorOfServerRole = governorOfServerRole;
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(GovernorOfServiceTemplate.class);
+    @Autowired
+    public void setValidator(Validator validator) {
+        this.validator = validator;
+    }
 
     @Override
     public ServiceTemplate createResource(ServiceMessage serviceMessage) throws ParameterValidateException {
-        String loggerPrefix = "OPERATION IDENTITY:" + serviceMessage.getOperationIdentity() + " ACTION IDENTITY:" + serviceMessage.getActionIdentity() + " ";
         ServiceTemplate serviceTemplate = new ServiceTemplate();
 
         LordOfResources.setResourceParams(serviceTemplate, serviceMessage, cleaner);
 
-        @SuppressWarnings("unchecked") List<ConfigTemplate> configTemplates = (List<ConfigTemplate>)serviceMessage.getParam("configTemplates");
-        ServiceType serviceType = (ServiceType) serviceMessage.getParam("serviceType");
-        serviceTemplate.setConfigTemplates(configTemplates);
-        serviceTemplate.setServiceType(serviceType);
+        @SuppressWarnings("unchecked") List<String> configTemplateIds = (List<String>) serviceMessage.getParam("configTemplateIds");
+        serviceTemplate.setConfigTemplateIds(configTemplateIds);
+        serviceTemplate.setServiceTypeName((String) serviceMessage.getParam("serviceTypeName"));
         isValid(serviceTemplate);
         save(serviceTemplate);
 
@@ -76,100 +67,18 @@ public class GovernorOfServiceTemplate extends LordOfResources<ServiceTemplate> 
     }
 
     @Override
-    public void isValid(ServiceTemplate resource) throws ParameterValidateException {
-        if (resource.getConfigTemplates().isEmpty()) {
-            throw new ParameterValidateException("Не найден ни один ConfigTemplate");
-        }
-        if (resource.getConfigTemplateIds().isEmpty()) {
-            throw new ParameterValidateException("Не найден ни один ConfigTemplateId");
-        }
-        if (resource.getServiceType() == null || resource.getServiceTypeName() == null || resource.getServiceTypeName().equals("")) {
-            throw new ParameterValidateException("Отсутствует ServiceType");
-        }
+    public void isValid(ServiceTemplate serviceTemplate) throws ParameterValidateException {
+        Set<ConstraintViolation<ServiceTemplate>> constraintViolations = validator.validate(serviceTemplate, ServiceTemplateChecks.class);
 
-        //Валидация ConfigTemplate
-        for (ConfigTemplate configTemplateToValidate : resource.getConfigTemplates()) {
-            ConfigTemplate configTemplateFromRepository = governorOfConfigTemplate.build(configTemplateToValidate.getId());
-            if (configTemplateFromRepository == null) {
-                throw new ParameterValidateException("ConfigTemplate с ID: " + configTemplateToValidate.getId() + " не найден");
-            }
-            if(!configTemplateFromRepository.equals(configTemplateToValidate)) {
-                throw new ParameterValidateException("ConfigTemplate с ID: " + configTemplateToValidate.getId() + " задан некорректно");
-            }
+        if (!constraintViolations.isEmpty()) {
+            logger.error("serviceTemplate: " + serviceTemplate + " constraintViolations: " + constraintViolations.toString());
+            throw new ConstraintViolationException(constraintViolations);
         }
-
-        //Валидация ServiceType
-        try {
-            governorOfServiceType.build(resource.getServiceType().getName());
-        } catch (ResourceNotFoundException e)  {
-            throw new ParameterValidateException("ServiceType с именем: " + resource.getServiceType().getName() + " не найден");
-        }
-
-    }
-
-    @Override
-    public ServiceTemplate build(String resourceId) throws ResourceNotFoundException {
-        ServiceTemplate serviceTemplate = serviceTemplateRepository.findOne(resourceId);
-        if (serviceTemplate == null) {
-            throw new ResourceNotFoundException("ServiceTemplate с ID:" + resourceId + " не найден");
-        }
-        for (String configTemplateId : serviceTemplate.getConfigTemplateIds()) {
-            ConfigTemplate configTemplate = governorOfConfigTemplate.build(configTemplateId);
-            serviceTemplate.addConfigTemplate(configTemplate);
-        }
-
-        if (serviceTemplate.getServiceTypeName() == null) {
-            throw new ParameterValidateException("ServiceTypeName отсутствует");
-        }
-        ServiceType serviceType = governorOfServiceType.build(serviceTemplate.getServiceTypeName());
-        serviceTemplate.setServiceType(serviceType);
-
-        return serviceTemplate;
     }
 
     @Override
     public ServiceTemplate build(Map<String, String> keyValue) throws NotImplementedException {
         throw new NotImplementedException();
-    }
-
-    @Override
-    public List<ServiceTemplate> buildAll(Map<String, String> keyValue) {
-
-        List<ServiceTemplate> buildedServiceTemplates = new ArrayList<>();
-
-        Boolean byName = false;
-
-        for (Map.Entry<String, String> entry : keyValue.entrySet()) {
-            if (entry.getKey().equals("name")) {
-                byName = true;
-            }
-        }
-
-        if (byName) {
-            for (ServiceTemplate serviceTemplate : serviceTemplateRepository.findByName(keyValue.get("name"))) {
-                buildedServiceTemplates.add(build(serviceTemplate.getId()));
-            }
-        } else {
-            for (ServiceTemplate serviceTemplate : serviceTemplateRepository.findAll()) {
-                buildedServiceTemplates.add(build(serviceTemplate.getId()));
-            }
-        }
-
-        return buildedServiceTemplates;
-    }
-
-    @Override
-    public List<ServiceTemplate> buildAll() {
-        List<ServiceTemplate> buildedServiceTemplates = new ArrayList<>();
-        for (ServiceTemplate serviceTemplate : serviceTemplateRepository.findAll()) {
-            buildedServiceTemplates.add(build(serviceTemplate.getId()));
-        }
-        return buildedServiceTemplates;
-    }
-
-    @Override
-    public void save(ServiceTemplate resource) {
-        serviceTemplateRepository.save(resource);
     }
 
     @Override
@@ -191,11 +100,4 @@ public class GovernorOfServiceTemplate extends LordOfResources<ServiceTemplate> 
             }
         }
     }
-
-    @Override
-    public void delete(String resourceId) {
-        preDelete(resourceId);
-        serviceTemplateRepository.delete(resourceId);
-    }
-
 }

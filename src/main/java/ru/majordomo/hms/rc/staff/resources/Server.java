@@ -2,24 +2,37 @@ package ru.majordomo.hms.rc.staff.resources;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.majordomo.hms.rc.staff.resources.validation.ObjectIdCollection;
+
 @Document
 public class Server extends Resource {
+    @NotEmpty(message = "Не найден ни один Service")
+    @ObjectIdCollection(value = Service.class)
+    private List<String> serviceIds = new ArrayList<>();
+
+    @NotEmpty(message = "Не найден ни один ServerRole")
+    @ObjectIdCollection(value = ServerRole.class)
+    private List<String> serverRoleIds = new ArrayList<>();
+
+    @NotEmpty(message = "Не найден ни один Storage")
+    @ObjectIdCollection(value = Storage.class)
+    private List<String> storageIds = new ArrayList<>();
 
     @Transient
     private List<Service> services = new ArrayList<>();
-    private List<String> serviceIds = new ArrayList<>();
+
     @Transient
     private List<ServerRole> serverRoles = new ArrayList<>();
-    private List<String> serverRoleIds = new ArrayList<>();
+
     @Transient
     private List<Storage> storages = new ArrayList<>();
-    private List<String> storageIds = new ArrayList<>();
 
     @Transient
     private String activeMailboxStorageMountPoint;
@@ -78,32 +91,26 @@ public class Server extends Resource {
         return null;
     }
 
-    @JsonIgnore
     public List<String> getServiceIds() {
         return serviceIds;
     }
 
-    @JsonIgnore
     public void setServiceIds(List<String> serviceIds) {
         this.serviceIds = serviceIds;
     }
 
-    @JsonIgnore
     public List<String> getServerRoleIds() {
         return serverRoleIds;
     }
 
-    @JsonIgnore
     public void setServerRoleIds(List<String> serverRoleIds) {
         this.serverRoleIds = serverRoleIds;
     }
 
-    @JsonIgnore
     public List<String> getStorageIds() {
         return storageIds;
     }
 
-    @JsonIgnore
     public void setStorageIds(List<String> storageIds) {
         this.storageIds = storageIds;
     }
@@ -144,17 +151,10 @@ public class Server extends Resource {
 
         Server server = (Server) o;
 
-        if (getServices() != null ? !getServices().equals(server.getServices()) : server.getServices() != null)
-            return false;
         if (getServiceIds() != null ? !getServiceIds().equals(server.getServiceIds()) : server.getServiceIds() != null)
-            return false;
-        if (getServerRoles() != null ? !getServerRoles().equals(server.getServerRoles()) : server.getServerRoles() != null)
             return false;
         if (getServerRoleIds() != null ? !getServerRoleIds().equals(server.getServerRoleIds()) : server.getServerRoleIds() != null)
             return false;
-        if (getStorages() != null ? !getStorages().equals(server.getStorages()) : server.getStorages() != null)
-            return false;
         return getStorageIds() != null ? getStorageIds().equals(server.getStorageIds()) : server.getStorageIds() == null;
-
     }
 }

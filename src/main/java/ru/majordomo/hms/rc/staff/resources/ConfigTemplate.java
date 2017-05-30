@@ -1,10 +1,14 @@
 package ru.majordomo.hms.rc.staff.resources;
 
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.URL;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
 public class ConfigTemplate extends Resource {
 
+    @NotBlank(message = "Адрес не может быть пустым")
+    @URL(message = "Параметр fileLink содержит некорретный URL:'${validatedValue}'")
     private String fileLink;
 
     @Override
@@ -29,6 +33,5 @@ public class ConfigTemplate extends Resource {
         ConfigTemplate that = (ConfigTemplate) o;
 
         return getFileLink() != null ? getFileLink().equals(that.getFileLink()) : that.getFileLink() == null;
-
     }
 }

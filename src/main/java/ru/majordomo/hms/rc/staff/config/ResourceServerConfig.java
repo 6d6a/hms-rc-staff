@@ -1,4 +1,4 @@
-package ru.majordomo.hms.rc.staff;
+package ru.majordomo.hms.rc.staff.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

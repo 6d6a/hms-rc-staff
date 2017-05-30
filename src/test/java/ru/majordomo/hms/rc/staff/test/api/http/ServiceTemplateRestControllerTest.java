@@ -19,6 +19,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.majordomo.hms.rc.staff.event.serviceTemplate.listener.ServiceTemplateMongoEventListener;
 import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceTemplateRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceTypeRepository;
@@ -43,7 +44,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         classes = {
                 RepositoriesConfig.class,
                 ConfigOfRestControllers.class,
-                ConfigOfGovernors.class
+                ConfigOfGovernors.class,
+                ValidationConfig.class,
+                ServiceTemplateMongoEventListener.class
         },
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
@@ -129,7 +132,9 @@ public class ServiceTemplateRestControllerTest {
                                     fieldWithPath("name").description("Имя ServiceTemplate"),
                                     fieldWithPath("switchedOn").description("Статус ServiceTemplate"),
                                     fieldWithPath("configTemplates").description("Список СonfigTemplates для ServiceTemplate"),
-                                    fieldWithPath("serviceType").description("ServiceType, к которому относится данный ServiceTemplate")
+                                    fieldWithPath("configTemplateIds").description("Список configTemplateIds для ServiceTemplate"),
+                                    fieldWithPath("serviceType").description("ServiceType, к которому относится данный ServiceTemplate"),
+                                    fieldWithPath("serviceTypeName").description("serviceTypeName, к которому относится данный ServiceTemplate")
                             )
                     ));
         } catch (Exception e) {
@@ -153,7 +158,9 @@ public class ServiceTemplateRestControllerTest {
                                     fieldWithPath("[].name").description("Имя ServiceTemplate"),
                                     fieldWithPath("[].switchedOn").description("Статус ServiceTemplate"),
                                     fieldWithPath("[].configTemplates").description("Список СonfigTemplates для ServiceTemplate"),
-                                    fieldWithPath("[].serviceType").description("ServiceType, к которому относится данный ServiceTemplate")
+                                    fieldWithPath("[].configTemplateIds").description("Список configTemplateIds для ServiceTemplate"),
+                                    fieldWithPath("[].serviceType").description("ServiceType, к которому относится данный ServiceTemplate"),
+                                    fieldWithPath("[].serviceTypeName").description("serviceTypeName, к которому относится данный ServiceTemplate")
                             )
                     ));
         } catch (Exception e) {
@@ -177,7 +184,9 @@ public class ServiceTemplateRestControllerTest {
                                     fieldWithPath("[].name").description("Имя ServiceTemplate"),
                                     fieldWithPath("[].switchedOn").description("Статус ServiceTemplate"),
                                     fieldWithPath("[].configTemplates").description("Список СonfigTemplates для ServiceTemplate"),
-                                    fieldWithPath("[].serviceType").description("ServiceType, к которому относится данный ServiceTemplate")
+                                    fieldWithPath("[].configTemplateIds").description("Список configTemplateIds для ServiceTemplate"),
+                                    fieldWithPath("[].serviceType").description("ServiceType, к которому относится данный ServiceTemplate"),
+                                    fieldWithPath("[].serviceTypeName").description("serviceTypeName, к которому относится данный ServiceTemplate")
                             )
                     ));
         } catch (Exception e) {
@@ -205,7 +214,9 @@ public class ServiceTemplateRestControllerTest {
                                     fieldWithPath("name").description("Имя ServiceTemplate"),
                                     fieldWithPath("switchedOn").description("Статус ServiceTemplate"),
                                     fieldWithPath("configTemplates").description("Список СonfigTemplates для ServiceTemplate"),
-                                    fieldWithPath("serviceType").description("ServiceType, к которому относится данный ServiceTemplate")
+                                    fieldWithPath("configTemplateIds").description("Список configTemplateIds для ServiceTemplate"),
+                                    fieldWithPath("serviceType").description("ServiceType, к которому относится данный ServiceTemplate"),
+                                    fieldWithPath("serviceTypeName").description("serviceTypeName, к которому относится данный ServiceTemplate")
                             )
                     ));
         } catch (Exception e) {
