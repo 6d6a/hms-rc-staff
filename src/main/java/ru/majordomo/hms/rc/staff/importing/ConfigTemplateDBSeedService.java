@@ -42,7 +42,9 @@ public class ConfigTemplateDBSeedService {
                 .put("{config_base_path}/apache2.conf", "https://gitlab.intr/api/v3/projects/174/repository/files/?file_path=etc/apache2/apache2.conf&ref=master")
                 .put("{config_base_path}/modules_conf.conf", "https://gitlab.intr/api/v3/projects/174/repository/files/?file_path=etc/apache2/modules_conf.conf&ref=master")
                 .put("{config_base_path}/modules_load.conf", "https://gitlab.intr/api/v3/projects/174/repository/files/?file_path=etc/apache2/modules_load.conf&ref=master")
-                .put("/opt/{interpreter.name}{interpreter.version_major}{interpreter.version_minor}/etc/{name}/php.ini", "https://gitlab.intr/api/v3/projects/174/repository/files/?file_path=opt/php/etc/apache2/@PHPini&ref=master")
+                .put("/opt/{interpreter.name}{interpreter.version_major}{interpreter.version_minor}/etc/{name}/php.ini", "https://gitlab.intr/api/v3/projects/174/repository/files/?file_path=opt/php/etc/apache2/php.ini&ref=master")
+                .put("/etc/init/{name}.conf", "https://gitlab.intr/api/v3/projects/174/repository/files/?file_path=etc/init/apache2.conf&ref=master")
+                .put("/etc/{name}/sites-available/000-default-vhost.conf", "https://gitlab.intr/api/v3/projects/174/repository/files/?file_path=etc/apache2/sites-available/000-default-vhost.conf&ref=master")
                 .build();
 
         configTemplateNamesWithFileLink.forEach((name, fileLink) -> {

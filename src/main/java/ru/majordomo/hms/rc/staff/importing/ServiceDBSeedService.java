@@ -84,6 +84,7 @@ public class ServiceDBSeedService {
 
         nginxSockets.forEach((serveName, serverServiceSockets) -> {
             Service service = new Service();
+            service.setSwitchedOn(true);
             String[] names = serverServiceSockets.get(0).getName().split("@");
             names[0] = names[0]
                     .replaceAll("-https?", "")
@@ -112,6 +113,7 @@ public class ServiceDBSeedService {
 
         for (ServiceSocket serviceSocket : serviceSockets) {
             Service service = new Service();
+            service.setSwitchedOn(true);
             if (serviceSocket.getId().contains("_mysql_socket")) {
                 service.setId(serviceSocket.getId().replaceAll("_mysql_socket", "_mysql_service"));
             }

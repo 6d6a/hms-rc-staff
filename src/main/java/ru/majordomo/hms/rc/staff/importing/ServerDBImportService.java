@@ -104,6 +104,30 @@ public class ServerDBImportService {
 
         serverRepository.save(server);
 
+        if (name.equals("web35")) {
+            String finalName = "web36";
+            server = new Server();
+            server.setSwitchedOn(true);
+            server.setName(finalName);
+            server.setServiceIds(services
+                    .stream()
+                    .filter(service -> service.getName().contains("@" + finalName))
+                    .map(Resource::getId)
+                    .collect(Collectors.toList()));
+            server.setServerRoleIds(serverRoles
+                    .stream()
+                    .filter(serverRole -> (serverRole.getName().equals("shared-hosting") || serverRole.getName().equals("mysql-database-server")))
+                    .map(Resource::getId)
+                    .collect(Collectors.toList()));
+            server.setStorageIds(storages
+                    .stream()
+                    .filter(storage -> storage.getName().equals(finalName))
+                    .map(Resource::getId)
+                    .collect(Collectors.toList()));
+
+            serverRepository.save(server);
+        }
+
         return null;
     }
 

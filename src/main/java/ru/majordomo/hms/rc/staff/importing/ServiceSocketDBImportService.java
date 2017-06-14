@@ -91,8 +91,14 @@ public class ServiceSocketDBImportService {
                 (rs1 -> {
                     ServiceSocket apacheServiceSocket = new ServiceSocket();
                     apacheServiceSocket.setSwitchedOn(true);
-                    String defaultInName = rs1.getString("flag").matches(".*-.*|.*perl.*") ? "" : "-default";
-                    apacheServiceSocket.setName("apache2-" + rs1.getString("flag") + defaultInName + "-http@" + rs.getString("name"));
+                    String flag = rs1.getString("flag");
+                    flag = flag.matches("(^php5-).*$") ? flag.replace("php5-", "php52-") : flag;
+                    flag = flag.matches("(^php5$)") ? flag.replace("php5", "php52") : flag;
+//                    flag = flag.matches("^php5$|^php5-.*") ? flag.replace("5", "52") : flag;
+
+
+                    String defaultInName = flag.matches(".*-.*|.*perl.*") ? "" : "-default";
+                    apacheServiceSocket.setName("apache2-" + flag + defaultInName + "-http@" + rs.getString("name"));
 
                     String[] redirTo = rs1.getString("redir_to").split(":");
                     apacheServiceSocket.setAddress(redirTo[0]);
@@ -104,6 +110,60 @@ public class ServiceSocketDBImportService {
                     logger.debug(apacheServiceSocket.toString());
                 })
         );
+
+        if (rs.getString("name").equals("web35")) {
+            serviceSocket = new ServiceSocket();
+            serviceSocket.setSwitchedOn(true);
+            serviceSocket.setName("nginx-http@" + "web36");
+            serviceSocket.setAddress(rs.getString("proxy"));
+            serviceSocket.setPort(80);
+
+            governorOfServiceSocket.isValid(serviceSocket);
+            governorOfServiceSocket.save(serviceSocket);
+
+            logger.debug(serviceSocket.toString());
+
+            serviceSocket = new ServiceSocket();
+            serviceSocket.setSwitchedOn(true);
+            serviceSocket.setName("nginx-https@" + "web36");
+            serviceSocket.setAddress(rs.getString("proxy"));
+            serviceSocket.setPort(443);
+
+            governorOfServiceSocket.isValid(serviceSocket);
+            governorOfServiceSocket.save(serviceSocket);
+
+            logger.debug(serviceSocket.toString());
+
+            query = "SELECT nc.id, nc.server, nc.listen, nc.redir_to, nc.flag " +
+                    "FROM nginx_conf nc " +
+                    "WHERE nc.server = :server AND nc.flag != 'otd_ip'";
+            namedParameters1 = new MapSqlParameterSource("server", rs.getString("name") + ".majordomo.ru");
+
+            namedParameterJdbcTemplate.query(query,
+                    namedParameters1,
+                    (rs1 -> {
+                        ServiceSocket apacheServiceSocket = new ServiceSocket();
+                        apacheServiceSocket.setSwitchedOn(true);
+                        String flag = rs1.getString("flag");
+                        flag = flag.matches("(^php5-).*$") ? flag.replace("php5-", "php52-") : flag;
+                        flag = flag.matches("(^php5$)") ? flag.replace("php5", "php52") : flag;
+
+//                        flag = flag.replaceAll("(^php5$)", "php52");
+//                        flag = flag.matches("^php5$|^php5-.*") ? flag.replace("5", "52") : flag;
+                        String defaultInName = flag.matches(".*-.*|.*perl.*") ? "" : "-default";
+                        apacheServiceSocket.setName("apache2-" + flag + defaultInName + "-http@" + "web36");
+
+                        String[] redirTo = rs1.getString("redir_to").split(":");
+                        apacheServiceSocket.setAddress(redirTo[0]);
+                        apacheServiceSocket.setPort(Integer.valueOf(redirTo[1]));
+
+                        governorOfServiceSocket.isValid(apacheServiceSocket);
+                        governorOfServiceSocket.save(apacheServiceSocket);
+
+                        logger.debug(apacheServiceSocket.toString());
+                    })
+            );
+        }
 
         return null;
     }
@@ -122,6 +182,19 @@ public class ServiceSocketDBImportService {
         governorOfServiceSocket.save(serviceSocket);
 
         logger.debug(serviceSocket.toString());
+
+        if (rs.getString("name").equals("web35")) {
+            serviceSocket = new ServiceSocket();
+            serviceSocket.setSwitchedOn(true);
+            serviceSocket.setName("mysql-mysql@" + "web36");
+            serviceSocket.setAddress(rs.getString("out_ip"));
+            serviceSocket.setPort(3306);
+
+            governorOfServiceSocket.isValid(serviceSocket);
+            governorOfServiceSocket.save(serviceSocket);
+
+            logger.debug(serviceSocket.toString());
+        }
 
         return null;
     }
