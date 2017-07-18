@@ -2,7 +2,9 @@ package ru.majordomo.hms.rc.staff.resources.DTO;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+@Document
 public class ServerIpInfo {
     @Id
     @Indexed

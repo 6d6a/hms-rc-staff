@@ -50,4 +50,8 @@ public class ConfigOfRestControllers {
     public StorageRestController storageRestController() {
         return new StorageRestController();
     }
+    @Bean
+    public ServerIpInfoRestController serverIpInfoRestController() {
+        return new ServerIpInfoRestController();
+    }
 }

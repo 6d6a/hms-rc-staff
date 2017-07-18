@@ -4,10 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.majordomo.hms.rc.staff.repositories.ServerIpInfoRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServerRepository;
 import ru.majordomo.hms.rc.staff.resources.DTO.ServerIpInfo;
@@ -33,8 +30,11 @@ public class ServerIpInfoRestController {
         this.serverRepository = serverRepository;
     }
 
-    @GetMapping(value = {"", "/"})
-    public ServerIpInfo getInfo(@RequestParam("serverId") String serverId, @RequestParam("serviceId") String serviceId) {
+    @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
+    public ServerIpInfo getInfo(
+            @RequestParam(value = "serverId", required = false) String serverId,
+            @RequestParam(value = "serviceId", required = false) String serviceId
+    ) {
         ServerIpInfo serverIpInfo = new ServerIpInfo();
 
         if ((serverId == null || serverId.equals("")) && (serviceId == null || serviceId.equals(""))) {
