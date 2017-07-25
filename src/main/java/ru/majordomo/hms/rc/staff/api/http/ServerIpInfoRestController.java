@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.majordomo.hms.rc.staff.repositories.ServerIpInfoRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServerRepository;
@@ -31,6 +32,7 @@ public class ServerIpInfoRestController {
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public ServerIpInfo getInfo(
             @RequestParam(value = "serverId", required = false) String serverId,
             @RequestParam(value = "serviceId", required = false) String serviceId
