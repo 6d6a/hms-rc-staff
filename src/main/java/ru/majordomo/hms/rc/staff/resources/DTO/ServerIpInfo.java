@@ -9,6 +9,7 @@ public class ServerIpInfo {
     @Id
     @Indexed
     private String id;
+    private String name;
     private String serverId;
     private String primaryIp;
     private String secondaryIp;
@@ -19,6 +20,14 @@ public class ServerIpInfo {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getServerId() {

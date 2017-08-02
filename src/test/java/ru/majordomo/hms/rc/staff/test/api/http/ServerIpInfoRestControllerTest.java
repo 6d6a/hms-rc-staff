@@ -70,6 +70,7 @@ public class ServerIpInfoRestControllerTest {
                 .apply(documentationConfiguration(this.restDocumentation))
                 .build();
         String serverId = "web_server_";
+        String name = "web10050";
         String primaryIp = "8.8.8.";
         String secondaryIp = "8.8.9.";
         for (int i = 0; i < 10; i++) {
@@ -77,6 +78,7 @@ public class ServerIpInfoRestControllerTest {
             serverIpInfo.setPrimaryIp(primaryIp + i);
             serverIpInfo.setSecondaryIp(secondaryIp + i);
             serverIpInfo.setServerId(serverId + i);
+            serverIpInfo.setName(name + i);
             serverIpInfos.add(serverIpInfo);
         }
 
@@ -91,6 +93,7 @@ public class ServerIpInfoRestControllerTest {
             mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                     .andExpect(jsonPath("primaryIp").value("8.8.8.1"))
                     .andExpect(jsonPath("secondaryIp").value("8.8.9.1"))
+                    .andExpect(jsonPath("name").value("web100501"))
                     .andExpect(jsonPath("serverId").value("web_server_1"));
         } catch (Exception e) {
             e.printStackTrace();
