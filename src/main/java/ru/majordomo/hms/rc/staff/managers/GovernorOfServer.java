@@ -1,25 +1,10 @@
 package ru.majordomo.hms.rc.staff.managers;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
-import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
-import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
-import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
-import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
-import ru.majordomo.hms.rc.staff.repositories.ServerRepository;
-import ru.majordomo.hms.rc.staff.repositories.ServerRoleRepository;
-import ru.majordomo.hms.rc.staff.resources.Server;
-import ru.majordomo.hms.rc.staff.resources.ServerRole;
-import ru.majordomo.hms.rc.staff.resources.Service;
-import ru.majordomo.hms.rc.staff.resources.validation.group.ServerChecks;
-
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,7 +13,18 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 
+import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
+import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
+import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
+import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
+import ru.majordomo.hms.rc.staff.repositories.ServerRepository;
+import ru.majordomo.hms.rc.staff.repositories.ServerRoleRepository;
+import ru.majordomo.hms.rc.staff.resources.Server;
+import ru.majordomo.hms.rc.staff.resources.ServerRole;
+import ru.majordomo.hms.rc.staff.resources.validation.group.ServerChecks;
+
 @Component
+@RefreshScope
 public class GovernorOfServer extends LordOfResources<Server> {
     private ServerRoleRepository serverRoleRepository;
     private Cleaner cleaner;
