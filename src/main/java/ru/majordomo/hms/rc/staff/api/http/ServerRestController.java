@@ -75,8 +75,14 @@ public class ServerRestController extends RestControllerTemplate<Server> {
 
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVER_VIEW')")
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET, headers = "X-HMS-Projection=OnlyIdAndName")
-    public Collection<Server> readAll() {
-        return processReadAllQueryOnlyIdAndName();
+    public Collection<Server> readAllOnlyIdAndName(
+            @RequestParam(required=false) Map<String,String> requestParams
+    ) {
+        if (!requestParams.isEmpty()) {
+            return processReadAllWithParamsQueryOnlyIdAndName(requestParams);
+        } else {
+            return processReadAllQueryOnlyIdAndName();
+        }
     }
 
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVER_VIEW')")
