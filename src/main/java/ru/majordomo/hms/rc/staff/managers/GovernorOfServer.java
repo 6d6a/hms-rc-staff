@@ -184,4 +184,38 @@ public class GovernorOfServer extends LordOfResources<Server> {
 
         return server;
     }
+
+    @Override
+    public List<Server> buildAllOnlyIdAndName(Map<String, String> keyValue) {
+        if (keyValue.get("name") != null) {
+            return repository.findByNameOnlyIdAndName(keyValue.get("name"));
+        } else if (keyValue.get("server-role") != null) {
+            ServerRole serverRole = serverRoleRepository.findOneByName(keyValue.get("server-role"));
+
+            if (serverRole == null) {
+                throw new ResourceNotFoundException("ServerRole с именем: " + keyValue.get("server-role") + " не найдена");
+            }
+
+            return ((ServerRepository) repository).findByServerRoleIdsIncludeIdAndName(serverRole.getId());
+        } else {
+            return repository.findAll();
+        }
+    }
+
+    @Override
+    public List<Server> buildAll(Map<String, String> keyValue) {
+        if (keyValue.get("name") != null) {
+            return repository.findByName(keyValue.get("name"));
+        } else if (keyValue.get("server-role") != null) {
+            ServerRole serverRole = serverRoleRepository.findOneByName(keyValue.get("server-role"));
+
+            if (serverRole == null) {
+                throw new ResourceNotFoundException("ServerRole с именем: " + keyValue.get("server-role") + " не найдена");
+            }
+
+            return ((ServerRepository) repository).findByServerRoleIds(serverRole.getId());
+        } else {
+            return repository.findAll();
+        }
+    }
 }

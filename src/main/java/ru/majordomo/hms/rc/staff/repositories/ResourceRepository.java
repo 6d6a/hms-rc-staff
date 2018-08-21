@@ -20,5 +20,8 @@ public interface ResourceRepository<T, ID extends Serializable> extends MongoRep
     @Query(value="{}", fields="{name : 1}")
     List<T> findOnlyIdAndName();
 
+    @Query(value="{'name' : ?0}", fields="{name : 1}")
+    List<T> findByNameOnlyIdAndName(String name);
+
     Long deleteByName(String name);
 }
