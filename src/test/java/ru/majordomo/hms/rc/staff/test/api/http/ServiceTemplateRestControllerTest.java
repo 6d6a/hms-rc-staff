@@ -1,7 +1,11 @@
 package ru.majordomo.hms.rc.staff.test.api.http;
 
 import org.bson.types.ObjectId;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
+import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -26,7 +31,10 @@ import ru.majordomo.hms.rc.staff.repositories.ServiceTypeRepository;
 import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
 import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 import ru.majordomo.hms.rc.staff.resources.ServiceType;
-import ru.majordomo.hms.rc.staff.test.config.*;
+import ru.majordomo.hms.rc.staff.test.config.ConfigOfGovernors;
+import ru.majordomo.hms.rc.staff.test.config.ConfigOfRestControllers;
+import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
+import ru.majordomo.hms.rc.staff.test.config.ValidationConfig;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
@@ -35,6 +43,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -70,6 +79,16 @@ public class ServiceTemplateRestControllerTest {
     private String resourceName = "service-template";
     private MockMvc mockMvc;
     private List<ServiceTemplate> serviceTemplates = new ArrayList<>();
+
+    private static FieldDescriptor[] serviceTemplateFields = new FieldDescriptor[] {
+            fieldWithPath("id").description("ServiceTemplate ID"),
+            fieldWithPath("name").description("Имя ServiceTemplate"),
+            fieldWithPath("switchedOn").description("Статус ServiceTemplate"),
+            subsectionWithPath("configTemplates[]").description("Список СonfigTemplates для ServiceTemplate"),
+            fieldWithPath("configTemplateIds").description("Список configTemplateIds для ServiceTemplate"),
+            subsectionWithPath("serviceType").description("ServiceType, к которому относится данный ServiceTemplate"),
+            fieldWithPath("serviceTypeName").description("serviceTypeName, к которому относится данный ServiceTemplate")
+    };
 
     private void generateBatchOfServiceTemplates() {
         String namePattern = "Шаблон для сервиса ";
@@ -126,17 +145,8 @@ public class ServiceTemplateRestControllerTest {
             mockMvc.perform(request).andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                     .andDo(this.document)
-                    .andDo(this.document.document(
-                            responseFields(
-                                    fieldWithPath("id").description("ServiceTemplate ID"),
-                                    fieldWithPath("name").description("Имя ServiceTemplate"),
-                                    fieldWithPath("switchedOn").description("Статус ServiceTemplate"),
-                                    fieldWithPath("configTemplates").description("Список СonfigTemplates для ServiceTemplate"),
-                                    fieldWithPath("configTemplateIds").description("Список configTemplateIds для ServiceTemplate"),
-                                    fieldWithPath("serviceType").description("ServiceType, к которому относится данный ServiceTemplate"),
-                                    fieldWithPath("serviceTypeName").description("serviceTypeName, к которому относится данный ServiceTemplate")
-                            )
-                    ));
+                    .andDo(this.document.document(responseFields(serviceTemplateFields)))
+            ;
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -153,15 +163,8 @@ public class ServiceTemplateRestControllerTest {
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                     .andDo(this.document)
                     .andDo(this.document.document(
-                            responseFields(
-                                    fieldWithPath("[].id").description("ServiceTemplate ID"),
-                                    fieldWithPath("[].name").description("Имя ServiceTemplate"),
-                                    fieldWithPath("[].switchedOn").description("Статус ServiceTemplate"),
-                                    fieldWithPath("[].configTemplates").description("Список СonfigTemplates для ServiceTemplate"),
-                                    fieldWithPath("[].configTemplateIds").description("Список configTemplateIds для ServiceTemplate"),
-                                    fieldWithPath("[].serviceType").description("ServiceType, к которому относится данный ServiceTemplate"),
-                                    fieldWithPath("[].serviceTypeName").description("serviceTypeName, к которому относится данный ServiceTemplate")
-                            )
+                            responseFields(fieldWithPath("[]").description("ServiceTemplates"))
+                                    .andWithPrefix("[].", serviceTemplateFields)
                     ));
         } catch (Exception e) {
             e.printStackTrace();
@@ -179,15 +182,8 @@ public class ServiceTemplateRestControllerTest {
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                     .andDo(this.document)
                     .andDo(this.document.document(
-                            responseFields(
-                                    fieldWithPath("[].id").description("ServiceTemplate ID"),
-                                    fieldWithPath("[].name").description("Имя ServiceTemplate"),
-                                    fieldWithPath("[].switchedOn").description("Статус ServiceTemplate"),
-                                    fieldWithPath("[].configTemplates").description("Список СonfigTemplates для ServiceTemplate"),
-                                    fieldWithPath("[].configTemplateIds").description("Список configTemplateIds для ServiceTemplate"),
-                                    fieldWithPath("[].serviceType").description("ServiceType, к которому относится данный ServiceTemplate"),
-                                    fieldWithPath("[].serviceTypeName").description("serviceTypeName, к которому относится данный ServiceTemplate")
-                            )
+                            responseFields(fieldWithPath("[]").description("ServiceTemplates"))
+                                    .andWithPrefix("[].", serviceTemplateFields)
                     ));
         } catch (Exception e) {
             e.printStackTrace();
@@ -208,17 +204,8 @@ public class ServiceTemplateRestControllerTest {
                     .andExpect(jsonPath("switchedOn").value(serviceTemplate.getSwitchedOn()))
                     .andExpect(jsonPath("configTemplates.[0].id").value(serviceTemplate.getConfigTemplateIds().get(0)))
                     .andDo(this.document)
-                    .andDo(this.document.document(
-                            responseFields(
-                                    fieldWithPath("id").description("ServiceTemplate ID"),
-                                    fieldWithPath("name").description("Имя ServiceTemplate"),
-                                    fieldWithPath("switchedOn").description("Статус ServiceTemplate"),
-                                    fieldWithPath("configTemplates").description("Список СonfigTemplates для ServiceTemplate"),
-                                    fieldWithPath("configTemplateIds").description("Список configTemplateIds для ServiceTemplate"),
-                                    fieldWithPath("serviceType").description("ServiceType, к которому относится данный ServiceTemplate"),
-                                    fieldWithPath("serviceTypeName").description("serviceTypeName, к которому относится данный ServiceTemplate")
-                            )
-                    ));
+                    .andDo(this.document.document(responseFields(serviceTemplateFields)))
+            ;
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();

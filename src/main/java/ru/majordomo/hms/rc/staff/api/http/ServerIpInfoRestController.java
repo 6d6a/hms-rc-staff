@@ -3,9 +3,10 @@ package ru.majordomo.hms.rc.staff.api.http;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.repositories.ServerIpInfoRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServerRepository;
 import ru.majordomo.hms.rc.staff.resources.DTO.ServerIpInfo;

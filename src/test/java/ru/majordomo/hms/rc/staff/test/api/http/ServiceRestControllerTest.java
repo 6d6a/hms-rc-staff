@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
+import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -32,6 +33,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -73,6 +75,16 @@ public class ServiceRestControllerTest {
     private MockMvc mockMvc;
 
     private RestDocumentationResultHandler document;
+
+    private static FieldDescriptor[] serviceFields = new FieldDescriptor[] {
+            fieldWithPath("id").description("Service ID"),
+            fieldWithPath("name").description("Имя Service"),
+            fieldWithPath("switchedOn").description("Статус Service"),
+            subsectionWithPath("serviceSockets").description("Список serviceSockets для Service"),
+            fieldWithPath("serviceSocketIds").description("Список serviceSocketIds для Service"),
+            subsectionWithPath("serviceTemplate").description("serviceTemplate для Service"),
+            fieldWithPath("serviceTemplateId").description("serviceTemplateId для Service")
+    };
 
     private void generateBatchOfServices() {
         for (int i = 2; i < 6; i++) {
@@ -136,17 +148,8 @@ public class ServiceRestControllerTest {
         try {
             mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                     .andDo(this.document)
-                    .andDo(this.document.document(
-                    responseFields(
-                            fieldWithPath("id").description("Service ID"),
-                            fieldWithPath("name").description("Имя Service"),
-                            fieldWithPath("switchedOn").description("Статус Service"),
-                            fieldWithPath("serviceSockets").description("Список serviceSockets для Service"),
-                            fieldWithPath("serviceSocketIds").description("Список serviceSocketIds для Service"),
-                            fieldWithPath("serviceTemplate").description("serviceTemplate для Service"),
-                            fieldWithPath("serviceTemplateId").description("serviceTemplateId для Service")
-                    )
-            ));
+                    .andDo(this.document.document(responseFields(serviceFields)))
+            ;
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -163,16 +166,10 @@ public class ServiceRestControllerTest {
                     .andExpect(jsonPath("$").isArray())
                     .andDo(this.document)
                     .andDo(this.document.document(
-                    responseFields(
-                            fieldWithPath("[].id").description("Service ID"),
-                            fieldWithPath("[].name").description("Имя Service"),
-                            fieldWithPath("[].switchedOn").description("Статус Service"),
-                            fieldWithPath("[].serviceSockets").description("Список serviceSockets для Service"),
-                            fieldWithPath("[].serviceSocketIds").description("Список serviceSocketIds для Service"),
-                            fieldWithPath("[].serviceTemplate").description("serviceTemplate для Service"),
-                            fieldWithPath("[].serviceTemplateId").description("serviceTemplateId для Service")
+                            responseFields(fieldWithPath("[]").description("Services"))
+                                    .andWithPrefix("[].", serviceFields))
                     )
-            ));
+            ;
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -189,16 +186,10 @@ public class ServiceRestControllerTest {
                     .andExpect(jsonPath("$").isArray())
                     .andDo(this.document)
                     .andDo(this.document.document(
-                            responseFields(
-                                    fieldWithPath("[].id").description("Service ID"),
-                                    fieldWithPath("[].name").description("Имя Service"),
-                                    fieldWithPath("[].switchedOn").description("Статус Service"),
-                                    fieldWithPath("[].serviceSockets").description("Список serviceSockets для Service"),
-                                    fieldWithPath("[].serviceSocketIds").description("Список serviceSocketIds для Service"),
-                                    fieldWithPath("[].serviceTemplate").description("serviceTemplate для Service"),
-                                    fieldWithPath("[].serviceTemplateId").description("serviceTemplateId для Service")
-                            )
-                    ));
+                            responseFields(fieldWithPath("[]").description("Services"))
+                                    .andWithPrefix("[].", serviceFields))
+                    )
+            ;
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -218,17 +209,8 @@ public class ServiceRestControllerTest {
                     .andExpect(jsonPath("serviceTemplate.id").value(testingService.getServiceTemplateId()))
                     .andExpect(jsonPath("serviceSockets.[0].id").value(testingService.getServiceSocketIds().get(0))).andDo(print())
                     .andDo(this.document)
-                    .andDo(this.document.document(
-                            responseFields(
-                                    fieldWithPath("id").description("Service ID"),
-                                    fieldWithPath("name").description("Имя Service"),
-                                    fieldWithPath("switchedOn").description("Статус Service"),
-                                    fieldWithPath("serviceSockets").description("Список serviceSockets для Service"),
-                                    fieldWithPath("serviceSocketIds").description("Список serviceSocketIds для Service"),
-                                    fieldWithPath("serviceTemplate").description("serviceTemplate для Service"),
-                                    fieldWithPath("serviceTemplateId").description("serviceTemplateId для Service")
-                            )
-                    ));
+                    .andDo(this.document.document(responseFields(serviceFields)))
+            ;
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();

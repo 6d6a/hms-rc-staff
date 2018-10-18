@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.test.config.ConfigOfGovernors;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
@@ -72,7 +73,7 @@ public class GovernorOfNetworkTest {
         try {
             serviceMessage = createServiceMessage(name,switchedOn,address,mask,gatewayAddress,vlanNumber);
             Network network = governorOfNetwork.createResource(serviceMessage);
-            Network network1 = networkRepository.findOne(network.getId());
+            Network network1 = networkRepository.findById(network.getId()).orElseThrow(() -> new ResourceNotFoundException("сеть не найдена"));
             Assert.assertEquals("Имя сети, полученное из базы не совпадает с ожидаемым", name, network1.getName());
             Assert.assertEquals("Флаг switchedOn не совпадает с ожидаемым", switchedOn, network1.getSwitchedOn());
             Assert.assertEquals("Адрес сети не совпадает с ожидаемым", address, network1.getAddressAsString());

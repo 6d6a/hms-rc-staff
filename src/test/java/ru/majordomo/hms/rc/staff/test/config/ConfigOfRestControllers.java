@@ -1,7 +1,7 @@
 package ru.majordomo.hms.rc.staff.test.config;
 
-import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory;
-import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -11,9 +11,10 @@ import ru.majordomo.hms.rc.staff.api.http.*;
 @EnableWebMvc
 public class ConfigOfRestControllers {
     @Bean
-    public EmbeddedServletContainerFactory embeddedServletContainerFactory() {
-        return new TomcatEmbeddedServletContainerFactory(0);
+    ServletWebServerFactory servletWebServerFactory(){
+        return new TomcatServletWebServerFactory(0);
     }
+
     @Bean
     public ConfigTemplateRestController configTemplateRestController() {
         return new ConfigTemplateRestController();

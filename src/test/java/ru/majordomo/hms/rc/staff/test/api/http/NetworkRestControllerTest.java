@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
+import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -65,6 +66,16 @@ public class NetworkRestControllerTest {
 
     private RestDocumentationResultHandler document;
 
+    private static FieldDescriptor[] networkFields = new FieldDescriptor[] {
+            fieldWithPath("id").description("Network ID"),
+            fieldWithPath("name").description("Имя Network"),
+            fieldWithPath("switchedOn").description("Статус Network"),
+            fieldWithPath("address").description("IP-адрес"),
+            fieldWithPath("mask").description("Маска"),
+            fieldWithPath("gatewayAddress").description("Шлюз"),
+            fieldWithPath("vlanNumber").description("Номер сети")
+    };
+
     @Before
     public void generateBatchOfNetworks() {
 
@@ -104,17 +115,8 @@ public class NetworkRestControllerTest {
         try {
             mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                     .andDo(this.document)
-                    .andDo(this.document.document(
-                    responseFields(
-                            fieldWithPath("id").description("Network ID"),
-                            fieldWithPath("name").description("Имя Network"),
-                            fieldWithPath("switchedOn").description("Статус Network"),
-                            fieldWithPath("address").description("IP-адрес"),
-                            fieldWithPath("mask").description("Маска"),
-                            fieldWithPath("gatewayAddress").description("Шлюз"),
-                            fieldWithPath("vlanNumber").description("Номер сети")
-                    )
-            ));
+                    .andDo(this.document.document(responseFields(networkFields)))
+            ;
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -129,16 +131,10 @@ public class NetworkRestControllerTest {
             mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                     .andDo(this.document)
                     .andDo(this.document.document(
-                    responseFields(
-                            fieldWithPath("[].id").description("Network ID"),
-                            fieldWithPath("[].name").description("Имя Network"),
-                            fieldWithPath("[].switchedOn").description("Статус Network"),
-                            fieldWithPath("[].address").description("IP-адрес"),
-                            fieldWithPath("[].mask").description("Маска"),
-                            fieldWithPath("[].gatewayAddress").description("Шлюз"),
-                            fieldWithPath("[].vlanNumber").description("Номер сети")
+                            responseFields(fieldWithPath("[]").description("Networks"))
+                                    .andWithPrefix("[].", networkFields))
                     )
-            ));
+            ;
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -153,16 +149,11 @@ public class NetworkRestControllerTest {
             mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                     .andDo(this.document)
                     .andDo(this.document.document(
-                            responseFields(
-                                    fieldWithPath("[].id").description("Network ID"),
-                                    fieldWithPath("[].name").description("Имя Network"),
-                                    fieldWithPath("[].switchedOn").description("Статус Network"),
-                                    fieldWithPath("[].address").description("IP-адрес"),
-                                    fieldWithPath("[].mask").description("Маска"),
-                                    fieldWithPath("[].gatewayAddress").description("Шлюз"),
-                                    fieldWithPath("[].vlanNumber").description("Номер сети")
+                            responseFields(fieldWithPath("[]").description("Networks"))
+                                    .andWithPrefix("[].", networkFields)
                             )
-                    ));
+                    )
+            ;
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -183,17 +174,7 @@ public class NetworkRestControllerTest {
                     .andExpect(jsonPath("name").value(testingNetwork.getName()))
                     .andExpect(jsonPath("id").value(testingNetwork.getId()))
                     .andDo(this.document)
-                    .andDo(this.document.document(
-                            responseFields(
-                                    fieldWithPath("id").description("Network ID"),
-                                    fieldWithPath("name").description("Имя Network"),
-                                    fieldWithPath("switchedOn").description("Статус Network"),
-                                    fieldWithPath("address").description("IP-адрес"),
-                                    fieldWithPath("mask").description("Маска"),
-                                    fieldWithPath("gatewayAddress").description("Шлюз"),
-                                    fieldWithPath("vlanNumber").description("Номер сети")
-                            )
-                    ));
+                    .andDo(this.document.document(responseFields(networkFields)));
         } catch (Exception ex) {
             ex.printStackTrace();
             Assert.fail();

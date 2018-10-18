@@ -15,6 +15,7 @@ import javax.validation.Validator;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
+import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.repositories.NetworkRepository;
 import ru.majordomo.hms.rc.staff.resources.Network;
 import ru.majordomo.hms.rc.staff.resources.ServiceSocket;
@@ -88,7 +89,7 @@ public class GovernorOfNetwork extends LordOfResources<Network> {
 
     @Override
     public void preDelete(String resourceId) {
-        Network network = repository.findOne(resourceId);
+        Network network = repository.findById(resourceId).orElseThrow(() -> new ResourceNotFoundException("сеть не найдена"));
         List<ServiceSocket> sockets = governorOfServiceSocket.buildAll();
         for (ServiceSocket socket : sockets) {
             if (network.isAddressIn(socket.getAddressAsString())) {

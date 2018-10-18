@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +26,7 @@ import ru.majordomo.hms.rc.staff.resources.ServiceSocket;
 import ru.majordomo.hms.rc.staff.resources.Storage;
 
 @Component
+@Profile("import")
 public class ServerDBImportService {
     private final static Logger logger = LoggerFactory.getLogger(ServerDBImportService.class);
 

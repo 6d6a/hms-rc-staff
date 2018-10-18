@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import ru.majordomo.hms.rc.staff.resources.Resource;
 import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 
 @Service
+@Profile("import")
 public class ServiceTemplateDBSeedService {
     private final static Logger logger = LoggerFactory.getLogger(ServiceTemplateDBSeedService.class);
 

@@ -2,10 +2,10 @@ package ru.majordomo.hms.rc.staff.resources;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 

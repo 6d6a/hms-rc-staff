@@ -3,6 +3,7 @@ package ru.majordomo.hms.rc.staff.importing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import ru.majordomo.hms.rc.staff.resources.ServiceSocket;
 import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 
 @Component
+@Profile("import")
 public class ServiceDBSeedService {
     private final static Logger logger = LoggerFactory.getLogger(ServiceDBSeedService.class);
 
