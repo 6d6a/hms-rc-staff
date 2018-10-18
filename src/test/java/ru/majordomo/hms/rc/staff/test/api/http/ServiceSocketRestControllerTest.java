@@ -1,7 +1,11 @@
 package ru.majordomo.hms.rc.staff.test.api.http;
 
 import org.bson.types.ObjectId;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,6 +14,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
+import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -22,10 +27,13 @@ import java.util.List;
 
 import ru.majordomo.hms.rc.staff.exception.handler.RestResponseEntityExceptionHandler;
 import ru.majordomo.hms.rc.staff.repositories.NetworkRepository;
-import ru.majordomo.hms.rc.staff.resources.Network;
-import ru.majordomo.hms.rc.staff.test.config.*;
 import ru.majordomo.hms.rc.staff.repositories.ServiceSocketRepository;
+import ru.majordomo.hms.rc.staff.resources.Network;
 import ru.majordomo.hms.rc.staff.resources.ServiceSocket;
+import ru.majordomo.hms.rc.staff.test.config.ConfigOfGovernors;
+import ru.majordomo.hms.rc.staff.test.config.ConfigOfRestControllers;
+import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
+import ru.majordomo.hms.rc.staff.test.config.ValidationConfig;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
@@ -69,6 +77,14 @@ public class ServiceSocketRestControllerTest {
 
     private MockMvc mockMvc;
     private List<ServiceSocket> serviceSocketList = new ArrayList<>();
+
+    private static FieldDescriptor[] serviceSocketFields = new FieldDescriptor[] {
+            fieldWithPath("id").description("ServiceSocket ID"),
+            fieldWithPath("name").description("Имя ServiceSocket"),
+            fieldWithPath("switchedOn").description("Статус ServiceSocket"),
+            fieldWithPath("port").description("Порт"),
+            fieldWithPath("address").description("IP")
+    };
 
     private void generateBatchOfSockets() {
 
@@ -115,15 +131,8 @@ public class ServiceSocketRestControllerTest {
         try {
             mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                     .andDo(this.document)
-                    .andDo(this.document.document(
-                    responseFields(
-                            fieldWithPath("id").description("ServiceSocket ID"),
-                            fieldWithPath("name").description("Имя ServiceSocket"),
-                            fieldWithPath("switchedOn").description("Статус ServiceSocket"),
-                            fieldWithPath("port").description("Порт"),
-                            fieldWithPath("address").description("IP")
-                    )
-            ));
+                    .andDo(this.document.document(responseFields(serviceSocketFields)))
+            ;
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -138,14 +147,9 @@ public class ServiceSocketRestControllerTest {
             mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                     .andDo(this.document)
                     .andDo(this.document.document(
-                    responseFields(
-                            fieldWithPath("[].id").description("ServiceSocket ID"),
-                            fieldWithPath("[].name").description("Имя ServiceSocket"),
-                            fieldWithPath("[].switchedOn").description("Статус ServiceSocket"),
-                            fieldWithPath("[].port").description("Порт"),
-                            fieldWithPath("[].address").description("IP")
-                    )
-            ));
+                            responseFields(fieldWithPath("[]").description("ServiceSockets"))
+                                    .andWithPrefix("[].", serviceSocketFields))
+            );
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -160,14 +164,9 @@ public class ServiceSocketRestControllerTest {
             mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                     .andDo(this.document)
                     .andDo(this.document.document(
-                            responseFields(
-                                    fieldWithPath("[].id").description("ServiceSocket ID"),
-                                    fieldWithPath("[].name").description("Имя ServiceSocket"),
-                                    fieldWithPath("[].switchedOn").description("Статус ServiceSocket"),
-                                    fieldWithPath("[].port").description("Порт"),
-                                    fieldWithPath("[].address").description("IP")
-                            )
-                    ));
+                            responseFields(fieldWithPath("[]").description("ServiceSockets"))
+                                    .andWithPrefix("[].", serviceSocketFields))
+                    );
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -187,15 +186,8 @@ public class ServiceSocketRestControllerTest {
                     .andExpect(jsonPath("name").value(testingServiceSocket.getName()))
                     .andExpect(jsonPath("id").value(testingServiceSocket.getId()))
                     .andDo(this.document)
-                    .andDo(this.document.document(
-                            responseFields(
-                                    fieldWithPath("id").description("ServiceSocket ID"),
-                                    fieldWithPath("name").description("Имя ServiceSocket"),
-                                    fieldWithPath("switchedOn").description("Статус ServiceSocket"),
-                                    fieldWithPath("port").description("Порт"),
-                                    fieldWithPath("address").description("IP")
-                            )
-                    ));
+                    .andDo(this.document.document(responseFields(serviceSocketFields)))
+            ;
         } catch (Exception ex) {
             ex.printStackTrace();
             Assert.fail();

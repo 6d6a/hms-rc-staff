@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
+import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -36,6 +37,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -102,6 +104,18 @@ public class ServerRestControllerTest {
     private List<Server> testServers = new ArrayList<>();
     private MockMvc mockMvc;
 
+    private static FieldDescriptor[] serverFields = new FieldDescriptor[] {
+            fieldWithPath("id").description("Server ID"),
+            fieldWithPath("name").description("Имя Server"),
+            fieldWithPath("switchedOn").description("Статус Server"),
+            subsectionWithPath("services").description("Список Service для Server"),
+            fieldWithPath("serviceIds").description("Список serviceIds для Server"),
+            subsectionWithPath("serverRoles").description("Список ServerRoles для Server"),
+            fieldWithPath("serverRoleIds").description("Список serverRoleIds для Server"),
+            subsectionWithPath("storages").description("Список Storages для Server"),
+            fieldWithPath("storageIds").description("Список storageIds для Server")
+    };
+
     private void generateBatchOfServers() {
         for (int i = 1; i < 10; i++) {
 
@@ -124,7 +138,6 @@ public class ServerRestControllerTest {
 
             ServiceTemplate serviceTemplate = new ServiceTemplate();
             serviceTemplate.addConfigTemplate(configTemplate);
-//            serviceTemplate.setServiceType(serviceType);
             serviceTemplate.setServiceTypeName(serviceType.getName());
             serviceTemplateRepository.save(serviceTemplate);
 
@@ -141,7 +154,6 @@ public class ServerRestControllerTest {
                     break;
                 case 3:
                     serverRole.setName("mysql-database-server");
-                    serverRole1.setName("shared-hosting");
                     break;
                 default:
                     serverRole.setName("Серверная роль " + i);
@@ -167,13 +179,13 @@ public class ServerRestControllerTest {
             service.setServiceTemplate(serviceTemplate);
             service.addServiceSocket(serviceSocket);
             services.add(service);
-            serviceRepository.save(services);
+            serviceRepository.saveAll(services);
 
             List<Storage> storages = new ArrayList<>();
             Storage storage = new Storage();
             if (i == 2) storage.setMountPoint("/homebig");
             storages.add(storage);
-            storageRepository.save(storages);
+            storageRepository.saveAll(storages);
 
             String name;
             switch (i) {
@@ -222,19 +234,8 @@ public class ServerRestControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                     .andDo(this.document)
-                    .andDo(this.document.document(
-                    responseFields(
-                            fieldWithPath("id").description("Server ID"),
-                            fieldWithPath("name").description("Имя Server"),
-                            fieldWithPath("switchedOn").description("Статус Server"),
-                            fieldWithPath("services").description("Список Service для Server"),
-                            fieldWithPath("serviceIds").description("Список serviceIds для Server"),
-                            fieldWithPath("serverRoles").description("Список ServerRoles для Server"),
-                            fieldWithPath("serverRoleIds").description("Список serverRoleIds для Server"),
-                            fieldWithPath("storages").description("Список Storages для Server"),
-                            fieldWithPath("storageIds").description("Список storageIds для Server")
-                    )
-            ));
+                    .andDo(this.document.document(responseFields(serverFields)))
+            ;
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -251,17 +252,8 @@ public class ServerRestControllerTest {
                     .andExpect(jsonPath("$").isArray())
                     .andDo(this.document)
                     .andDo(this.document.document(
-                            responseFields(
-                                    fieldWithPath("[].id").description("Server ID"),
-                                    fieldWithPath("[].name").description("Имя Server"),
-                                    fieldWithPath("[].switchedOn").description("Статус Server"),
-                                    fieldWithPath("[].services").description("Список Service для Server"),
-                                    fieldWithPath("[].serviceIds").description("Список serviceIds для Server"),
-                                    fieldWithPath("[].serverRoles").description("Список ServerRoles для Server"),
-                                    fieldWithPath("[].serverRoleIds").description("Список serverRoleIds для Server"),
-                                    fieldWithPath("[].storages").description("Список Storages для Server"),
-                                    fieldWithPath("[].storageIds").description("Список storageIds для Server")
-                            )
+                            responseFields(fieldWithPath("[]").description("Servers"))
+                                    .andWithPrefix("[].", serverFields)
                     ));
         } catch (Exception e) {
             e.printStackTrace();
@@ -325,17 +317,8 @@ public class ServerRestControllerTest {
                     .andExpect(jsonPath("$").isArray())
                     .andDo(this.document)
                     .andDo(this.document.document(
-                            responseFields(
-                                    fieldWithPath("[].id").description("Server ID"),
-                                    fieldWithPath("[].name").description("Имя Server"),
-                                    fieldWithPath("[].switchedOn").description("Статус Server"),
-                                    fieldWithPath("[].services").description("Список Service для Server"),
-                                    fieldWithPath("[].serviceIds").description("Список serviceIds для Server"),
-                                    fieldWithPath("[].serverRoles").description("Список ServerRoles для Server"),
-                                    fieldWithPath("[].serverRoleIds").description("Список serverRoleIds для Server"),
-                                    fieldWithPath("[].storages").description("Список Storages для Server"),
-                                    fieldWithPath("[].storageIds").description("Список storageIds для Server")
-                            )
+                            responseFields(fieldWithPath("[]").description("Servers"))
+                                    .andWithPrefix("[].", serverFields)
                     ));
         } catch (Exception e) {
             e.printStackTrace();
@@ -353,7 +336,6 @@ public class ServerRestControllerTest {
 
         try {
             mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                    .andExpect(jsonPath("name").value(testServers.get(0).getName()))
                     .andExpect(jsonPath("name").value(activeSharedHostingName))
                     .andExpect(jsonPath("switchedOn").value(testServers.get(0).getSwitchedOn()))
                     .andExpect(jsonPath("serverRoles").isArray())
@@ -459,19 +441,8 @@ public class ServerRestControllerTest {
                     .andExpect(jsonPath("storages").isArray())
                     .andExpect(jsonPath("storages.[0].id").value(testingServer.getStorages().get(0).getId()))
                     .andDo(this.document)
-                    .andDo(this.document.document(
-                            responseFields(
-                                    fieldWithPath("id").description("Server ID"),
-                                    fieldWithPath("name").description("Имя Server"),
-                                    fieldWithPath("switchedOn").description("Статус Server"),
-                                    fieldWithPath("services").description("Список Service для Server"),
-                                    fieldWithPath("serviceIds").description("Список serviceIds для Server"),
-                                    fieldWithPath("serverRoles").description("Список ServerRoles для Server"),
-                                    fieldWithPath("serverRoleIds").description("Список serverRoleIds для Server"),
-                                    fieldWithPath("storages").description("Список Storages для Server"),
-                                    fieldWithPath("storageIds").description("Список storageIds для Server")
-                            )
-                    ));
+                    .andDo(this.document.document(responseFields(serverFields)))
+            ;
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();

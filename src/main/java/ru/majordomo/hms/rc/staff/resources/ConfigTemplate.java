@@ -1,8 +1,9 @@
 package ru.majordomo.hms.rc.staff.resources;
 
-import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.URL;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import javax.validation.constraints.NotBlank;
 
 @Document
 public class ConfigTemplate extends Resource {

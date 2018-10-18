@@ -15,12 +15,16 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import ru.majordomo.hms.rc.staff.repositories.ServiceTypeRepository;
-import ru.majordomo.hms.rc.staff.resources.ServiceType;
-import ru.majordomo.hms.rc.staff.test.config.*;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import ru.majordomo.hms.rc.staff.repositories.ServiceTypeRepository;
+import ru.majordomo.hms.rc.staff.resources.ServiceType;
+import ru.majordomo.hms.rc.staff.test.config.ConfigOfGovernors;
+import ru.majordomo.hms.rc.staff.test.config.ConfigOfRestControllers;
+import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
+import ru.majordomo.hms.rc.staff.test.config.ValidationConfig;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;

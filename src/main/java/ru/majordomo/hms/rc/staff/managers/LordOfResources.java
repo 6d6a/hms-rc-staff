@@ -31,7 +31,7 @@ public abstract class LordOfResources<T extends Resource> {
     public abstract void isValid(T resource) throws ParameterValidateException;
 
     public T build(String resourceId) throws ResourceNotFoundException {
-        T resource = repository.findOne(resourceId);
+        T resource = repository.findById(resourceId).orElse(null);
         if (resource == null) {
             throw new ResourceNotFoundException(genericType.getSimpleName() +" с ID:" + resourceId + " не найден");
         }
@@ -84,7 +84,7 @@ public abstract class LordOfResources<T extends Resource> {
 
     public void delete(String resourceId) {
         preDelete(resourceId);
-        repository.delete(resourceId);
+        repository.deleteById(resourceId);
     }
 
     public void preValidate(T resource) {}
@@ -96,7 +96,7 @@ public abstract class LordOfResources<T extends Resource> {
     }
 
     public boolean exists(String resourceId) {
-        return repository.exists(resourceId);
+        return repository.existsById(resourceId);
     }
 
     public static Resource setResourceParams(Resource resource, ServiceMessage serviceMessage, Cleaner cleaner) throws ClassCastException{

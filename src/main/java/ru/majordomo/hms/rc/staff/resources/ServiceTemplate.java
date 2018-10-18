@@ -1,9 +1,5 @@
 package ru.majordomo.hms.rc.staff.resources;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import org.hibernate.validator.constraints.NotBlank;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 import ru.majordomo.hms.rc.staff.resources.validation.ObjectId;
@@ -11,6 +7,9 @@ import ru.majordomo.hms.rc.staff.resources.validation.ObjectIdCollection;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 
 @Document
 public class ServiceTemplate extends Resource {

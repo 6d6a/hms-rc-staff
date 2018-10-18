@@ -3,9 +3,11 @@ package ru.majordomo.hms.rc.staff.importing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 @Service
+@Profile("import")
 public class DBImportService {
     private final static Logger logger = LoggerFactory.getLogger(DBImportService.class);
 
@@ -63,14 +65,14 @@ public class DBImportService {
 //        seeded = serviceDBSeedService.seedDB();
 //        logger.debug(seeded ? "service db_seeded" : "service db_not_seeded");
 
-        seeded = serverRoleDBSeedService.seedDB();
-        logger.debug(seeded ? "serverRole db_seeded" : "serverRole db_not_seeded");
+//        seeded = serverRoleDBSeedService.seedDB();
+//        logger.debug(seeded ? "serverRole db_seeded" : "serverRole db_not_seeded");
 
 //        seeded = storageDBImportService.importToMongo();
 //        logger.debug(seeded ? "storage db_imported" : "storage db_not_imported");
 
-        seeded = serverDBImportService.importToMongo();
-        logger.debug(seeded ? "server db_imported" : "server db_not_imported");
+//        seeded = serverDBImportService.importToMongo();
+//        logger.debug(seeded ? "server db_imported" : "server db_not_imported");
 
         return true;
     }

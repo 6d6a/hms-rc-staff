@@ -10,6 +10,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
+import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -31,6 +32,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -66,6 +68,15 @@ public class StorageRestControllerTest {
 
     private RestDocumentationResultHandler document;
 
+    private static FieldDescriptor[] storageFields = new FieldDescriptor[] {
+            fieldWithPath("id").description("Storage ID"),
+            fieldWithPath("name").description("Имя Storage"),
+            fieldWithPath("switchedOn").description("Статус Storage"),
+            fieldWithPath("capacity").description("Объем хранилища"),
+            fieldWithPath("capacityUsed").description("Занятый объем хранилища"),
+            fieldWithPath("mountPoint").description("mountPoint хранилища")
+    };
+
     private void generateBatchOfStorages() {
         String namePattern = "Хранилище ";
         Boolean switchedOn = Boolean.TRUE;
@@ -99,16 +110,8 @@ public class StorageRestControllerTest {
         try {
             mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                     .andDo(this.document)
-                    .andDo(this.document.document(
-                    responseFields(
-                            fieldWithPath("id").description("Storage ID"),
-                            fieldWithPath("name").description("Имя Storage"),
-                            fieldWithPath("switchedOn").description("Статус Storage"),
-                            fieldWithPath("capacity").description("Объем хранилища"),
-                            fieldWithPath("capacityUsed").description("Занятый объем хранилища"),
-                            fieldWithPath("mountPoint").description("mountPoint хранилища")
-                    )
-            ));
+                    .andDo(this.document.document(responseFields(storageFields)))
+            ;
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -123,15 +126,9 @@ public class StorageRestControllerTest {
             mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                     .andDo(this.document)
                     .andDo(this.document.document(
-                    responseFields(
-                            fieldWithPath("[].id").description("Storage ID"),
-                            fieldWithPath("[].name").description("Имя Storage"),
-                            fieldWithPath("[].switchedOn").description("Статус Storage"),
-                            fieldWithPath("[].capacity").description("Объем хранилища"),
-                            fieldWithPath("[].capacityUsed").description("Занятый объем хранилища"),
-                            fieldWithPath("[].mountPoint").description("mountPoint хранилища")
-                    )
-            ));
+                            responseFields(fieldWithPath("[]").description("Storages"))
+                                    .andWithPrefix("[].", storageFields))
+            );
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -146,15 +143,9 @@ public class StorageRestControllerTest {
             mockMvc.perform(request).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                     .andDo(this.document)
                     .andDo(this.document.document(
-                            responseFields(
-                                    fieldWithPath("[].id").description("Storage ID"),
-                                    fieldWithPath("[].name").description("Имя Storage"),
-                                    fieldWithPath("[].switchedOn").description("Статус Storage"),
-                                    fieldWithPath("[].capacity").description("Объем хранилища"),
-                                    fieldWithPath("[].capacityUsed").description("Занятый объем хранилища"),
-                                    fieldWithPath("[].mountPoint").description("mountPoint хранилища")
-                            )
-                    ));
+                            responseFields(fieldWithPath("[]").description("Storages"))
+                                    .andWithPrefix("[].", storageFields))
+                    );
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -173,16 +164,8 @@ public class StorageRestControllerTest {
                     .andExpect(jsonPath("capacity").value(testingStorage.getCapacity()))
                     .andExpect(jsonPath("capacityUsed").value(testingStorage.getCapacityUsed()))
                     .andDo(this.document)
-                    .andDo(this.document.document(
-                            responseFields(
-                                    fieldWithPath("id").description("Storage ID"),
-                                    fieldWithPath("name").description("Имя Storage"),
-                                    fieldWithPath("switchedOn").description("Статус Storage"),
-                                    fieldWithPath("capacity").description("Объем хранилища"),
-                                    fieldWithPath("capacityUsed").description("Занятый объем хранилища"),
-                                    fieldWithPath("mountPoint").description("mountPoint хранилища")
-                            )
-                    ));
+                    .andDo(this.document.document(responseFields(storageFields)))
+            ;
         } catch (Exception e){
             e.printStackTrace();
             Assert.fail();

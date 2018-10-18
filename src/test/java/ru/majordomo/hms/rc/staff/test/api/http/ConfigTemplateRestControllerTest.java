@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
+import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -61,6 +62,13 @@ public class ConfigTemplateRestControllerTest {
 
     private RestDocumentationResultHandler document;
 
+    private static FieldDescriptor[] configTemplateFields = new FieldDescriptor[] {
+            fieldWithPath("id").description("ConfigTemplate ID"),
+            fieldWithPath("name").description("Имя ConfigTemplate"),
+            fieldWithPath("switchedOn").description("Статус ConfigTemplate"),
+            fieldWithPath("fileLink").description("Ссылка на файл")
+    };
+
     private void generateBatchOfConfigTemplates() {
         String namePattern = "Шаблон ";
         Boolean switchedOn = Boolean.TRUE;
@@ -94,14 +102,8 @@ public class ConfigTemplateRestControllerTest {
             mockMvc.perform(request).andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                     .andDo(this.document)
-                    .andDo(this.document.document(
-                            responseFields(
-                                fieldWithPath("id").description("ConfigTemplate ID"),
-                                fieldWithPath("name").description("Имя ConfigTemplate"),
-                                fieldWithPath("switchedOn").description("Статус ConfigTemplate"),
-                                fieldWithPath("fileLink").description("Ссылка на файл")
-                            )
-                    ));
+                    .andDo(this.document.document(responseFields(configTemplateFields)))
+            ;
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -117,14 +119,8 @@ public class ConfigTemplateRestControllerTest {
             mockMvc.perform(request).andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                     .andDo(this.document)
-                    .andDo(this.document.document(
-                            responseFields(
-                                    fieldWithPath("id").description("ConfigTemplate ID"),
-                                    fieldWithPath("name").description("Имя ConfigTemplate"),
-                                    fieldWithPath("switchedOn").description("Статус ConfigTemplate"),
-                                    fieldWithPath("fileLink").description("Ссылка на файл")
-                            )
-                    ));
+                    .andDo(this.document.document(responseFields(configTemplateFields)))
+            ;
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -140,12 +136,8 @@ public class ConfigTemplateRestControllerTest {
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                     .andDo(this.document)
                     .andDo(this.document.document(
-                            responseFields(
-                                    fieldWithPath("[].id").description("ConfigTemplate ID"),
-                                    fieldWithPath("[].name").description("Имя ConfigTemplate"),
-                                    fieldWithPath("[].switchedOn").description("Статус ConfigTemplate"),
-                                    fieldWithPath("[].fileLink").description("Ссылка на файл")
-                            )
+                            responseFields(fieldWithPath("[]").description("ConfigTemplates"))
+                                    .andWithPrefix("[].", configTemplateFields)
                     ));
         } catch (Exception e) {
             e.printStackTrace();
@@ -162,12 +154,8 @@ public class ConfigTemplateRestControllerTest {
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                     .andDo(this.document)
                     .andDo(this.document.document(
-                            responseFields(
-                                    fieldWithPath("[].id").description("ConfigTemplate ID"),
-                                    fieldWithPath("[].name").description("Имя ConfigTemplate"),
-                                    fieldWithPath("[].switchedOn").description("Статус ConfigTemplate"),
-                                    fieldWithPath("[].fileLink").description("Ссылка на файл")
-                            )
+                            responseFields(fieldWithPath("[]").description("ConfigTemplates"))
+                                    .andWithPrefix("[].", configTemplateFields)
                     ));
         } catch (Exception e) {
             e.printStackTrace();
@@ -185,14 +173,8 @@ public class ConfigTemplateRestControllerTest {
                     .andExpect(jsonPath("switchedOn").value(configTemplate.getSwitchedOn()))
                     .andExpect(jsonPath("fileLink").value(configTemplate.getFileLink()))
                     .andDo(this.document)
-                    .andDo(this.document.document(
-                            responseFields(
-                                    fieldWithPath("id").description("ConfigTemplate ID"),
-                                    fieldWithPath("name").description("Имя ConfigTemplate"),
-                                    fieldWithPath("switchedOn").description("Статус ConfigTemplate"),
-                                    fieldWithPath("fileLink").description("Ссылка на файл")
-                            )
-                    ));
+                    .andDo(this.document.document(responseFields(configTemplateFields)))
+            ;
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -209,14 +191,8 @@ public class ConfigTemplateRestControllerTest {
                     .andExpect(jsonPath("switchedOn").value(configTemplate.getSwitchedOn()))
                     .andExpect(jsonPath("fileLink").value(configTemplate.getFileLink()))
                     .andDo(this.document)
-                    .andDo(this.document.document(
-                            responseFields(
-                                    fieldWithPath("id").description("ConfigTemplate ID"),
-                                    fieldWithPath("name").description("Имя ConfigTemplate"),
-                                    fieldWithPath("switchedOn").description("Статус ConfigTemplate"),
-                                    fieldWithPath("fileLink").description("Ссылка на файл")
-                            )
-                    ));
+                    .andDo(this.document.document(responseFields(configTemplateFields)))
+            ;
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();

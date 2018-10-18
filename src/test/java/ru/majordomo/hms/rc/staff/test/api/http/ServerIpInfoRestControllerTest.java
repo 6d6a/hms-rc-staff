@@ -82,7 +82,7 @@ public class ServerIpInfoRestControllerTest {
             serverIpInfos.add(serverIpInfo);
         }
 
-        repository.save(serverIpInfos);
+        repository.saveAll(serverIpInfos);
     }
 
     @Test
