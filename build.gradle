@@ -156,4 +156,4 @@ clean.doFirst {
 
 build.dependsOn("resourceJar")
 publish.doFirst autoIncrementBuildNumber
-apply from: "https://nexus.intr/repository/init/gradle-init/0.1/dockertask.gradle"
+//apply from: "https://nexus.intr/repository/init/gradle-init/0.1/dockertask.gradle"
