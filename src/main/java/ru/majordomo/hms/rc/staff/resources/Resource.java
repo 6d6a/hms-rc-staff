@@ -1,5 +1,6 @@
 package ru.majordomo.hms.rc.staff.resources;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.data.annotation.Id;
@@ -11,13 +12,16 @@ import javax.validation.constraints.Pattern;
 
 import java.io.IOException;
 
+import ru.majordomo.hms.rc.staff.common.Views;
 import ru.majordomo.hms.rc.staff.resources.validation.group.ServiceTypeChecks;
 
 public abstract class Resource {
     @Id
     @Indexed
+    @JsonView(Views.Operator.class)
     private String id;
 
+    @JsonView(Views.Operator.class)
     @Indexed
     @NotBlank
     @Pattern(regexp = "(?ui)(DATABASE_[A-Z]+|WEBSITE_[A-Z0-9]+_[A-Z0-9]+_[A-Z0-9]+|MAILBOX_[A-Z]+)", groups = {ServiceTypeChecks.class})
