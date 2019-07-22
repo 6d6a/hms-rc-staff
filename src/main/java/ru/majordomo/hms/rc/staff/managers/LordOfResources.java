@@ -80,6 +80,10 @@ public abstract class LordOfResources<T extends Resource> {
         repository.save(resource);
     }
 
+    public void insert(T resource) {
+        repository.insert(resource);
+    }
+
     public void preDelete(String resourceId) {}
 
     public void delete(String resourceId) {

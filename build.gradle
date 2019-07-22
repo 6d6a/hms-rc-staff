@@ -1,7 +1,7 @@
 buildscript {
     repositories {
         maven {
-            url 'https://nexus.intr/repository/mavengroup'
+            url 'http://nexus.intr/repository/mavengroup'
         }
         maven {
             url "https://plugins.gradle.org/m2/"
@@ -94,7 +94,7 @@ task resourceJar(type: Jar, dependsOn: compileJava) {
 
 repositories {
     maven {
-        url 'https://nexus.intr/repository/mavengroup'
+        url 'http://nexus.intr/repository/mavengroup'
     }
 }
 
