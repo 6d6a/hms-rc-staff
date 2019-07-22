@@ -51,7 +51,7 @@ abstract public class RestControllerTemplate<T extends Resource> {
 
     protected ResponseEntity<T> processCreateQuery(T resource) throws ParameterValidateException {
         governor.isValid(resource);
-        governor.save(resource);
+        governor.insert(resource);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{id}")
