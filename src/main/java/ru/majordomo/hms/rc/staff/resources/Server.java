@@ -14,6 +14,7 @@ import ru.majordomo.hms.rc.staff.resources.validation.ObjectIdCollection;
 
 @Document
 public class Server extends Resource {
+//    @Transient
     @NotEmpty(message = "Не найден ни один Service")
     @ObjectIdCollection(value = Service.class)
     private List<String> serviceIds = new ArrayList<>();
@@ -22,6 +23,7 @@ public class Server extends Resource {
     @ObjectIdCollection(value = ServerRole.class)
     private List<String> serverRoleIds = new ArrayList<>();
 
+//    @Transient
     @NotEmpty(message = "Не найден ни один Storage")
     @ObjectIdCollection(value = Storage.class)
     private List<String> storageIds = new ArrayList<>();

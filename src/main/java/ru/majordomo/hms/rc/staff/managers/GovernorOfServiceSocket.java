@@ -3,21 +3,20 @@ package ru.majordomo.hms.rc.staff.managers;
 import org.apache.commons.lang.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validator;
-
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.repositories.ServiceSocketRepository;
 import ru.majordomo.hms.rc.staff.resources.ServiceSocket;
 import ru.majordomo.hms.rc.staff.resources.validation.group.ServiceSocketChecks;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 public class GovernorOfServiceSocket extends LordOfResources<ServiceSocket> {
@@ -46,20 +45,19 @@ public class GovernorOfServiceSocket extends LordOfResources<ServiceSocket> {
     }
 
     @Override
-    public ServiceSocket createResource(ServiceMessage serviceMessage) throws ParameterValidateException {
+    public ServiceSocket buildResourceFromServiceMessage(ServiceMessage serviceMessage) throws ClassCastException, UnsupportedEncodingException {
         ServiceSocket serviceSocket = new ServiceSocket();
-        LordOfResources.setResourceParams(serviceSocket, serviceMessage, cleaner);
 
         try {
+            LordOfResources.setResourceParams(serviceSocket, serviceMessage, cleaner);
             String address = cleaner.cleanString((String) serviceMessage.getParam("address"));
             Integer port = (Integer) serviceMessage.getParam("port");
             serviceSocket.setAddress(address);
             serviceSocket.setPort(port);
-            isValid(serviceSocket);
-            save(serviceSocket);
         } catch (ClassCastException e) {
             throw new ParameterValidateException("один из параметров указан неверно:" + e.getMessage());
         }
+
         return serviceSocket;
     }
 

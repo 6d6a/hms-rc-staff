@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,14 +20,19 @@ import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.repositories.ServerRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServerRoleRepository;
+import ru.majordomo.hms.rc.staff.repositories.ServiceRepository;
+import ru.majordomo.hms.rc.staff.repositories.StorageRepository;
 import ru.majordomo.hms.rc.staff.resources.Server;
 import ru.majordomo.hms.rc.staff.resources.ServerRole;
+import ru.majordomo.hms.rc.staff.resources.Service;
 import ru.majordomo.hms.rc.staff.resources.validation.group.ServerChecks;
 
 @Component
 @RefreshScope
 public class GovernorOfServer extends LordOfResources<Server> {
     private ServerRoleRepository serverRoleRepository;
+    private ServiceRepository serviceRepository;
+    private StorageRepository storageRepository;
     private Cleaner cleaner;
     private Validator validator;
 
@@ -67,8 +73,18 @@ public class GovernorOfServer extends LordOfResources<Server> {
     }
 
     @Autowired
-    public void setRepository(ServerRoleRepository repository) {
-        this.serverRoleRepository = repository;
+    public void setServerRoleRepository(ServerRoleRepository serverRoleRepository) {
+        this.serverRoleRepository = serverRoleRepository;
+    }
+
+    @Autowired
+    public void setServiceRepository(ServiceRepository serviceRepository) {
+        this.serviceRepository = serviceRepository;
+    }
+
+    @Autowired
+    public void setStorageRepository(StorageRepository storageRepository) {
+        this.storageRepository = storageRepository;
     }
 
     @Autowired
@@ -82,26 +98,32 @@ public class GovernorOfServer extends LordOfResources<Server> {
     }
 
     @Override
-    public Server createResource(ServiceMessage serviceMessage) throws ParameterValidateException {
+    public Server buildResourceFromServiceMessage(ServiceMessage serviceMessage) throws ClassCastException, UnsupportedEncodingException {
         Server server = new Server();
+
         try {
             LordOfResources.setResourceParams(server, serviceMessage, cleaner);
 
             @SuppressWarnings("unchecked") List<String> serviceIds = (List<String>) serviceMessage.getParam("serviceIds");
             server.setServiceIds(serviceIds);
 
+            for (String serviceId : serviceIds) {
+                serviceRepository.findById(serviceId).ifPresent(server::addService);
+            }
+
             @SuppressWarnings("unchecked") List<String> storageIds = (List<String>) serviceMessage.getParam("storageIds");
             server.setStorageIds(storageIds);
 
+            for (String storageId : storageIds) {
+                storageRepository.findById(storageId).ifPresent(server::addStorage);
+            }
+
             @SuppressWarnings("unchecked") List<String> serverRoleIds = (List<String>) serviceMessage.getParam("serverRoleIds");
             server.setServerRoleIds(serverRoleIds);
-
-            isValid(server);
-            save(server);
-
         } catch (ClassCastException e) {
             throw new ParameterValidateException("Один из параметров указан неверно:" + e.getMessage());
         }
+
         return server;
     }
 
@@ -173,7 +195,12 @@ public class GovernorOfServer extends LordOfResources<Server> {
 
         if (byServiceId) {
             String serviceId = keyValue.get("service-id");
-            server = ((ServerRepository) repository).findByServiceIds(serviceId);
+            Service service = serviceRepository.findById(serviceId).orElseThrow(
+                    () -> new ResourceNotFoundException("Service с serviceId: " + serviceId + " не найден")
+            );
+            server = repository.findById(service.getServerId()).orElseThrow(
+                    () -> new ResourceNotFoundException("Server по serviceId: " + serviceId + " не найден")
+            );
         }
 
         if (findStorage && byServerId) {

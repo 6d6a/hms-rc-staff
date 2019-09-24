@@ -1,11 +1,13 @@
 package ru.majordomo.hms.rc.staff.managers;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.GenericTypeResolver;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import ru.majordomo.hms.personmgr.exception.ParameterValidationException;
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.repositories.ResourceRepository;
 import ru.majordomo.hms.rc.staff.resources.Resource;
@@ -13,6 +15,7 @@ import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +29,28 @@ public abstract class LordOfResources<T extends Resource> {
         this.genericType = (Class<T>) GenericTypeResolver.resolveTypeArgument(getClass(), LordOfResources.class);
     }
 
-    public abstract T createResource(ServiceMessage serviceMessage) throws ParameterValidateException;
+    public T create(ServiceMessage serviceMessage) throws ParameterValidationException {
+        T resource;
+
+        try {
+            resource = buildResourceFromServiceMessage(serviceMessage);
+            preValidate(resource);
+            isValid(resource);
+            save(resource);
+        } catch (ClassCastException | UnsupportedEncodingException e) {
+            throw new ParameterValidationException("Один из параметров указан неверно:" + e.getMessage());
+        }
+
+        return resource;
+    }
+
+    public T buildResourceFromServiceMessage(ServiceMessage serviceMessage) throws ClassCastException, UnsupportedEncodingException {
+        throw new NotImplementedException("Создание ресурса по AMQP не поддерживается");
+    }
+
+    public T update(ServiceMessage serviceMessage) throws ParameterValidationException, UnsupportedEncodingException {
+        throw new NotImplementedException("Обновление ресурса по AMQP не поддерживается");
+    }
 
     public abstract void isValid(T resource) throws ParameterValidateException;
 

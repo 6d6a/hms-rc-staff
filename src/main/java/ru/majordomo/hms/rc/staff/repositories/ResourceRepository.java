@@ -5,12 +5,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
+import ru.majordomo.hms.rc.staff.resources.Resource;
 
 import java.io.Serializable;
 import java.util.List;
 
 @NoRepositoryBean
-public interface ResourceRepository<T, ID extends Serializable> extends MongoRepository<T, ID> {
+public interface ResourceRepository<T extends Resource, ID extends Serializable> extends MongoRepository<T, ID> {
     List<T> findAll();
     List<T> findByName(String name);
     Page<T> findAll(Pageable pageable);

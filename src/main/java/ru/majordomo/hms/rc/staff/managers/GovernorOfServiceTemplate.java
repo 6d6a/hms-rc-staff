@@ -4,6 +4,7 @@ import org.apache.commons.lang.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,6 +14,7 @@ import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.repositories.ServiceTemplateRepository;
+import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 import ru.majordomo.hms.rc.staff.resources.validation.group.ServiceTemplateChecks;
 
 import javax.validation.ConstraintViolation;
@@ -52,16 +54,18 @@ public class GovernorOfServiceTemplate extends LordOfResources<ServiceTemplate> 
     }
 
     @Override
-    public ServiceTemplate createResource(ServiceMessage serviceMessage) throws ParameterValidateException {
+    public ServiceTemplate buildResourceFromServiceMessage(ServiceMessage serviceMessage) throws ClassCastException, UnsupportedEncodingException {
         ServiceTemplate serviceTemplate = new ServiceTemplate();
 
-        LordOfResources.setResourceParams(serviceTemplate, serviceMessage, cleaner);
+        try {
+            LordOfResources.setResourceParams(serviceTemplate, serviceMessage, cleaner);
 
-        @SuppressWarnings("unchecked") List<String> configTemplateIds = (List<String>) serviceMessage.getParam("configTemplateIds");
-        serviceTemplate.setConfigTemplateIds(configTemplateIds);
-        serviceTemplate.setServiceTypeName((String) serviceMessage.getParam("serviceTypeName"));
-        isValid(serviceTemplate);
-        save(serviceTemplate);
+            @SuppressWarnings("unchecked") List<String> configTemplateIds = (List<String>) serviceMessage.getParam("configTemplateIds");
+            serviceTemplate.setConfigTemplateIds(configTemplateIds);
+            serviceTemplate.setServiceTypeName((String) serviceMessage.getParam("serviceTypeName"));
+        } catch (ClassCastException e) {
+            throw new ParameterValidateException("один из параметров указан неверно:" + e.getMessage());
+        }
 
         return serviceTemplate;
     }

@@ -12,7 +12,7 @@ import javax.validation.constraints.Pattern;
 
 import java.io.IOException;
 
-import ru.majordomo.hms.rc.staff.common.Views;
+import ru.majordomo.hms.rc.staff.resources.DTO.Views;
 import ru.majordomo.hms.rc.staff.resources.validation.group.ServiceTypeChecks;
 
 public abstract class Resource {
@@ -23,12 +23,12 @@ public abstract class Resource {
 
     @JsonView(Views.Operator.class)
     @Indexed
-    @NotBlank
+    @NotBlank(message = "Параметр name должен быть не пустым")
     @Pattern(regexp = "(?ui)(DATABASE_[A-Z]+|WEBSITE_[A-Z0-9]+_[A-Z0-9]+_[A-Z0-9]+|MAILBOX_[A-Z]+)", groups = {ServiceTypeChecks.class})
     private String name;
 
     @Indexed
-    @NotNull
+    @NotNull(message = "Параметр switchedOn должен быть указан")
     public Boolean switchedOn;
 
     public abstract void switchResource();

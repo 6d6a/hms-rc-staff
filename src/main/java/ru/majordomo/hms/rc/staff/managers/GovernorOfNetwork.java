@@ -4,6 +4,7 @@ import org.apache.commons.lang.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,6 +13,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 
+import ru.majordomo.hms.personmgr.exception.ParameterValidationException;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
@@ -48,10 +50,10 @@ public class GovernorOfNetwork extends LordOfResources<Network> {
     }
 
     @Override
-    public Network createResource(ServiceMessage serviceMessage) throws ParameterValidateException {
+    public Network buildResourceFromServiceMessage(ServiceMessage serviceMessage) throws ClassCastException, UnsupportedEncodingException {
         Network network = new Network();
         try {
-            network = (Network) LordOfResources.setResourceParams(network, serviceMessage, cleaner);
+            LordOfResources.setResourceParams(network, serviceMessage, cleaner);
             String address = cleaner.cleanString((String) serviceMessage.getParam("address"));
             Integer netmask = (Integer) serviceMessage.getParam("mask");
             String gwAddress = cleaner.cleanString((String) serviceMessage.getParam("gatewayAddress"));
@@ -61,13 +63,9 @@ public class GovernorOfNetwork extends LordOfResources<Network> {
             network.setGatewayAddress(gwAddress);
             network.setVlanNumber(vlanNumber);
             network.setMask(netmask);
-            isValid(network);
-
         } catch (ClassCastException | IllegalArgumentException e) {
             throw new ParameterValidateException("один из параметров указан неверно:" + e.getMessage());
         }
-
-        repository.save(network);
 
         return network;
     }

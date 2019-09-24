@@ -70,6 +70,7 @@ public class StorageRestControllerTest {
 
     private static FieldDescriptor[] storageFields = new FieldDescriptor[] {
             fieldWithPath("id").description("Storage ID"),
+            fieldWithPath("serverId").description("Server ID"),
             fieldWithPath("name").description("Имя Storage"),
             fieldWithPath("switchedOn").description("Статус Storage"),
             fieldWithPath("capacity").description("Объем хранилища"),

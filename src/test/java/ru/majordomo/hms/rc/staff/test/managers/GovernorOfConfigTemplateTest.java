@@ -46,7 +46,7 @@ public class GovernorOfConfigTemplateTest {
 
         ServiceMessage serviceMessage = buildCreateServiceMessage(fileName, switchedOn, fileLink);
         try {
-            ConfigTemplate configTemplate = governorOfConfigTemplate.createResource(serviceMessage);
+            ConfigTemplate configTemplate = governorOfConfigTemplate.create(serviceMessage);
             Assert.assertEquals("name соответствует ожидаемому", fileName, configTemplate.getName());
             Assert.assertEquals("switchedOn соответствует ожидаемомему", switchedOn, configTemplate.getSwitchedOn());
             Assert.assertEquals("fileLink соответствует ожидаемому", fileLink, configTemplate.getFileLink());
@@ -109,7 +109,7 @@ public class GovernorOfConfigTemplateTest {
 
         ServiceMessage serviceMessage = buildCreateServiceMessage(fileName, switchedOn, fileLink);
         try {
-            ConfigTemplate configTemplate = governorOfConfigTemplate.createResource(serviceMessage);
+            ConfigTemplate configTemplate = governorOfConfigTemplate.create(serviceMessage);
         } catch (NullPointerException e ) {
             e.printStackTrace();
             Assert.fail();

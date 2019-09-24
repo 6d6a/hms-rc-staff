@@ -109,7 +109,7 @@ public class GovernorOfServerRoleTest {
     @Test
     public void create() {
         try {
-            ServerRole createdRole = governor.createResource(testServiceMessage);
+            ServerRole createdRole = governor.create(testServiceMessage);
             Assert.assertEquals("Имя не совпадает с ожидаемым", testServerRole.getName(), createdRole.getName());
             Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testServerRole.getSwitchedOn(), createdRole.getSwitchedOn());
             Assert.assertTrue(testServerRole.getServiceTemplates().equals(createdRole.getServiceTemplates()));
@@ -155,7 +155,7 @@ public class GovernorOfServerRoleTest {
         List<String> unknownServiceTemplates = new ArrayList<>();
         unknownServiceTemplates.add(ObjectId.get().toString());
         testServiceMessage.addParam("serviceTemplateIds", unknownServiceTemplates);
-        governor.createResource(testServiceMessage);
+        governor.create(testServiceMessage);
     }
 
     @Test(expected = ConstraintViolationException.class)

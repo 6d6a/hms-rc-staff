@@ -15,6 +15,7 @@ public class ServiceMessage {
     private String actionIdentity;
     private String objRef;
     private Map<Object,Object> params = new HashMap<>();
+    private String accountId;
 
     public String getOperationIdentity() {
         return operationIdentity;
@@ -54,6 +55,14 @@ public class ServiceMessage {
 
     public void addParam(Object name, Object value) {
         params.put(name,value);
+    }
+
+    public String getAccountId() {
+        return accountId;
+    }
+
+    public void setAccountId(String accountId) {
+        this.accountId = accountId;
     }
 
     public String toJson() {

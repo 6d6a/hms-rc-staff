@@ -28,9 +28,8 @@ import ru.majordomo.hms.rc.staff.event.serviceTemplate.listener.ServiceTemplateM
 import ru.majordomo.hms.rc.staff.repositories.ConfigTemplateRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceTemplateRepository;
 import ru.majordomo.hms.rc.staff.repositories.ServiceTypeRepository;
-import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
+import ru.majordomo.hms.rc.staff.resources.*;
 import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
-import ru.majordomo.hms.rc.staff.resources.ServiceType;
 import ru.majordomo.hms.rc.staff.test.config.ConfigOfGovernors;
 import ru.majordomo.hms.rc.staff.test.config.ConfigOfRestControllers;
 import ru.majordomo.hms.rc.staff.test.config.RepositoriesConfig;
@@ -92,7 +91,6 @@ public class ServiceTemplateRestControllerTest {
 
     private void generateBatchOfServiceTemplates() {
         String namePattern = "Шаблон для сервиса ";
-        Boolean switchedOn = Boolean.TRUE;
         for (int i = 1; i < 6; i++) {
             ServiceType serviceType = new ServiceType();
             switch (i) {
@@ -116,7 +114,7 @@ public class ServiceTemplateRestControllerTest {
             configTemplateRepository.save(configTemplate);
             ServiceTemplate serviceTemplate = new ServiceTemplate();
             serviceTemplate.setName(name);
-            serviceTemplate.setSwitchedOn(switchedOn);
+            serviceTemplate.setSwitchedOn(true);
             serviceTemplate.addConfigTemplate(configTemplate);
             serviceTemplate.setServiceType(serviceType);
             serviceTempalteRepository.save(serviceTemplate);

@@ -7,13 +7,13 @@ import java.util.List;
 @Component
 public class Cleaner {
     public String cleanString(String input) {
-        return input.trim()
+        return input != null ? input.trim()
                 .replace("\\", "")
                 .replace("<", "")
                 .replace(">", "")
                 .replace("?", "")
                 .replace("#", "")
-                .replace("~", "");
+                .replace("~", "") : null;
     }
 
     public List<String> cleanListWithStrings(List<String> stringList) {

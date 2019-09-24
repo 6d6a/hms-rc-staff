@@ -12,6 +12,7 @@ import ru.majordomo.hms.rc.staff.resources.Server;
 import ru.majordomo.hms.rc.staff.resources.Storage;
 import ru.majordomo.hms.rc.staff.resources.validation.group.StorageChecks;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,11 +48,11 @@ public class GovernorOfStorage extends LordOfResources<Storage> {
     }
 
     @Override
-    public Storage createResource(ServiceMessage serviceMessage) throws ParameterValidateException {
+    public Storage buildResourceFromServiceMessage(ServiceMessage serviceMessage) throws ClassCastException, UnsupportedEncodingException {
         Storage storage = new Storage();
-        storage = (Storage) LordOfResources.setResourceParams(storage, serviceMessage, cleaner);
 
         try {
+            LordOfResources.setResourceParams(storage, serviceMessage, cleaner);
             Double capacity = (Double) serviceMessage.getParam("capacity");
             Double capacityUsed = (Double) serviceMessage.getParam("capacityUsed");
             String mountPoint = (String) serviceMessage.getParam("mountPoint");
@@ -59,9 +60,6 @@ public class GovernorOfStorage extends LordOfResources<Storage> {
             storage.setCapacity(capacity);
             storage.setCapacityUsed(capacityUsed);
             storage.setMountPoint(mountPoint);
-
-            isValid(storage);
-            save(storage);
         } catch (ClassCastException e){
             throw new ParameterValidateException("один из параметров указан неверно:" + e.getMessage());
         }

@@ -19,6 +19,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import ru.majordomo.hms.rc.staff.event.server.listener.ServerMongoEventListener;
@@ -26,7 +27,14 @@ import ru.majordomo.hms.rc.staff.event.serverRole.listener.ServerRoleMongoEventL
 import ru.majordomo.hms.rc.staff.event.service.listener.ServiceMongoEventListener;
 import ru.majordomo.hms.rc.staff.event.serviceTemplate.listener.ServiceTemplateMongoEventListener;
 import ru.majordomo.hms.rc.staff.repositories.*;
+import ru.majordomo.hms.rc.staff.repositories.socket.SocketRepository;
+import ru.majordomo.hms.rc.staff.repositories.template.TemplateRepository;
 import ru.majordomo.hms.rc.staff.resources.*;
+import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
+import ru.majordomo.hms.rc.staff.resources.socket.NetworkSocket;
+import ru.majordomo.hms.rc.staff.resources.template.ApplicationServer;
+import ru.majordomo.hms.rc.staff.resources.template.DatabaseServer;
+import ru.majordomo.hms.rc.staff.resources.template.ResourceType;
 import ru.majordomo.hms.rc.staff.test.config.*;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
@@ -85,6 +93,10 @@ public class ServerRestControllerTest {
     private ServiceSocketRepository serviceSocketRepository;
     @Autowired
     private ServiceTypeRepository serviceTypeRepository;
+    @Autowired
+    private TemplateRepository templateRepository;
+    @Autowired
+    private SocketRepository socketRepository;
 
     private RestDocumentationResultHandler document;
 
@@ -136,6 +148,25 @@ public class ServerRestControllerTest {
             }
             serviceTypeRepository.save(serviceType);
 
+            ApplicationServer applicationServer = new ApplicationServer();
+            applicationServer.setName("php");
+            applicationServer.addConfigTemplate(configTemplate);
+            applicationServer.setAvailableToAccounts(true);
+            applicationServer.setVersion("5.6");
+            applicationServer.setSupervisionType("systemd");
+            applicationServer.setLanguage(ApplicationServer.Language.PHP);
+//            applicationServerTemplate.addProvidedResourceConfig(ResourceType.WEBSITE, new HashMap<>());
+            templateRepository.save(applicationServer);
+
+            DatabaseServer databaseServer = new DatabaseServer();
+            databaseServer.setName("mysql");
+            databaseServer.addConfigTemplate(configTemplate);
+            databaseServer.setAvailableToAccounts(false);
+            databaseServer.setSupervisionType("systemd");
+            databaseServer.setType(DatabaseServer.Type.MYSQL);
+//            databaseServer.addProvidedResourceConfig(ResourceType.DATABASE, new HashMap<>());
+            templateRepository.save(databaseServer);
+
             ServiceTemplate serviceTemplate = new ServiceTemplate();
             serviceTemplate.addConfigTemplate(configTemplate);
             serviceTemplate.setServiceTypeName(serviceType.getName());
@@ -172,17 +203,33 @@ public class ServerRestControllerTest {
             }
 
             List<Service> services = new ArrayList<>();
-            Service service = new Service();
-            ServiceSocket serviceSocket = new ServiceSocket();
-            serviceSocketRepository.save(serviceSocket);
 
-            service.setServiceTemplate(serviceTemplate);
-            service.addServiceSocket(serviceSocket);
+            NetworkSocket socket = new NetworkSocket();
+            socket.setAddress("10.10.10.1");
+            socket.setPort(2000);
+            socket.setProtocol("http");
+            socket.setName(socket.getAddressAsString() + ":" + socket.getPort());
+            socketRepository.save(socket);
+
+            Service service = new Service();
+            service.setServerId(String.valueOf(i));
+            service.setTemplate(applicationServer);
+            service.addSocket(socket);
+            serviceRepository.save(service);
+
             services.add(service);
-            serviceRepository.saveAll(services);
+
+            Service service2 = new Service();
+            service2.setServerId(String.valueOf(i));
+            service2.setTemplate(databaseServer);
+            service2.addSocket(socket);
+            serviceRepository.save(service2);
+
+            services.add(service2);
 
             List<Storage> storages = new ArrayList<>();
             Storage storage = new Storage();
+            storage.setServerId(String.valueOf(i));
             if (i == 2) storage.setMountPoint("/homebig");
             storages.add(storage);
             storageRepository.saveAll(storages);
@@ -205,6 +252,7 @@ public class ServerRestControllerTest {
             Boolean switchedOn = Boolean.TRUE;
 
             Server server = new Server();
+            server.setId(String.valueOf(i));
             server.setName(name);
             server.setSwitchedOn(switchedOn);
             server.setServerRoles(serverRoles);
@@ -264,7 +312,7 @@ public class ServerRestControllerTest {
     @Test
     public void readAllServicesByIdAndServiceTypeDatabase() {
         MultiValueMap<String, String> keyValue = new LinkedMultiValueMap<>();
-        keyValue.set("service-type", "database");
+        keyValue.set("service-type", "DATABASE");
 
         //Возвращает список объектов Service
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testServers.get(0).getId() + "/services").params(keyValue).accept(APPLICATION_JSON_UTF8);
@@ -273,11 +321,11 @@ public class ServerRestControllerTest {
             mockMvc.perform(request).andExpect(status().isOk())
                     .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                     .andExpect(jsonPath("$").isArray())
-                    .andExpect(jsonPath("$[0].id").value(testServers.get(0).getServices().get(0).getId()))
-                    .andExpect(jsonPath("$[0].name").value(testServers.get(0).getServices().get(0).getName()))
-                    .andExpect(jsonPath("$[0].switchedOn").value(testServers.get(0).getServices().get(0).getSwitchedOn()))
-                    .andExpect(jsonPath("$[0].serviceTemplate.id").value(testServers.get(0).getServices().get(0).getServiceTemplateId()))
-                    .andExpect(jsonPath("$[0].serviceSockets.[0].id").value(testServers.get(0).getServices().get(0).getServiceSocketIds().get(0))).andDo(print());
+                    .andExpect(jsonPath("$[0].id").value(testServers.get(0).getServices().get(1).getId()))
+                    .andExpect(jsonPath("$[0].name").value(testServers.get(0).getServices().get(1).getName()))
+                    .andExpect(jsonPath("$[0].switchedOn").value(testServers.get(0).getServices().get(1).getSwitchedOn()))
+                    .andExpect(jsonPath("$[0].template.id").value(testServers.get(0).getServices().get(1).getTemplateId()))
+                    .andExpect(jsonPath("$[0].sockets.[0].id").value(testServers.get(0).getServices().get(1).getSocketIds().get(0))).andDo(print());
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -287,7 +335,7 @@ public class ServerRestControllerTest {
     @Test
     public void readAllServicesByIdAndServiceTypeWebsite() {
         MultiValueMap<String, String> keyValue = new LinkedMultiValueMap<>();
-        keyValue.set("service-type", "website");
+        keyValue.set("service-type", "WEBSITE");
 
         //Возвращает список объектов Service
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/" + resourceName + "/" + testServers.get(1).getId() + "/services").params(keyValue).accept(APPLICATION_JSON_UTF8);
@@ -299,8 +347,8 @@ public class ServerRestControllerTest {
                     .andExpect(jsonPath("$[0].id").value(testServers.get(1).getServices().get(0).getId()))
                     .andExpect(jsonPath("$[0].name").value(testServers.get(1).getServices().get(0).getName()))
                     .andExpect(jsonPath("$[0].switchedOn").value(testServers.get(1).getServices().get(0).getSwitchedOn()))
-                    .andExpect(jsonPath("$[0].serviceTemplate.id").value(testServers.get(1).getServices().get(0).getServiceTemplateId()))
-                    .andExpect(jsonPath("$[0].serviceSockets.[0].id").value(testServers.get(1).getServices().get(0).getServiceSocketIds().get(0))).andDo(print());
+                    .andExpect(jsonPath("$[0].template.id").value(testServers.get(1).getServices().get(0).getTemplateId()))
+                    .andExpect(jsonPath("$[0].sockets.[0].id").value(testServers.get(1).getServices().get(0).getSocketIds().get(0))).andDo(print());
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();

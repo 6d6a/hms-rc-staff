@@ -12,6 +12,7 @@ import ru.majordomo.hms.rc.staff.resources.ServiceTemplate;
 import ru.majordomo.hms.rc.staff.resources.ServiceType;
 import ru.majordomo.hms.rc.staff.resources.validation.group.ServiceTypeChecks;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.Set;
 
@@ -42,8 +43,8 @@ public class GovernorOfServiceType extends LordOfResources<ServiceType> {
     }
 
     @Override
-    public ServiceType createResource(ServiceMessage serviceMessage) throws ParameterValidateException {
-        throw new NotImplementedException();
+    public ServiceType buildResourceFromServiceMessage(ServiceMessage serviceMessage) throws ClassCastException, UnsupportedEncodingException {
+        throw new NotImplementedException("Build from AMQP service message not implemented");
     }
 
     public ServiceType build(String serviceTypeName) throws ResourceNotFoundException {
@@ -68,6 +69,7 @@ public class GovernorOfServiceType extends LordOfResources<ServiceType> {
         }
     }
 
+    @Override
     public void save(ServiceType serviceType) {
         serviceType.setName(serviceType.getName().toUpperCase());
         isValid(serviceType);
