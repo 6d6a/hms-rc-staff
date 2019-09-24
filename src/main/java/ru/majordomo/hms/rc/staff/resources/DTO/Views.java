@@ -1,4 +1,4 @@
-package ru.majordomo.hms.rc.staff.common;
+package ru.majordomo.hms.rc.staff.resources.DTO;
 
 public class Views {
     public static class Public {

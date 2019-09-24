@@ -4,6 +4,7 @@ import org.apache.commons.lang.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,13 +48,12 @@ public class GovernorOfConfigTemplate extends LordOfResources<ConfigTemplate> {
     }
 
     @Override
-    public ConfigTemplate createResource(ServiceMessage serviceMessage) throws ParameterValidateException {
+    public ConfigTemplate buildResourceFromServiceMessage(ServiceMessage serviceMessage) throws ClassCastException, UnsupportedEncodingException {
         ConfigTemplate configTemplate = new ConfigTemplate();
         LordOfResources.setResourceParams(configTemplate, serviceMessage, cleaner);
         String fileLink = cleaner.cleanString((String)serviceMessage.getParam("fileLink"));
         configTemplate.setFileLink(fileLink);
-        isValid(configTemplate);
-        save(configTemplate);
+
         return configTemplate;
     }
 

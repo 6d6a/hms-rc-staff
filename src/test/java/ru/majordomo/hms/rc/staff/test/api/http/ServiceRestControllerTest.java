@@ -23,7 +23,11 @@ import java.util.List;
 import ru.majordomo.hms.rc.staff.event.service.listener.ServiceMongoEventListener;
 import ru.majordomo.hms.rc.staff.event.serviceTemplate.listener.ServiceTemplateMongoEventListener;
 import ru.majordomo.hms.rc.staff.repositories.*;
+import ru.majordomo.hms.rc.staff.repositories.socket.SocketRepository;
+import ru.majordomo.hms.rc.staff.repositories.template.TemplateRepository;
 import ru.majordomo.hms.rc.staff.resources.*;
+import ru.majordomo.hms.rc.staff.resources.socket.NetworkSocket;
+import ru.majordomo.hms.rc.staff.resources.template.ApplicationServer;
 import ru.majordomo.hms.rc.staff.test.config.*;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -60,9 +64,9 @@ public class ServiceRestControllerTest {
     @Autowired
     private ServiceRepository serviceRepository;
     @Autowired
-    private ServiceSocketRepository serviceSocketRepository;
+    private SocketRepository socketRepository;
     @Autowired
-    private ServiceTemplateRepository serviceTemplateRepository;
+    private TemplateRepository templateRepository;
     @Autowired
     private ConfigTemplateRepository configTemplateRepository;
     @Autowired
@@ -79,53 +83,48 @@ public class ServiceRestControllerTest {
     private static FieldDescriptor[] serviceFields = new FieldDescriptor[] {
             fieldWithPath("id").description("Service ID"),
             fieldWithPath("name").description("Имя Service"),
+            fieldWithPath("accountId").description("ID аккаунта"),
+            fieldWithPath("serverId").description("Server ID"),
             fieldWithPath("switchedOn").description("Статус Service"),
             subsectionWithPath("serviceSockets").description("Список serviceSockets для Service"),
             fieldWithPath("serviceSocketIds").description("Список serviceSocketIds для Service"),
+            subsectionWithPath("sockets").description("Список sockets для Service"),
+            fieldWithPath("socketIds").description("Список socketIds для Service"),
             subsectionWithPath("serviceTemplate").description("serviceTemplate для Service"),
-            fieldWithPath("serviceTemplateId").description("serviceTemplateId для Service")
+            fieldWithPath("serviceTemplateId").description("serviceTemplateId для Service"),
+            subsectionWithPath("template").description("template для Service"),
+            fieldWithPath("templateId").description("templateId для Service"),
+            subsectionWithPath("instanceProps").description("Список instanceProps для Service")
     };
 
     private void generateBatchOfServices() {
         for (int i = 2; i < 6; i++) {
-            ServiceType serviceType = new ServiceType();
-            switch (i) {
-                case 1:
-                    serviceType.setName("DATABASE_MYSQL");
-                    break;
-                case 2:
-                    serviceType.setName("WEBSITE_APACHE_PHP53_HARDENED");
-                    break;
-                default:
-                    serviceType.setName("DATABASE_POSTGRESQL");
-                    break;
-            }
-            serviceTypeRepository.save(serviceType);
-
             // Создать сокет
-            ServiceSocket serviceSocket = new ServiceSocket();
-            serviceSocket.setAddress("10.10.10." + i);
-            serviceSocket.setPort(2000 + i);
-            serviceSocket.setName(serviceSocket.getAddressAsString() + ":" + serviceSocket.getPort());
-            serviceSocketRepository.save(serviceSocket);
+            NetworkSocket socket = new NetworkSocket();
+            socket.setAddress("10.10.10." + i);
+            socket.setPort(2000 + i);
+            socket.setProtocol("http");
+            socket.setName(socket.getAddressAsString() + ":" + socket.getPort());
+            socketRepository.save(socket);
 
             ConfigTemplate configTemplate = new ConfigTemplate();
             configTemplateRepository.save(configTemplate);
             // Создать сервис темплейт
-            ServiceTemplate serviceTemplate = new ServiceTemplate();
-            serviceTemplate.setName("Шаблон сервиса " + i);
-            serviceTemplate.addConfigTemplate(configTemplate);
-            serviceTemplate.setServiceType(serviceType);
-            serviceTemplateRepository.save(serviceTemplate);
+            ApplicationServer applicationServer = new ApplicationServer();
+            applicationServer.setName("Шаблон сервиса " + i);
+            applicationServer.addConfigTemplate(configTemplate);
+            applicationServer.setVersion("5.6");
+            applicationServer.setLanguage(ApplicationServer.Language.PHP);
+            applicationServer.setSupervisionType("systemd");
+            templateRepository.save(applicationServer);
 
             // Создать сервис и добавить в него сокет и сервис темплейт
             Service service = new Service();
-            serviceTypeRepository.save(serviceType);
 
             service.setName("Сервис " + i);
             service.setSwitchedOn(Boolean.TRUE);
-            service.setServiceTemplate(serviceTemplate);
-            service.addServiceSocket(serviceSocket);
+            service.setTemplate(applicationServer);
+            service.addSocket(socket);
 
             serviceRepository.save(service);
             testServices.add(service);
@@ -206,8 +205,8 @@ public class ServiceRestControllerTest {
                     .andExpect(jsonPath("id").value(testingService.getId()))
                     .andExpect(jsonPath("name").value(testingService.getName()))
                     .andExpect(jsonPath("switchedOn").value(testingService.getSwitchedOn()))
-                    .andExpect(jsonPath("serviceTemplate.id").value(testingService.getServiceTemplateId()))
-                    .andExpect(jsonPath("serviceSockets.[0].id").value(testingService.getServiceSocketIds().get(0))).andDo(print())
+                    .andExpect(jsonPath("template.id").value(testingService.getTemplateId()))
+                    .andExpect(jsonPath("sockets.[0].id").value(testingService.getSocketIds().get(0))).andDo(print())
                     .andDo(this.document)
                     .andDo(this.document.document(responseFields(serviceFields)))
             ;
@@ -289,9 +288,9 @@ public class ServiceRestControllerTest {
     @After
     public void cleanAll() {
         serviceRepository.deleteAll();
-        serviceTemplateRepository.deleteAll();
+        templateRepository.deleteAll();
         serviceTypeRepository.deleteAll();
-        serviceSocketRepository.deleteAll();
+        socketRepository.deleteAll();
         configTemplateRepository.deleteAll();
     }
 }

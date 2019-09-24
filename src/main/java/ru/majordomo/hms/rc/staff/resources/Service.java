@@ -1,29 +1,57 @@
 package ru.majordomo.hms.rc.staff.resources;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import ru.majordomo.hms.rc.staff.resources.socket.Socket;
+import ru.majordomo.hms.rc.staff.resources.template.Template;
 import ru.majordomo.hms.rc.staff.resources.validation.ObjectId;
 import ru.majordomo.hms.rc.staff.resources.validation.ObjectIdCollection;
 
 @Document
-public class Service extends Resource {
-    @NotNull(message = "Отсутствует ServiceTemplate")
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class Service extends Resource implements ConnectableToAccount, ConnectableToServer {
+    @Indexed
+    private String accountId;
+
+    @Indexed
+    private String serverId;
+
     @ObjectId(ServiceTemplate.class)
     private String serviceTemplateId;
 
-    @NotEmpty(message = "Не найден ни один ServiceSocket")
+    @NotNull(message = "Отсутствует Template")
+    @ObjectId(Template.class)
+    private String templateId;
+
+    @ObjectIdCollection(Socket.class)
+    private List<String> socketIds = new ArrayList<>();
+
     @ObjectIdCollection(ServiceSocket.class)
     private List<String> serviceSocketIds = new ArrayList<>();
 
+    private Map<String, String> instanceProps = new HashMap<>();
+
     @Transient
     private ServiceTemplate serviceTemplate;
+
+    @Transient
+    private Template template;
+
+    @Transient
+    private List<Socket> sockets = new ArrayList<>();
 
     @Transient
     private List<ServiceSocket> serviceSockets = new ArrayList<>();
@@ -33,33 +61,23 @@ public class Service extends Resource {
         switchedOn = !switchedOn;
     }
 
-    public String getServiceTemplateId() {
-        return serviceTemplateId;
-    }
-
-    public void setServiceTemplateId(String serviceTemplateId) {
-        this.serviceTemplateId = serviceTemplateId;
-    }
-
-    public List<String> getServiceSocketIds() {
-        return serviceSocketIds;
-    }
-
-    public void setServiceSocketIds(List<String> serviceSocketIds) {
-        this.serviceSocketIds = serviceSocketIds;
-    }
-
-    public ServiceTemplate getServiceTemplate() {
-        return serviceTemplate;
-    }
-
     public void setServiceTemplate(ServiceTemplate serviceTemplate) {
         this.serviceTemplateId = serviceTemplate != null ? serviceTemplate.getId() : null;
         this.serviceTemplate = serviceTemplate;
     }
 
-    public List<ServiceSocket> getServiceSockets() {
-        return serviceSockets;
+    public void setTemplate(Template template) {
+        this.templateId = template != null ? template.getId() : null;
+        this.template = template;
+    }
+
+    public void setSockets(List<Socket> sockets) {
+        List<String> ids = new ArrayList<>();
+        for (Socket socket: sockets) {
+            ids.add(socket.getId());
+        }
+        this.socketIds = ids;
+        this.sockets = sockets;
     }
 
     public void setServiceSockets(List<ServiceSocket> serviceSockets) {
@@ -83,17 +101,18 @@ public class Service extends Resource {
         this.serviceSocketIds.add(serviceSocketId);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+    public void addSocket(Socket socket) {
+        this.sockets.add(socket);
+        if (!socketIds.contains(socket.getId())) {
+            this.socketIds.add(socket.getId());
+        }
+    }
 
-        Service service = (Service) o;
-
-        if (getServiceTemplateId() != null ? !getServiceTemplateId().equals(service.getServiceTemplateId()) : service.getServiceTemplateId() != null)
-            return false;
-        return getServiceSocketIds() != null ? getServiceSocketIds().equals(service.getServiceSocketIds()) : service.getServiceSocketIds() == null;
+    public void addInstanceProp(String propName,String propValue) {
+        if (instanceProps == null) {
+            instanceProps = new HashMap<>();
+        }
+        instanceProps.put(propName, propValue);
     }
 
     @Override

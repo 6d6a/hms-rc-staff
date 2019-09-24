@@ -11,7 +11,7 @@ buildscript {
         resolutionStrategy.cacheDynamicVersionsFor 5, 'minutes'
     }
     dependencies {
-        classpath("io.spring.gradle:dependency-management-plugin:1.0.5.RELEASE")
+        classpath("io.spring.gradle:dependency-management-plugin:1.0.8.RELEASE")
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         classpath("ru.majordomo.hms.rc.staff:resources:1+")
     }
@@ -19,7 +19,7 @@ buildscript {
 
 plugins {
     id "org.asciidoctor.convert" version "1.5.2"
-    id "com.gorylenko.gradle-git-properties" version "1.5.1"
+    id "com.gorylenko.gradle-git-properties" version "2.1.0"
 }
 
 apply plugin: 'idea'
@@ -56,7 +56,7 @@ publishing {
         mavenJava(MavenPublication) {
             groupId 'ru.majordomo.hms.rc.staff'
             artifactId 'resources'
-            version '1.1.' + versionBuild
+            version '2.0.' + versionBuild
             artifact resourceJar
         }
     }
@@ -89,31 +89,37 @@ springBoot {
 task resourceJar(type: Jar, dependsOn: compileJava) {
     baseName = 'resources'
     from sourceSets.main.output.classesDir
-    include 'ru/majordomo/hms/rc/staff/resources/*'
+    include 'ru/majordomo/hms/rc/staff/resources/**'
 }
 
 repositories {
     maven {
         url 'http://nexus.intr/repository/mavengroup'
     }
+    maven { url 'http://nexus.intr/repository/spring_milestone' }
 }
 
 dependencies {
-    compile('ru.majordomo.hms.rc.staff:resources:1+')
-    compile('org.springframework.cloud:spring-cloud-starter-config')
-    compile('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
-    compile('org.springframework.cloud:spring-cloud-starter-oauth2')
-    compile("org.springframework.cloud:spring-cloud-starter-sleuth")
-    compile('org.springframework.boot:spring-boot-starter-data-mongodb')
-    compile('org.springframework.boot:spring-boot-starter-amqp')
-    compile('org.springframework.boot:spring-boot-starter-web')
-    compile('org.springframework.boot:spring-boot-starter-jdbc')
-    compile('commons-net:commons-net:3.5')
-    compile('org.springframework.cloud:spring-cloud-starter-bus-amqp')
-    compile(group: 'com.mysql', name: 'management', version: '1.1.6') {
+    implementation('ru.majordomo.hms.rc.staff:resources:1+')
+    implementation('ru.majordomo.hms.personmgr:exceptions:1.0.17')
+    implementation('org.springframework.cloud:spring-cloud-starter-config')
+    implementation('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
+    implementation 'org.springframework.cloud:spring-cloud-starter-security'
+    implementation('org.springframework.cloud:spring-cloud-starter-bus-amqp')
+    implementation('org.springframework.cloud:spring-cloud-starter-oauth2')
+    implementation("org.springframework.cloud:spring-cloud-starter-sleuth")
+    implementation('org.springframework.cloud:spring-cloud-starter-openfeign')
+    implementation('org.springframework.boot:spring-boot-starter-data-mongodb')
+    implementation('org.springframework.boot:spring-boot-starter-amqp')
+    implementation('org.springframework.boot:spring-boot-starter-web')
+    implementation('org.springframework.boot:spring-boot-starter-jdbc')
+    implementation('commons-net:commons-net:3.5')
+    implementation("org.projectlombok:lombok:1.18.2")
+    implementation(group: 'com.mysql', name: 'management', version: '1.1.6') {
         exclude(module: 'jmxtools')
     }
-    testCompile('com.github.fakemongo:fongo:2.2.0-RC2')
+//    testCompile('com.github.fakemongo:fongo:2.2.0-RC2')
+    testCompile('de.bwaldvogel:mongo-java-server:1.19.0')
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile("org.springframework.restdocs:spring-restdocs-mockmvc:${springRestDocsVersion}")
 }

@@ -1,5 +1,6 @@
 package ru.majordomo.hms.rc.staff.resources;
 
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.Min;
@@ -10,7 +11,10 @@ import ru.majordomo.hms.rc.staff.resources.validation.ValidStorage;
 
 @Document
 @ValidStorage
-public class Storage extends Resource {
+public class Storage extends Resource implements ConnectableToServer {
+    @Indexed
+    private String serverId;
+
     @NotNull
     @Min(value = 1L, message = "capacity не может быть меньше или равен нулю")
     private Double capacity;
@@ -26,6 +30,14 @@ public class Storage extends Resource {
     @Override
     public void switchResource() {
         switchedOn = !switchedOn;
+    }
+
+    public String getServerId() {
+        return serverId;
+    }
+
+    public void setServerId(String serverId) {
+        this.serverId = serverId;
     }
 
     public Double getCapacity() {

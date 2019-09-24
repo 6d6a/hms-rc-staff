@@ -5,15 +5,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
@@ -90,5 +86,26 @@ public class ConfigTemplateRestController extends RestControllerTemplate<ConfigT
     @RequestMapping(value = {"/{configTemplateId}", "/{configTemplateId}/"}, method = RequestMethod.DELETE)
     public ResponseEntity<Void> delete(@PathVariable String configTemplateId) {
         return processDeleteQuery(configTemplateId);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping(value = "/migrate")
+    public Collection<ConfigTemplate> migrate() {
+        List<ConfigTemplate> configTemplates = governor.buildAll();
+
+        configTemplates.forEach(configTemplate -> {
+            configTemplate.switchedOn = true;
+
+            if (configTemplate.getName().startsWith("@")) {
+                configTemplate.setContext(ConfigTemplate.ContextType.WEBSITE);
+            } else {
+                configTemplate.setContext(ConfigTemplate.ContextType.SERVICE);
+                configTemplate.setPathTemplate(configTemplate.getName());
+            }
+
+            governor.save(configTemplate);
+        });
+
+        return configTemplates;
     }
 }

@@ -83,7 +83,7 @@ public class GovernorOfServiceSocketTest {
     @Test
     public void create() {
         try {
-            ServiceSocket createdServiceSocket = governor.createResource(testServiceMessage);
+            ServiceSocket createdServiceSocket = governor.create(testServiceMessage);
             Assert.assertEquals("Имя не совпадает с ожидаемым", testServiceSocket.getName(), createdServiceSocket.getName());
             Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testServiceSocket.getName(), createdServiceSocket.getName());
             Assert.assertEquals("Адрес не совпадает с ожидаемым", testServiceSocket.getAddress(), createdServiceSocket.getAddress());
@@ -128,20 +128,20 @@ public class GovernorOfServiceSocketTest {
     public void createWithBadAddressHigher() {
         ServiceMessage badAddressServiceMessage = testServiceMessage;
         badAddressServiceMessage.addParam("address", "11.20.30.40");
-        governor.createResource(badAddressServiceMessage);
+        governor.create(badAddressServiceMessage);
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void createWithBadAddressLower() {
         ServiceMessage badAddressServiceMessage = testServiceMessage;
         badAddressServiceMessage.addParam("address", "9.20.30.40");
-        governor.createResource(badAddressServiceMessage);
+        governor.create(badAddressServiceMessage);
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void createWithBadPort() {
         ServiceMessage badPortServiceMessage = testServiceMessage;
         badPortServiceMessage.addParam("port", -1);
-        governor.createResource(badPortServiceMessage);
+        governor.create(badPortServiceMessage);
     }
 }

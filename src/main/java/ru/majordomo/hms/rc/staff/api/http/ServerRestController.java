@@ -3,25 +3,38 @@ package ru.majordomo.hms.rc.staff.api.http;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import ru.majordomo.hms.rc.staff.annotation.SecurityView;
 import ru.majordomo.hms.rc.staff.annotation.SecurityView.View;
-import ru.majordomo.hms.rc.staff.common.Views;
+import ru.majordomo.hms.rc.staff.resources.DTO.Views;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfServer;
 import ru.majordomo.hms.rc.staff.resources.Server;
+import ru.majordomo.hms.rc.staff.resources.Service;
 import ru.majordomo.hms.rc.staff.resources.Storage;
 
 @RestController
 @RequestMapping(value = "/server")
 public class ServerRestController extends RestControllerTemplate<Server> {
+    private MongoOperations mongoOperations;
+
+    @Autowired
+    public void setMongoOperations(MongoOperations mongoOperations) {
+        this.mongoOperations = mongoOperations;
+    }
+
     @Autowired
     public void setGovernor(GovernorOfServer governor) {
         this.governor = governor;
@@ -105,5 +118,31 @@ public class ServerRestController extends RestControllerTemplate<Server> {
     @DeleteMapping("/{serverId}")
     public ResponseEntity<Void> delete(@PathVariable String serverId) {
         return processDeleteQuery(serverId);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping(value = "/migrate")
+    public Collection<Server> migrate() {
+        List<Server> servers = governor.buildAll();
+
+        servers.forEach(server -> {
+            if (!server.getStorageIds().isEmpty()) {
+                mongoOperations.updateMulti(
+                        new Query(new Criteria("_id").in(server.getStorageIds())),
+                        new Update().set("serverId", server.getId()),
+                        Storage.class
+                );
+            }
+
+            if (!server.getServiceIds().isEmpty()) {
+                mongoOperations.updateMulti(
+                        new Query(new Criteria("_id").in(server.getServiceIds())),
+                        new Update().set("serverId", server.getId()),
+                        Service.class
+                );
+            }
+        });
+
+        return servers;
     }
 }

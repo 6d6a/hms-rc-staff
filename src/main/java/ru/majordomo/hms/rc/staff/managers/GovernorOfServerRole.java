@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -50,19 +51,18 @@ public class GovernorOfServerRole extends LordOfResources<ServerRole> {
     }
 
     @Override
-    public ServerRole createResource(ServiceMessage serviceMessage) throws ParameterValidateException {
+    public ServerRole buildResourceFromServiceMessage(ServiceMessage serviceMessage) throws ClassCastException, UnsupportedEncodingException {
         ServerRole serverRole = new ServerRole();
+
         try {
             LordOfResources.setResourceParams(serverRole, serviceMessage, cleaner);
 
             @SuppressWarnings("unchecked") List<String> serviceTemplateIds = (List<String>)serviceMessage.getParam("serviceTemplateIds");
             serverRole.setServiceTemplateIds(serviceTemplateIds);
-
-            isValid(serverRole);
-            save(serverRole);
         } catch (ClassCastException e) {
             throw new ParameterValidateException("Один из параметров указан неверно:" + e.getMessage());
         }
+
         return serverRole;
     }
 

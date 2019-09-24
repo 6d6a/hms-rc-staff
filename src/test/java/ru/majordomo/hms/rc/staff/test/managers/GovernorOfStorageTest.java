@@ -73,7 +73,7 @@ public class GovernorOfStorageTest {
     @Test
     public void create() {
         try {
-            Storage createdStorage = governor.createResource(testServiceMessage);
+            Storage createdStorage = governor.create(testServiceMessage);
             Assert.assertEquals("Имя не совпадает с ожидаемым", testStorage.getName(), createdStorage.getName());
             Assert.assertEquals("Статус включен/выключен не совпадает с ожидаемым", testStorage.getSwitchedOn(), createdStorage.getSwitchedOn());
             Assert.assertEquals("Capacity не совпадает с ожидаемым", testStorage.getCapacity(), createdStorage.getCapacity());
@@ -120,19 +120,19 @@ public class GovernorOfStorageTest {
     @Test(expected = ConstraintViolationException.class)
     public void createResourceWithInvalidCapacity() {
         testServiceMessage = generateServiceMessage("Хранилище 2", Boolean.TRUE, 0.0, 3 * Math.pow(10, 12), "/home/");
-        governor.createResource(testServiceMessage);
+        governor.create(testServiceMessage);
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void createResourceWithInvalidCapacityUsed() {
         testServiceMessage = generateServiceMessage("Хранилище 3", Boolean.TRUE, 5 * Math.pow(10, 12), -10.0, "/home/");
-        governor.createResource(testServiceMessage);
+        governor.create(testServiceMessage);
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void createResourceWithCapacityUsedBiggerThenCapacity() {
         testServiceMessage = generateServiceMessage("Хранилище 4", Boolean.TRUE, 3 * Math.pow(10, 12), 5 * Math.pow(10, 12), "/home/");
-        governor.createResource(testServiceMessage);
+        governor.create(testServiceMessage);
     }
 
     @Test(expected = ConstraintViolationException.class)

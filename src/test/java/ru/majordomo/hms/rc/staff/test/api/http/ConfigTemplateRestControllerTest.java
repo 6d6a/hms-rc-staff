@@ -66,7 +66,9 @@ public class ConfigTemplateRestControllerTest {
             fieldWithPath("id").description("ConfigTemplate ID"),
             fieldWithPath("name").description("Имя ConfigTemplate"),
             fieldWithPath("switchedOn").description("Статус ConfigTemplate"),
-            fieldWithPath("fileLink").description("Ссылка на файл")
+            fieldWithPath("fileLink").description("Ссылка на файл"),
+            fieldWithPath("pathTemplate").description("pathTemplate"),
+            fieldWithPath("context").description("context")
     };
 
     private void generateBatchOfConfigTemplates() {

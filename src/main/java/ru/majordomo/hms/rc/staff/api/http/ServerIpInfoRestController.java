@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.*;
 
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.repositories.ServerIpInfoRepository;
-import ru.majordomo.hms.rc.staff.repositories.ServerRepository;
+import ru.majordomo.hms.rc.staff.repositories.ServiceRepository;
 import ru.majordomo.hms.rc.staff.resources.DTO.ServerIpInfo;
-import ru.majordomo.hms.rc.staff.resources.Server;
+import ru.majordomo.hms.rc.staff.resources.Service;
 
 @RestController
 @RequestMapping("/server-ip-info")
@@ -20,7 +20,7 @@ public class ServerIpInfoRestController {
 
     private ServerIpInfoRepository repository;
 
-    private ServerRepository serverRepository;
+    private ServiceRepository serviceRepository;
 
     @Autowired
     public void setRepository(ServerIpInfoRepository repository) {
@@ -28,8 +28,8 @@ public class ServerIpInfoRestController {
     }
 
     @Autowired
-    public void setServerRepository(ServerRepository serverRepository) {
-        this.serverRepository = serverRepository;
+    public void setServiceRepository(ServiceRepository serviceRepository) {
+        this.serviceRepository = serviceRepository;
     }
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
@@ -46,26 +46,28 @@ public class ServerIpInfoRestController {
         }
 
         if (serviceId != null && !serviceId.equals("")) {
-            Server server = this.serverRepository.findByServiceIds(serviceId);
-            if (server == null) {
-                logger.error("Не найден сервер с serviceId " + serviceId);
-                throw new ResourceNotFoundException("Не найден сервер с serviceId " + serviceId);
+            Service service = serviceRepository.findById(serviceId).orElse(null);
+
+            if (service == null) {
+                logger.error("Не найден сервис с serviceId " + serviceId);
+                throw new ResourceNotFoundException("Не найден сервис с serviceId " + serviceId);
             }
-            serverIpInfo = this.repository.findByServerId(server.getId());
+
+            serverIpInfo = repository.findByServerId(service.getServerId());
+
             if (serverIpInfo == null) {
-                logger.error("Не найден сервер с Id " + server.getId());
-                throw new ResourceNotFoundException("Не найден сервер с Id " + server.getId());
+                logger.error("Не найден сервер с Id " + service.getServerId());
+                throw new ResourceNotFoundException("Не найден сервер с Id " + service.getServerId());
             }
+
             return serverIpInfo;
         }
 
-        if (serverId != null && !serverId.equals("")) {
-            serverIpInfo = this.repository.findByServerId(serverId);
-            if (serverIpInfo == null) {
-                logger.error("Не найден сервер с Id " + serverId);
-                throw new ResourceNotFoundException("Не найден сервер с Id " + serverId);
-            }
-            return serverIpInfo;
+        serverIpInfo = repository.findByServerId(serverId);
+
+        if (serverIpInfo == null) {
+            logger.error("Не найден сервер с Id " + serverId);
+            throw new ResourceNotFoundException("Не найден сервер с Id " + serverId);
         }
 
         return serverIpInfo;

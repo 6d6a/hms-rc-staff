@@ -33,8 +33,16 @@ public class ConfigOfGovernors {
         return new GovernorOfServiceSocket();
     }
     @Bean
+    public GovernorOfSocket governorOfSocket() {
+        return new GovernorOfSocket();
+    }
+    @Bean
     public GovernorOfServiceTemplate governorOfServiceTemplate() {
         return new GovernorOfServiceTemplate();
+    }
+    @Bean
+    public GovernorOfTemplate governorOfTemplate() {
+        return new GovernorOfTemplate();
     }
     @Bean
     public GovernorOfServiceType governorOfServiceType() {

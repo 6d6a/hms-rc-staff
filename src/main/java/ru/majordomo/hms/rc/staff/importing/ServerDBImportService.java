@@ -88,21 +88,21 @@ public class ServerDBImportService {
         server.setId("web_server_" + rs.getString("id"));
         server.setSwitchedOn(true);
         server.setName(name);
-        server.setServiceIds(services
-                .stream()
-                .filter(service -> service.getName().contains("@" + name))
-                .map(Resource::getId)
-                .collect(Collectors.toList()));
+//        server.setServiceIds(services
+//                .stream()
+//                .filter(service -> service.getName().contains("@" + name))
+//                .map(Resource::getId)
+//                .collect(Collectors.toList()));
         server.setServerRoleIds(serverRoles
                 .stream()
                 .filter(serverRole -> (serverRole.getName().equals("shared-hosting") || (!name.equals("baton") && serverRole.getName().equals("mysql-database-server"))))
                 .map(Resource::getId)
                 .collect(Collectors.toList()));
-        server.setStorageIds(storages
-                .stream()
-                .filter(storage -> storage.getName().equals(name))
-                .map(Resource::getId)
-                .collect(Collectors.toList()));
+//        server.setStorageIds(storages
+//                .stream()
+//                .filter(storage -> storage.getName().equals(name))
+//                .map(Resource::getId)
+//                .collect(Collectors.toList()));
 
         serverRepository.save(server);
 
@@ -111,21 +111,21 @@ public class ServerDBImportService {
             server = new Server();
             server.setSwitchedOn(true);
             server.setName(finalName);
-            server.setServiceIds(services
-                    .stream()
-                    .filter(service -> service.getName().contains("@" + finalName))
-                    .map(Resource::getId)
-                    .collect(Collectors.toList()));
+//            server.setServiceIds(services
+//                    .stream()
+//                    .filter(service -> service.getName().contains("@" + finalName))
+//                    .map(Resource::getId)
+//                    .collect(Collectors.toList()));
             server.setServerRoleIds(serverRoles
                     .stream()
                     .filter(serverRole -> (serverRole.getName().equals("shared-hosting") || serverRole.getName().equals("mysql-database-server")))
                     .map(Resource::getId)
                     .collect(Collectors.toList()));
-            server.setStorageIds(storages
-                    .stream()
-                    .filter(storage -> storage.getName().equals(finalName))
-                    .map(Resource::getId)
-                    .collect(Collectors.toList()));
+//            server.setStorageIds(storages
+//                    .stream()
+//                    .filter(storage -> storage.getName().equals(finalName))
+//                    .map(Resource::getId)
+//                    .collect(Collectors.toList()));
 
             serverRepository.save(server);
         }
@@ -141,17 +141,17 @@ public class ServerDBImportService {
         server.setSwitchedOn(true);
         String[] name = rs.getString("name").split("\\.");
         server.setName(name[0]);
-        server.setServiceIds(Collections.emptyList());
+//        server.setServiceIds(Collections.emptyList());
         server.setServerRoleIds(serverRoles
                 .stream()
                 .filter(serverRole -> serverRole.getName().equals("mail-storage"))
                 .map(Resource::getId)
                 .collect(Collectors.toList()));
-        server.setStorageIds(storages
-                .stream()
-                .filter(storage -> storage.getName().equals(name[0]))
-                .map(Resource::getId)
-                .collect(Collectors.toList()));
+//        server.setStorageIds(storages
+//                .stream()
+//                .filter(storage -> storage.getName().equals(name[0]))
+//                .map(Resource::getId)
+//                .collect(Collectors.toList()));
 
         serverRepository.save(server);
 
@@ -165,21 +165,21 @@ public class ServerDBImportService {
         server.setSwitchedOn(true);
         server.setId("db_server_20");
         server.setName("mdb4");
-        server.setServiceIds(services
-                .stream()
-                .filter(service -> service.getName().contains("@mdb4"))
-                .map(Resource::getId)
-                .collect(Collectors.toList()));
+//        server.setServiceIds(services
+//                .stream()
+//                .filter(service -> service.getName().contains("@mdb4"))
+//                .map(Resource::getId)
+//                .collect(Collectors.toList()));
         server.setServerRoleIds(serverRoles
                 .stream()
                 .filter(serverRole -> serverRole.getName().equals("mysql-database-server"))
                 .map(Resource::getId)
                 .collect(Collectors.toList()));
-        server.setStorageIds(storages
-                .stream()
-                .filter(storage -> storage.getName().equals("mdb4"))
-                .map(Resource::getId)
-                .collect(Collectors.toList()));
+//        server.setStorageIds(storages
+//                .stream()
+//                .filter(storage -> storage.getName().equals("mdb4"))
+//                .map(Resource::getId)
+//                .collect(Collectors.toList()));
 
         serverRepository.save(server);
     }
@@ -191,21 +191,21 @@ public class ServerDBImportService {
         server.setSwitchedOn(true);
         server.setId("5821f8c596ccde0001c82a61");
         server.setName("web99");
-        server.setServiceIds(services
-                .stream()
-                .filter(service -> service.getName().contains("@web99"))
-                .map(Resource::getId)
-                .collect(Collectors.toList()));
+//        server.setServiceIds(services
+//                .stream()
+//                .filter(service -> service.getName().contains("@web99"))
+//                .map(Resource::getId)
+//                .collect(Collectors.toList()));
         server.setServerRoleIds(serverRoles
                 .stream()
                 .filter(serverRole -> (serverRole.getName().equals("shared-hosting") || serverRole.getName().equals("mysql-database-server")))
                 .map(Resource::getId)
                 .collect(Collectors.toList()));
-        server.setStorageIds(storages
-                .stream()
-                .filter(storage -> storage.getName().equals("web99"))
-                .map(Resource::getId)
-                .collect(Collectors.toList()));
+//        server.setStorageIds(storages
+//                .stream()
+//                .filter(storage -> storage.getName().equals("web99"))
+//                .map(Resource::getId)
+//                .collect(Collectors.toList()));
 
         serverRepository.save(server);
 
@@ -213,17 +213,17 @@ public class ServerDBImportService {
         server.setSwitchedOn(true);
         server.setId("584eb62d96ccde00012776f7");
         server.setName("pop99");
-        server.setServiceIds(Collections.emptyList());
+//        server.setServiceIds(Collections.emptyList());
         server.setServerRoleIds(serverRoles
                 .stream()
                 .filter(serverRole -> serverRole.getName().equals("mail-storage"))
                 .map(Resource::getId)
                 .collect(Collectors.toList()));
-        server.setStorageIds(storages
-                .stream()
-                .filter(storage -> storage.getName().equals("pop99"))
-                .map(Resource::getId)
-                .collect(Collectors.toList()));
+//        server.setStorageIds(storages
+//                .stream()
+//                .filter(storage -> storage.getName().equals("pop99"))
+//                .map(Resource::getId)
+//                .collect(Collectors.toList()));
 
         serverRepository.save(server);
     }

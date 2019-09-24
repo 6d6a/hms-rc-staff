@@ -84,7 +84,7 @@ public class GovernorOfServiceTemplateTest {
         serviceMessage.addParam("switchedOn", Boolean.TRUE);
 
         try {
-            ServiceTemplate serviceTemplate = governorOfServiceTemplate.createResource(serviceMessage);
+            ServiceTemplate serviceTemplate = governorOfServiceTemplate.create(serviceMessage);
             System.out.println("[serviceTemplate] " + serviceTemplate);
             Assert.assertEquals("Имя сервиса установлено неверно", "Тестовый service template", serviceTemplate.getName());
             Assert.assertTrue("configTemplates указаны неверно", configTemplates.equals(serviceTemplate.getConfigTemplates()));

@@ -3,26 +3,35 @@ package ru.majordomo.hms.rc.staff.api.http;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfServiceSocket;
 import ru.majordomo.hms.rc.staff.resources.ServiceSocket;
+import ru.majordomo.hms.rc.staff.resources.socket.NetworkSocket;
 
 @RestController
 @RequestMapping("/service-socket")
 public class ServiceSocketRestController extends RestControllerTemplate<ServiceSocket> {
+    private MongoOperations mongoOperations;
+
+    @Autowired
+    public void setMongoOperations(MongoOperations mongoOperations) {
+        this.mongoOperations = mongoOperations;
+    }
 
     @Autowired
     public void setGovernor(GovernorOfServiceSocket governor) {
@@ -88,5 +97,38 @@ public class ServiceSocketRestController extends RestControllerTemplate<ServiceS
     @RequestMapping(value = "/{serviceSocketId}", method = RequestMethod.DELETE)
     public ResponseEntity<Void> delete(@PathVariable String serviceSocketId) {
         return processDeleteQuery(serviceSocketId);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping(value = "/migrate")
+    public Collection<ServiceSocket> migrate() {
+        List<ServiceSocket> serviceSockets = governor.buildAll();
+
+        serviceSockets.forEach(serviceSocket -> {
+            NetworkSocket socket = new NetworkSocket();
+            socket.setId(serviceSocket.getId());
+            socket.setAddress(serviceSocket.getAddress());
+            socket.setPort(serviceSocket.getPort());
+            socket.setName(serviceSocket.getName());
+            socket.setSwitchedOn(serviceSocket.getSwitchedOn());
+
+            if (serviceSocket.getName() == null) {
+                serviceSocket.setName("");
+            }
+            String protocol = null;
+            Pattern pattern = Pattern.compile(".*-([a-z]+)@.+");
+            Matcher matcher = pattern.matcher(serviceSocket.getName());
+            while (matcher.find()) {
+                protocol = matcher.group(1);
+            }
+
+            if (protocol != null) {
+                socket.setProtocol(protocol);
+            }
+
+            mongoOperations.save(socket);
+        });
+
+        return serviceSockets;
     }
 }

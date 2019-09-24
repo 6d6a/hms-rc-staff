@@ -5,11 +5,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import ru.majordomo.hms.rc.staff.resources.validation.ObjectId;
 import ru.majordomo.hms.rc.staff.resources.validation.ObjectIdCollection;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import java.util.ArrayList;
+import java.util.List;
 
 @Document
 public class ServiceTemplate extends Resource {
@@ -37,6 +36,7 @@ public class ServiceTemplate extends Resource {
     }
 
     public void setConfigTemplates(List<ConfigTemplate> configTemplates) {
+        this.configTemplateIds = new ArrayList<>();
         for (ConfigTemplate configTemplate: configTemplates) {
             this.configTemplateIds.add(configTemplate.getId());
         }

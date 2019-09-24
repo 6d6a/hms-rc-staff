@@ -72,7 +72,7 @@ public class GovernorOfNetworkTest {
     public void create() {
         try {
             serviceMessage = createServiceMessage(name,switchedOn,address,mask,gatewayAddress,vlanNumber);
-            Network network = governorOfNetwork.createResource(serviceMessage);
+            Network network = governorOfNetwork.create(serviceMessage);
             Network network1 = networkRepository.findById(network.getId()).orElseThrow(() -> new ResourceNotFoundException("сеть не найдена"));
             Assert.assertEquals("Имя сети, полученное из базы не совпадает с ожидаемым", name, network1.getName());
             Assert.assertEquals("Флаг switchedOn не совпадает с ожидаемым", switchedOn, network1.getSwitchedOn());
@@ -139,37 +139,37 @@ public class GovernorOfNetworkTest {
     @Test(expected = ParameterValidateException.class)
     public void createResourceWithInvalidAddress() throws ParameterValidateException {
         serviceMessage = createServiceMessage(name, switchedOn, "<? yabidabido?>", mask, gatewayAddress, vlanNumber);
-        governorOfNetwork.createResource(serviceMessage);
+        governorOfNetwork.create(serviceMessage);
     }
 
     @Test(expected = ParameterValidateException.class)
     public void createResourceWithInvalidGatewayAddress() throws ParameterValidateException {
         serviceMessage = createServiceMessage(name, switchedOn, address, mask, "<? SELECT *", vlanNumber);
-        governorOfNetwork.createResource(serviceMessage);
+        governorOfNetwork.create(serviceMessage);
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void createResourceWithGatewayNotInNetwork() {
         serviceMessage = createServiceMessage(name, switchedOn, address, mask, "10.10.10.1", vlanNumber);
-        governorOfNetwork.createResource(serviceMessage);
+        governorOfNetwork.create(serviceMessage);
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void createResourceWithMaskOutOfRange() {
         serviceMessage = createServiceMessage(name, switchedOn, address, 101, gatewayAddress, vlanNumber);
-        governorOfNetwork.createResource(serviceMessage);
+        governorOfNetwork.create(serviceMessage);
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void createResourceWithVlanOutOfRange() {
         serviceMessage = createServiceMessage(name, switchedOn, address, mask, gatewayAddress, -1);
-        governorOfNetwork.createResource(serviceMessage);
+        governorOfNetwork.create(serviceMessage);
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void validateWithInvalidAddress() {
         serviceMessage = createServiceMessage(name, switchedOn, address, mask, gatewayAddress, vlanNumber);
-        Network network = governorOfNetwork.createResource(serviceMessage);
+        Network network = governorOfNetwork.create(serviceMessage);
         network.setAddress(-1L);
         governorOfNetwork.isValid(network);
     }
@@ -177,7 +177,7 @@ public class GovernorOfNetworkTest {
     @Test(expected = ConstraintViolationException.class)
     public void validateWithInvalidGatewayNotInNetwork() {
         serviceMessage = createServiceMessage(name, switchedOn, address, mask, gatewayAddress, 103);
-        Network network = governorOfNetwork.createResource(serviceMessage);
+        Network network = governorOfNetwork.create(serviceMessage);
         network.setGatewayAddress("10.10.10.1");
         governorOfNetwork.isValid(network);
     }
@@ -185,7 +185,7 @@ public class GovernorOfNetworkTest {
     @Test(expected = ConstraintViolationException.class)
     public void validateWithMaskOutOfRange() {
         serviceMessage = createServiceMessage(name, switchedOn, address, mask, gatewayAddress, vlanNumber);
-        Network network = governorOfNetwork.createResource(serviceMessage);
+        Network network = governorOfNetwork.create(serviceMessage);
         network.setMask(101);
         governorOfNetwork.isValid(network);
     }
@@ -193,7 +193,7 @@ public class GovernorOfNetworkTest {
     @Test(expected = ConstraintViolationException.class)
     public void validateWithVlanOutOfRange() {
         serviceMessage = createServiceMessage(name, switchedOn, address, mask, gatewayAddress, vlanNumber);
-        Network network = governorOfNetwork.createResource(serviceMessage);
+        Network network = governorOfNetwork.create(serviceMessage);
         network.setVlanNumber(-1);
         governorOfNetwork.isValid(network);
     }
