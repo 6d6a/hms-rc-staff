@@ -38,6 +38,7 @@ public class GovernorOfServer extends LordOfResources<Server> {
 
     private String activeSharedHostingName;
     private String activeMailStorageName;
+    private String activeMjMailStorageName;
     private String activeMysqlDatabaseServerName;
     private String activePostgresqlDatabaseServerName;
     private String activeMailboxStorageMountPoint;
@@ -55,6 +56,11 @@ public class GovernorOfServer extends LordOfResources<Server> {
     @Value("${server.active.name.mail-storage}")
     public void setActiveMailStorageName(String activeMailStorageName) {
         this.activeMailStorageName = activeMailStorageName;
+    }
+
+    @Value("${server.active.name.mj-mail-storage}")
+    public void setActiveMjMailStorageName(String activeMjMailStorageName) {
+        this.activeMjMailStorageName = activeMjMailStorageName;
     }
 
     @Value("${server.active.name.mysql-database-server}")
@@ -145,6 +151,7 @@ public class GovernorOfServer extends LordOfResources<Server> {
         Boolean byServiceId = false;
         Boolean findStorage = false;
         Boolean byServerId = false;
+        Boolean byMj = false;
 
         for (Map.Entry<String, String> entry : keyValue.entrySet()) {
             if (entry.getKey().equals("state")) {
@@ -161,6 +168,9 @@ public class GovernorOfServer extends LordOfResources<Server> {
             }
             if (entry.getKey().equals("server-id")) {
                 byServerId = true;
+            }
+            if (entry.getKey().equals("mj")) {
+                byMj = true;
             }
         }
 
@@ -179,7 +189,7 @@ public class GovernorOfServer extends LordOfResources<Server> {
                     activeServerName = activeSharedHostingName;
                     break;
                 case "mail-storage":
-                    activeServerName = activeMailStorageName;
+                    activeServerName = byMj ? activeMjMailStorageName : activeMailStorageName;
                     break;
                 case "mysql-database-server":
                     activeServerName = activeMysqlDatabaseServerName;
