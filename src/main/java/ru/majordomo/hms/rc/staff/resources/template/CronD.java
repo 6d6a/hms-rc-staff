@@ -14,7 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class CronD extends Template {
     @Override
     public ResourceType getResourceType() {
-        return ResourceType.STAFF;
+        return ResourceType.UNIX_ACCOUNT;
     }
 
     public static final String TYPE = "CronD";

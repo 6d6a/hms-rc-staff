@@ -12,11 +12,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class Postfix extends Template {
-//    private final ResourceType resourceType = ResourceType.STAFF;
 
     @Override
     public ResourceType getResourceType() {
-        return ResourceType.STAFF;
+        return ResourceType.UNIX_ACCOUNT;
     }
 
     public static final String TYPE = "Postfix";

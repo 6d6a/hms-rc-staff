@@ -12,11 +12,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SshD extends Template {
-//    private final ResourceType resourceType = ResourceType.ACCESS;
 
     @Override
     public ResourceType getResourceType() {
-        return ResourceType.ACCESS;
+        return ResourceType.UNIX_ACCOUNT;
     }
 
     public static final String TYPE = "SshD";
