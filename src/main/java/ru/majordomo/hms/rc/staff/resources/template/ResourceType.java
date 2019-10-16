@@ -3,6 +3,7 @@ package ru.majordomo.hms.rc.staff.resources.template;
 public enum ResourceType {
     WEBSITE,
     DATABASE,
-    STAFF,
-    ACCESS
+    UNIX_ACCOUNT,
+    FTP_USER,
+    SERVICE
 }
