@@ -8,6 +8,7 @@ import java.io.IOException;
 
 @Document
 @UniqueNameResource(ServiceType.class)
+@Deprecated
 public class ServiceType extends Resource {
     public ServiceType() {
         switchedOn = true;
