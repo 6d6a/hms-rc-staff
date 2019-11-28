@@ -4,13 +4,18 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 import ru.majordomo.hms.rc.staff.resources.validation.ObjectId;
 import ru.majordomo.hms.rc.staff.resources.validation.ObjectIdCollection;
+import ru.majordomo.hms.rc.staff.resources.template.Template;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @deprecated use {@link ru.majordomo.hms.rc.staff.resources.template.Template}
+ */
 @Document
+@Deprecated
 public class ServiceTemplate extends Resource {
     @ObjectIdCollection(value = ConfigTemplate.class, message = "ConfigTemplate с указанным id не найден в БД")
     @NotEmpty(message = "Не найден ни один ConfigTemplateId")

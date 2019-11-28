@@ -32,6 +32,9 @@ import java.util.*;
 //TODO https://jira.spring.io/browse/DATAMONGO-2068
 // если добавляется новый наследник, то для корректной конвертации типов нужно создать отдельный repository
 public abstract class Template extends Resource {
+    /**
+     * может ли данный сервис быть привязан к аккаунту.
+     */
     @Indexed
     @NotNull
     private Boolean availableToAccounts = false;

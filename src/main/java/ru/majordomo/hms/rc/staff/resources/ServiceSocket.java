@@ -13,6 +13,7 @@ import ru.majordomo.hms.rc.staff.resources.validation.ValidServiceSocket;
 
 @Document
 @ValidServiceSocket
+@Deprecated
 public class ServiceSocket extends Resource {
     @NotNull
     @Range(max = 4294967295L, message = "параметр address указан неверно (должно быть между {min} и {max} в формате Long)")

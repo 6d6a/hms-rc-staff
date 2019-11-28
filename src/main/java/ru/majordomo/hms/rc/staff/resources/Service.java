@@ -29,6 +29,7 @@ public class Service extends Resource implements ConnectableToAccount, Connectab
     @Indexed
     private String serverId;
 
+    @Deprecated
     @ObjectId(ServiceTemplate.class)
     private String serviceTemplateId;
 
@@ -39,11 +40,13 @@ public class Service extends Resource implements ConnectableToAccount, Connectab
     @ObjectIdCollection(Socket.class)
     private List<String> socketIds = new ArrayList<>();
 
+    @Deprecated
     @ObjectIdCollection(ServiceSocket.class)
     private List<String> serviceSocketIds = new ArrayList<>();
 
     private Map<String, String> instanceProps = new HashMap<>();
 
+    @Deprecated
     @Transient
     private ServiceTemplate serviceTemplate;
 
@@ -54,6 +57,7 @@ public class Service extends Resource implements ConnectableToAccount, Connectab
     private List<Socket> sockets = new ArrayList<>();
 
     @Transient
+    @Deprecated
     private List<ServiceSocket> serviceSockets = new ArrayList<>();
 
     @Override
@@ -61,6 +65,7 @@ public class Service extends Resource implements ConnectableToAccount, Connectab
         switchedOn = !switchedOn;
     }
 
+    @Deprecated
     public void setServiceTemplate(ServiceTemplate serviceTemplate) {
         this.serviceTemplateId = serviceTemplate != null ? serviceTemplate.getId() : null;
         this.serviceTemplate = serviceTemplate;
@@ -80,6 +85,7 @@ public class Service extends Resource implements ConnectableToAccount, Connectab
         this.sockets = sockets;
     }
 
+    @Deprecated
     public void setServiceSockets(List<ServiceSocket> serviceSockets) {
         List<String> ids = new ArrayList<>();
         for (ServiceSocket serviceSocket: serviceSockets) {
@@ -89,6 +95,7 @@ public class Service extends Resource implements ConnectableToAccount, Connectab
         this.serviceSockets = serviceSockets;
     }
 
+    @Deprecated
     public void addServiceSocket(ServiceSocket serviceSocket) {
         String serviceSocketId = serviceSocket.getId();
         this.serviceSockets.add(serviceSocket);

@@ -30,7 +30,9 @@ public class ApplicationServer extends Template {
 
     public enum Language {
         PHP,
-        PERL
+        PERL,
+        PYTHON,
+        JAVASCRIPT
     }
 
     public static class Spec {
