@@ -30,10 +30,16 @@ public class SocketRestController extends RestControllerTemplate<Socket> {
 
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVICE_SOCKET_VIEW')")
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public Collection<Socket> readAll(@RequestParam(required=false, defaultValue="") String name) {
+    public Collection<Socket> readAll(
+            @RequestParam(required=false, defaultValue="") String name,
+            @RequestParam(required=false, defaultValue="") String regex
+    ) {
         Map<String, String> keyValue = new HashMap<>();
         if (!name.isEmpty()) {
             keyValue.put("name", name);
+        }
+        if (!regex.isEmpty()) {
+            keyValue.put("regex", "true");
         }
         if (!keyValue.isEmpty()) {
             return processReadAllWithParamsQuery(keyValue);
@@ -46,11 +52,15 @@ public class SocketRestController extends RestControllerTemplate<Socket> {
     @RequestMapping(value = "", method = RequestMethod.GET, headers = "X-HMS-Pageable=true")
     public Page<Socket> readAll(
             @RequestParam(required=false, defaultValue="") String name,
+            @RequestParam(required=false, defaultValue="") String regex,
             Pageable pageable
     ) {
         Map<String, String> keyValue = new HashMap<>();
         if (!name.isEmpty()) {
             keyValue.put("name", name);
+        }
+        if (!regex.isEmpty()) {
+            keyValue.put("regex", "true");
         }
         if (!keyValue.isEmpty()) {
             return processReadAllWithParamsQuery(keyValue, pageable);

@@ -31,10 +31,16 @@ public class ServiceTemplateRestController extends RestControllerTemplate<Servic
 
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVICE_TEMPLATE_VIEW')")
     @RequestMapping(value = "/service-template", method = RequestMethod.GET)
-    public Collection<ServiceTemplate> readAll(@RequestParam(required=false, defaultValue="") String name) {
+    public Collection<ServiceTemplate> readAll(
+            @RequestParam(required=false, defaultValue="") String name,
+            @RequestParam(required=false, defaultValue="") String regex
+    ) {
         Map<String, String> keyValue = new HashMap<>();
         if (!name.isEmpty()) {
             keyValue.put("name", name);
+        }
+        if (!regex.isEmpty()) {
+            keyValue.put("regex", "true");
         }
         if (!keyValue.isEmpty()) {
             return processReadAllWithParamsQuery(keyValue);
@@ -47,11 +53,15 @@ public class ServiceTemplateRestController extends RestControllerTemplate<Servic
     @RequestMapping(value = "/service-template", method = RequestMethod.GET, headers = "X-HMS-Pageable=true")
     public Page<ServiceTemplate> readAll(
             @RequestParam(required=false, defaultValue="") String name,
+            @RequestParam(required=false, defaultValue="") String regex,
             Pageable pageable
     ) {
         Map<String, String> keyValue = new HashMap<>();
         if (!name.isEmpty()) {
             keyValue.put("name", name);
+        }
+        if (!regex.isEmpty()) {
+            keyValue.put("regex", "true");
         }
         if (!keyValue.isEmpty()) {
             return processReadAllWithParamsQuery(keyValue, pageable);

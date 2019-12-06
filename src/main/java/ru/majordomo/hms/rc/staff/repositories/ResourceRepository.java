@@ -24,5 +24,11 @@ public interface ResourceRepository<T extends Resource, ID extends Serializable>
     @Query(value="{'name' : ?0}", fields="{name : 1}")
     List<T> findByNameOnlyIdAndName(String name);
 
+    @Query("{'name':{$regex:?0, $options: 'i'}}")
+    List<T> findByNameRegEx(String name);
+
+    @Query("{'name':{$regex:?0, $options: 'i'}}")
+    Page<T> findByNameRegEx(String name, Pageable pageable);
+
     Long deleteByName(String name);
 }
