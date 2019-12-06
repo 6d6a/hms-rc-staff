@@ -82,6 +82,9 @@ public abstract class LordOfResources<T extends Resource> {
 
     public List<T> buildAll(Map<String, String> keyValue) {
         if (keyValue.get("name") != null) {
+            if (keyValue.get("regex") != null) {
+                return repository.findByNameRegEx(keyValue.get("name"));
+            }
             return repository.findByName(keyValue.get("name"));
         } else {
             return repository.findAll();
@@ -94,6 +97,9 @@ public abstract class LordOfResources<T extends Resource> {
 
     public Page<T> buildAll(Map<String, String> keyValue, Pageable pageable) {
         if (keyValue.get("name") != null) {
+            if (keyValue.get("regex") != null) {
+                return repository.findByNameRegEx(keyValue.get("name"), pageable);
+            }
             return repository.findByName(keyValue.get("name"), pageable);
         } else {
             return repository.findAll(pageable);

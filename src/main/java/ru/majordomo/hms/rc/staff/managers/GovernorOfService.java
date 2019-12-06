@@ -236,6 +236,9 @@ public class GovernorOfService extends LordOfResources<Service> {
         } else if (keyValue.get("accountId") != null) {
             return ((ServiceRepository) repository).findByAccountId(keyValue.get("accountId"));
         } else if (keyValue.get("name") != null) {
+            if (keyValue.get("regex") != null) {
+                return repository.findByNameRegEx(keyValue.get("name"));
+            }
             return repository.findByName(keyValue.get("name"));
         } else if (keyValue.get("serverId") != null && keyValue.get("service-type") != null) {
             List<Service> services = ((ServiceRepository) repository).findByServerId(keyValue.get("serverId"));

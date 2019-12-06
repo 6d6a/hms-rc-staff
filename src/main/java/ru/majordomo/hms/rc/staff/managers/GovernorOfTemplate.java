@@ -88,6 +88,9 @@ public class GovernorOfTemplate extends LordOfResources<Template> {
     @Override
     public List<Template> buildAll(Map<String, String> keyValue) {
         if (keyValue.get("name") != null) {
+            if (keyValue.get("regex") != null) {
+                return repository.findByNameRegEx(keyValue.get("name"));
+            }
             return repository.findByName(keyValue.get("name"));
         } else if (keyValue.get("availableToAccounts") != null) {
             return ((TemplateRepository) repository).findByAvailableToAccounts(Boolean.parseBoolean(keyValue.get("availableToAccounts")));

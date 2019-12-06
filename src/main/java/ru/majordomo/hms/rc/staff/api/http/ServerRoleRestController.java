@@ -37,10 +37,16 @@ public class ServerRoleRestController extends RestControllerTemplate<ServerRole>
 
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVER_ROLE_VIEW')")
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
-    public Collection<ServerRole> readAll(@RequestParam(required=false, defaultValue="") String name) {
+    public Collection<ServerRole> readAll(
+            @RequestParam(required=false, defaultValue="") String name,
+            @RequestParam(required=false, defaultValue="") String regex
+    ) {
         Map<String, String> keyValue = new HashMap<>();
         if (!name.isEmpty()) {
             keyValue.put("name", name);
+        }
+        if (!regex.isEmpty()) {
+            keyValue.put("regex", "true");
         }
         if (!keyValue.isEmpty()) {
             return processReadAllWithParamsQuery(keyValue);
@@ -53,11 +59,15 @@ public class ServerRoleRestController extends RestControllerTemplate<ServerRole>
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET, headers = "X-HMS-Pageable=true")
     public Page<ServerRole> readAll(
             @RequestParam(required=false, defaultValue="") String name,
+            @RequestParam(required=false, defaultValue="") String regex,
             Pageable pageable
     ) {
         Map<String, String> keyValue = new HashMap<>();
         if (!name.isEmpty()) {
             keyValue.put("name", name);
+        }
+        if (!regex.isEmpty()) {
+            keyValue.put("regex", "true");
         }
         if (!keyValue.isEmpty()) {
             return processReadAllWithParamsQuery(keyValue, pageable);

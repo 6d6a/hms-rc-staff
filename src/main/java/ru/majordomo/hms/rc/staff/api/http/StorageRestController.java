@@ -37,10 +37,16 @@ public class StorageRestController extends RestControllerTemplate<Storage> {
 
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('STORAGE_VIEW')")
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
-    public Collection<Storage> readAll(@RequestParam(required=false, defaultValue="") String name) {
+    public Collection<Storage> readAll(
+            @RequestParam(required=false, defaultValue="") String name,
+            @RequestParam(required=false, defaultValue="") String regex
+    ) {
         Map<String, String> keyValue = new HashMap<>();
         if (!name.isEmpty()) {
             keyValue.put("name", name);
+        }
+        if (!regex.isEmpty()) {
+            keyValue.put("regex", "true");
         }
         if (!keyValue.isEmpty()) {
             return processReadAllWithParamsQuery(keyValue);
@@ -53,11 +59,15 @@ public class StorageRestController extends RestControllerTemplate<Storage> {
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET, headers = "X-HMS-Pageable=true")
     public Page<Storage> readAll(
             @RequestParam(required=false, defaultValue="") String name,
+            @RequestParam(required=false, defaultValue="") String regex,
             Pageable pageable
     ) {
         Map<String, String> keyValue = new HashMap<>();
         if (!name.isEmpty()) {
             keyValue.put("name", name);
+        }
+        if (!regex.isEmpty()) {
+            keyValue.put("regex", "true");
         }
         if (!keyValue.isEmpty()) {
             return processReadAllWithParamsQuery(keyValue, pageable);

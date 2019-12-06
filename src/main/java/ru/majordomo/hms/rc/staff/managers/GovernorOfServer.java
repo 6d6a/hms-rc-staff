@@ -242,6 +242,9 @@ public class GovernorOfServer extends LordOfResources<Server> {
     @Override
     public List<Server> buildAll(Map<String, String> keyValue) {
         if (keyValue.get("name") != null) {
+            if (keyValue.get("regex") != null) {
+                return repository.findByNameRegEx(keyValue.get("name"));
+            }
             return repository.findByName(keyValue.get("name"));
         } else if (keyValue.get("server-role") != null) {
             ServerRole serverRole = serverRoleRepository.findOneByName(keyValue.get("server-role"));

@@ -33,10 +33,16 @@ public class ConfigTemplateRestController extends RestControllerTemplate<ConfigT
 
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('CONFIG_TEMPLATE_VIEW')")
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
-    public Collection<ConfigTemplate> readAll(@RequestParam(required=false, defaultValue="") String name) {
+    public Collection<ConfigTemplate> readAll(
+            @RequestParam(required=false, defaultValue="") String name,
+            @RequestParam(required=false, defaultValue="") String regex
+    ) {
         Map<String, String> keyValue = new HashMap<>();
         if (!name.isEmpty()) {
             keyValue.put("name", name);
+        }
+        if (!regex.isEmpty()) {
+            keyValue.put("regex", "true");
         }
         if (!keyValue.isEmpty()) {
             return processReadAllWithParamsQuery(keyValue);
@@ -49,11 +55,15 @@ public class ConfigTemplateRestController extends RestControllerTemplate<ConfigT
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET, headers = "X-HMS-Pageable=true")
     public Page<ConfigTemplate> readAll(
             @RequestParam(required=false, defaultValue="") String name,
+            @RequestParam(required=false, defaultValue="") String regex,
             Pageable pageable
     ) {
         Map<String, String> keyValue = new HashMap<>();
         if (!name.isEmpty()) {
             keyValue.put("name", name);
+        }
+        if (!regex.isEmpty()) {
+            keyValue.put("regex", "true");
         }
         if (!keyValue.isEmpty()) {
             return processReadAllWithParamsQuery(keyValue, pageable);
