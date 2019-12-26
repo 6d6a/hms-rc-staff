@@ -30,6 +30,9 @@ public class ServerMongoEventListener extends AbstractMongoEventListener<Server>
     @Override
     public void onAfterConvert(AfterConvertEvent<Server> event) {
         super.onAfterConvert(event);
+        if (event.getDocument() != null && event.getDocument().size() <= 2 && event.getDocument().containsKey("name")) {
+            return;
+        }
         loadTransientFields(event.getSource());
     }
 
