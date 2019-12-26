@@ -20,7 +20,6 @@ import javax.validation.constraints.NotNull;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class NetworkSocket extends Socket {
-    @NotBlank(message = "protocol должен быть указан")
     private String protocol;
     @NotNull
     @Range(max = 4294967295L, message = "параметр address указан неверно (должно быть между {min} и {max} в формате Long)")
