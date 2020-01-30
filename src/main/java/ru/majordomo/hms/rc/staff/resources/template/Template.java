@@ -60,6 +60,8 @@ public abstract class Template extends Resource {
 
     private String sourceUri;
 
+    private List<String> resourceFilter = new ArrayList<>();
+
     private Map<String, String> resourceSpec = new HashMap<>();
 
     private Map<String, String> instanceSpec = new HashMap<>();
