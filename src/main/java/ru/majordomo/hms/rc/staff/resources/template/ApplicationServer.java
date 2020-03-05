@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -25,6 +26,9 @@ public class ApplicationServer extends Template {
     public ResourceType getResourceType() {
         return ResourceType.WEBSITE;
     }
+
+    @Nullable
+    private String deployImagePath;
 
     public static final String TYPE = "ApplicationServer";
 
