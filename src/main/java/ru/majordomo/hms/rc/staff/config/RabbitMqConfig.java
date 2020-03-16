@@ -18,6 +18,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.handler.annotation.support.DefaultMessageHandlerMethodFactory;
 import org.springframework.retry.interceptor.RetryOperationsInterceptor;
+import ru.majordomo.hms.rc.staff.common.Constants;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -121,7 +122,7 @@ public class RabbitMqConfig implements RabbitListenerConfigurer {
                     instanceName + "." + applicationName + "." + exchangeName,
                     Binding.DestinationType.QUEUE,
                     exchangeName,
-                    instanceName + "." + applicationName,
+                    instanceName + "." + Constants.RC_STAFF_ROUTING_KEY,
                     null
             ));
         }
