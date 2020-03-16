@@ -216,7 +216,7 @@ public class GovernorOfService extends LordOfResources<Service> {
             );
             services.addAll(filterByServiceTypeName(accountServices, keyValue.get("service-type")));
 
-            List<Service> serverServices = ((ServiceRepository) repository).findByServerId(keyValue.get("serverId"));
+            List<Service> serverServices = ((ServiceRepository) repository).findByServerIdAndAccountIdNull(keyValue.get("serverId"));
             services.addAll(filterByServiceTypeName(serverServices, keyValue.get("service-type")));
 
             return services;
@@ -228,7 +228,7 @@ public class GovernorOfService extends LordOfResources<Service> {
                     keyValue.get("serverId")
             );
 
-            List<Service> serverServices = ((ServiceRepository) repository).findByServerId(keyValue.get("serverId"));
+            List<Service> serverServices = ((ServiceRepository) repository).findByServerIdAndAccountIdNull(keyValue.get("serverId"));
 
             services.addAll(serverServices);
 
