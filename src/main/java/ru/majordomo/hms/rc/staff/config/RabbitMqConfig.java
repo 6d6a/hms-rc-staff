@@ -47,6 +47,12 @@ public class RabbitMqConfig implements RabbitListenerConfigurer {
     @Value("${hms.instance.name}")
     private String instanceName;
 
+    /**
+     * rabbit routing key. Так как не совпадает с именем приложения
+     */
+    @Value("${spring.rabbitmq.routing-key:}")
+    private String routingKey = "";
+
     @Bean
     public ConnectionFactory connectionFactory() {
         CachingConnectionFactory connectionFactory = new CachingConnectionFactory(rabbitHost);
@@ -122,7 +128,7 @@ public class RabbitMqConfig implements RabbitListenerConfigurer {
                     instanceName + "." + applicationName + "." + exchangeName,
                     Binding.DestinationType.QUEUE,
                     exchangeName,
-                    instanceName + "." + Constants.RC_STAFF_ROUTING_KEY,
+                    instanceName + "." + (routingKey.isEmpty() ? applicationName : routingKey),
                     null
             ));
         }
