@@ -20,12 +20,16 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import javax.sql.DataSource;
 
 @Configuration
-@Import(value = {
-        DataSourceAutoConfiguration.class,
-        DataSourceTransactionManagerAutoConfiguration.class
-})
 @Profile("import")
 public class DatabaseConfig {
+
+    private HikariSettings hikariSettings;
+
+    @Autowired
+    public void setHikariSettings(HikariSettings hikariSettings) {
+        this.hikariSettings = hikariSettings;
+    }
+
     @Bean(name = "billingJdbcTemplate")
     @Primary
     @Autowired
@@ -50,6 +54,15 @@ public class DatabaseConfig {
     @Bean(name = "billingDataSource")
     @Primary
     public HikariDataSource dataSource(@Qualifier("billingDataSourceProperties") DataSourceProperties properties) {
-        return properties.initializeDataSourceBuilder().type(HikariDataSource.class).build();
+        return HikariConfigWrapper(properties.initializeDataSourceBuilder().type(HikariDataSource.class).build());
+    }
+
+    private HikariDataSource HikariConfigWrapper(HikariDataSource hikari) {
+        hikari.setMaximumPoolSize(hikariSettings.getMaximumPoolSize());
+        hikari.setConnectionTimeout(hikariSettings.getConnectionTimeout());
+        hikari.setIdleTimeout(hikariSettings.getIdleTimeout());
+        hikari.setMaxLifetime(hikariSettings.getMaxLifetime());
+
+        return hikari;
     }
 }
