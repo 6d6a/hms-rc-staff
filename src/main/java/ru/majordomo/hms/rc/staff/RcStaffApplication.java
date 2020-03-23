@@ -9,8 +9,10 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 
+import ru.majordomo.hms.rc.staff.config.HikariSettings;
 import ru.majordomo.hms.rc.staff.importing.DBImportService;
 
 @EnableEurekaClient
@@ -18,6 +20,7 @@ import ru.majordomo.hms.rc.staff.importing.DBImportService;
         DataSourceAutoConfiguration.class,
         DataSourceTransactionManagerAutoConfiguration.class
 })
+@EnableConfigurationProperties({HikariSettings.class})
 public class RcStaffApplication implements CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(RcStaffApplication.class);
