@@ -12,21 +12,15 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerA
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 
-import ru.majordomo.hms.rc.staff.config.HikariSettings;
-import ru.majordomo.hms.rc.staff.importing.DBImportService;
-
 @EnableEurekaClient
 @SpringBootApplication(exclude = {
         DataSourceAutoConfiguration.class,
         DataSourceTransactionManagerAutoConfiguration.class
 })
-@EnableConfigurationProperties({HikariSettings.class})
+@EnableConfigurationProperties
 public class RcStaffApplication implements CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(RcStaffApplication.class);
-
-//    @Autowired
-//    private DBImportService dbImportService;
 
     public static void main(String[] args) {
         SpringApplication.run(RcStaffApplication.class, args);
@@ -34,8 +28,6 @@ public class RcStaffApplication implements CommandLineRunner {
 
     public void run(String... args) {
         String dbSeedOption = "--db_seed";
-        String dbImportOption = "--db_import";
-        String dbImportOneAccountOption = "--db_import_one_account";
         String processOption = "--process";
         StringBuilder sb = new StringBuilder();
         for (String option : args) {
@@ -46,16 +38,6 @@ public class RcStaffApplication implements CommandLineRunner {
 
 //                seeded = dbImportService.seedDB();
 //                sb.append(" ").append(seeded ? "dbImportService db_seeded" : "dbImportService db_not_seeded");
-            } else if (option.equals(dbImportOption)) {
-                boolean imported;
-
-//                imported = dbImportService.importToMongo();
-//                sb.append(" ").append(imported ? "dbImportService db_imported" : "dbImportService db_not_imported");
-            } else if (option.equals(dbImportOneAccountOption)) {
-                boolean imported;
-
-//                imported = dbImportService.importToMongo("100800");
-//                sb.append(" ").append(imported ? "dbImportService db_imported" : "dbImportService db_not_imported");
             } else if (option.equals(processOption)) {
                 //Do some shit
             }
