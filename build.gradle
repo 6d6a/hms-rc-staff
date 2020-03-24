@@ -116,9 +116,7 @@ dependencies {
     implementation('commons-net:commons-net:3.5')
     implementation("org.projectlombok:lombok:1.18.2")
     implementation("com.google.code.findbugs:jsr305:3.0.2")
-    implementation(group: 'com.mysql', name: 'management', version: '1.1.6') {
-        exclude(module: 'jmxtools')
-    }
+
 //    testCompile('com.github.fakemongo:fongo:2.2.0-RC2')
     testCompile('de.bwaldvogel:mongo-java-server:1.19.0')
     testCompile('org.springframework.boot:spring-boot-starter-test')
