@@ -41,5 +41,13 @@ public class ApplicationServer extends Template {
 
     public static class Spec {
         public static final String SECURITY_LEVEL = "security_level";
+
+    }
+    
+    public static class Security {
+        public static final String DEFAULT = "default";
+        public static final String UNSAFE = "unsafe";
+        public static final String HARDENED_NOCHMOD = "hardened_nochmod";
+        public static final String HARDENED = "hardened";
     }
 }
