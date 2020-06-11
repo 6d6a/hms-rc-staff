@@ -195,7 +195,7 @@ public class GovernorOfService extends LordOfResources<Service> {
         if (keyValue.get("accountId") != null && keyValue.get("resourceId") != null) {
             Service service = repository.findById(keyValue.get("resourceId")).orElse(null);
 
-            if (service == null || !service.getAccountId().equals(keyValue.get("accountId"))) {
+            if (service == null || !keyValue.get("accountId").equals(service.getAccountId())) {
                 throw new ResourceNotFoundException("Service по accountId и resourceId не найден");
             }
 
