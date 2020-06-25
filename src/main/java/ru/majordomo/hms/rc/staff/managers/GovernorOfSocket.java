@@ -17,6 +17,7 @@ import ru.majordomo.hms.rc.staff.resources.socket.NetworkSocket;
 import ru.majordomo.hms.rc.staff.resources.socket.Socket;
 import ru.majordomo.hms.rc.staff.resources.validation.group.SocketChecks;
 
+import javax.annotation.Nonnull;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
@@ -82,7 +83,7 @@ public class GovernorOfSocket extends LordOfResources<Socket> {
         }
     }
 
-    public Socket generateForAccount(String name) {
+    public Socket generateForAccount(String name, @Nonnull String protocol) {
         MatchOperation match = Aggregation.match(
                 Criteria.where("port").gte(minPortForAccount).lte(maxPortForAccount));
 
@@ -97,7 +98,7 @@ public class GovernorOfSocket extends LordOfResources<Socket> {
         serviceSocket.setAddress("127.0.0.1");
         serviceSocket.setPort(minPortForAccount);
         serviceSocket.setName(name);
-        serviceSocket.setProtocol("http");
+        serviceSocket.setProtocol(protocol);
         serviceSocket.setSwitchedOn(true);
 
         if (stringsContainers != null && !stringsContainers.isEmpty()) {

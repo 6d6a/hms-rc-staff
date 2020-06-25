@@ -1,5 +1,6 @@
 package ru.majordomo.hms.rc.staff.managers;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -121,7 +122,12 @@ public class GovernorOfService extends LordOfResources<Service> {
                 service.setServiceTemplateId(template.getMigratedServiceTemplateIds().iterator().next());
             }
             service.setAccountId(accountId);
-            service.setSockets(Collections.singletonList(governorOfSocket.generateForAccount(serviceName)));
+            if (CollectionUtils.isNotEmpty(template.getNetworkingProtocols())) {
+                service.setSockets(template.getNetworkingProtocols().stream()
+                        .map(protocol-> governorOfSocket.generateForAccount(serviceName, protocol))
+                        .collect(Collectors.toList())
+                );
+            }
             service.setSwitchedOn(true);
         } catch (ClassCastException e) {
             throw new ParameterValidateException("один из параметров указан неверно:" + e.getMessage());
