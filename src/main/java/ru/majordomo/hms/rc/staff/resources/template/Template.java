@@ -11,6 +11,7 @@ import ru.majordomo.hms.rc.staff.resources.ConfigTemplate;
 import ru.majordomo.hms.rc.staff.resources.Resource;
 import ru.majordomo.hms.rc.staff.resources.validation.ObjectIdCollection;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -59,6 +60,9 @@ public abstract class Template extends Resource {
     private String supervisionType;
 
     private String sourceUri;
+
+    @Valid
+    private Set<@NotBlank String> networkingProtocols = new HashSet<>();
 
     private List<String> resourceFilter = new ArrayList<>();
 
