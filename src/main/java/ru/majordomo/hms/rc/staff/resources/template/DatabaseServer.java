@@ -28,6 +28,8 @@ public class DatabaseServer extends Template {
 
     public enum Type {
         MYSQL,
-        POSTGRESQL
+        POSTGRESQL,
+        REDIS,
+        MEMCACHED
     }
 }
