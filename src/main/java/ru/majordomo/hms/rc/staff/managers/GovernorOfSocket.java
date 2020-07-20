@@ -1,6 +1,7 @@
 package ru.majordomo.hms.rc.staff.managers;
 
 import org.apache.commons.lang.NotImplementedException;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -15,16 +16,15 @@ import ru.majordomo.hms.rc.staff.repositories.socket.SocketRepository;
 import ru.majordomo.hms.rc.staff.resources.Service;
 import ru.majordomo.hms.rc.staff.resources.socket.NetworkSocket;
 import ru.majordomo.hms.rc.staff.resources.socket.Socket;
+import ru.majordomo.hms.rc.staff.resources.socket.UnixSocket;
 import ru.majordomo.hms.rc.staff.resources.validation.group.SocketChecks;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.IntStream;
 
 @Component
@@ -116,5 +116,53 @@ public class GovernorOfSocket extends LordOfResources<Socket> {
         save(serviceSocket);
 
         return serviceSocket;
+    }
+
+    public UnixSocket generateUnixSocket(@Nullable String name, String unixSocketTemplate, String homedir) {
+        UnixSocket newSocket = new UnixSocket();
+        if (unixSocketTemplate.contains("$ID")) {
+            String id = new ObjectId().toString();
+            newSocket.setId(id);
+            newSocket.setFile(generateFileWithId(unixSocketTemplate, homedir, id));
+        } else {
+            int prefix = 0;
+            String file;
+            while (isNetworkSocketFileExist(file = generateFileWithPrefix(unixSocketTemplate, homedir, prefix))) {
+                prefix++;
+            }
+            newSocket.setFile(file);
+        }
+        newSocket.setName(name);
+        newSocket.setSwitchedOn(true);
+        save(newSocket);
+        return newSocket;
+    }
+
+    public static String generateFileWithId(String template, String homedir, String uniqueId) {
+        if (homedir.endsWith("/")) {
+            homedir = homedir.substring(0, homedir.length() - 1);
+        }
+        return template.replace("$HOME", homedir).replace("$ID", uniqueId);
+    }
+
+    private boolean isNetworkSocketFileExist(String file) {
+        return mongoOperations.exists(Query.query(Criteria.where("file").is(file)), NetworkSocket.class);
+    }
+
+    public static String generateFileWithPrefix(String template, String homedir, int prefix) {
+        if (homedir.endsWith("/")) {
+            homedir = homedir.substring(0, homedir.length() - 1);
+        }
+        String name = template.replace("$HOME", homedir);
+        if (prefix > 0) {
+            int slashPos = name.lastIndexOf("/");
+            int dotPos = name.lastIndexOf(".");
+            if (slashPos >= 0 && dotPos > slashPos) {
+                return name.substring(0, dotPos) + "_" + prefix + name.substring(dotPos);
+            } else {
+                return name + "_" + prefix;
+            }
+        }
+        return name;
     }
 }
