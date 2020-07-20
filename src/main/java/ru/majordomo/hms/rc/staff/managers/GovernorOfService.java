@@ -2,6 +2,7 @@ package ru.majordomo.hms.rc.staff.managers;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,7 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 
 import ru.majordomo.hms.personmgr.exception.ParameterValidationException;
+import ru.majordomo.hms.rc.staff.common.Constants;
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.resources.*;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
@@ -75,6 +77,7 @@ public class GovernorOfService extends LordOfResources<Service> {
             String templateId = (String) serviceMessage.getParam("templateId");
             String serverId = (String) serviceMessage.getParam("serverId");
             String accountId = serviceMessage.getAccountId() != null ? cleaner.cleanString(serviceMessage.getAccountId()) : null;
+            String homedir = Objects.toString(serviceMessage.getParam(Constants.UNIX_ACCOUNT_HOMEDIR_KEY), "");
 
             if (accountId == null || accountId.equals("")) {
                 throw new ParameterValidationException("Не указан accountId");
@@ -122,11 +125,18 @@ public class GovernorOfService extends LordOfResources<Service> {
                 service.setServiceTemplateId(template.getMigratedServiceTemplateIds().iterator().next());
             }
             service.setAccountId(accountId);
+            if (StringUtils.isNotEmpty(accountId)) {
+                service.addInstanceProp(Template.Spec.UNIX_ACCOUNT_HOMEDIR, homedir);
+            }
             if (CollectionUtils.isNotEmpty(template.getNetworkingProtocols())) {
-                service.setSockets(template.getNetworkingProtocols().stream()
-                        .map(protocol-> governorOfSocket.generateForAccount(serviceName, protocol))
-                        .collect(Collectors.toList())
-                );
+                for (String protocol : template.getNetworkingProtocols()) {
+                    service.addSocket(governorOfSocket.generateForAccount(serviceName, protocol));
+                }
+            }
+            if (CollectionUtils.isNotEmpty(template.getUnixSocketTemplates())) {
+                for (String fileTemplate : template.getUnixSocketTemplates()) {
+                    service.addSocket(governorOfSocket.generateUnixSocket(serviceName, fileTemplate, homedir));
+                }
             }
             service.setSwitchedOn(true);
         } catch (ClassCastException e) {

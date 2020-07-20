@@ -64,6 +64,14 @@ public abstract class Template extends Resource {
     @Valid
     private Set<@NotBlank String> networkingProtocols = new HashSet<>();
 
+    /**
+     * Шаблон для генерации имени Unix-сокета
+     * $HOME/redis.socket = /home/u999/redis.socket /home/u999/redis_1.socket
+     * /tmp/$ID.socket /tmp/5dcea7aa75c2d9104131408f.socket
+     */
+    @Valid
+    private Set<@NotBlank String> unixSocketTemplates = new HashSet<>();
+
     private List<String> resourceFilter = new ArrayList<>();
 
     private Map<String, String> resourceSpec = new HashMap<>();
@@ -116,5 +124,10 @@ public abstract class Template extends Resource {
     public static class InstanceSpecType {
         public static final String STRING = "string";
         public static final String INTEGER = "integer";
+    }
+
+    public static class Spec {
+        /** для работы ТЕ с выделеными сервисами */
+        public static final String UNIX_ACCOUNT_HOMEDIR = "unix_account_homedir";
     }
 }
