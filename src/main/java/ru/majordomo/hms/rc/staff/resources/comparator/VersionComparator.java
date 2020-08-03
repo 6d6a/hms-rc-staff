@@ -1,11 +1,12 @@
 package ru.majordomo.hms.rc.staff.resources.comparator;
 
+import javax.annotation.Nullable;
 import java.util.Comparator;
 
 public class VersionComparator implements Comparator<String> {
 
     @Override
-    public int compare(String v1, String v2) {
+    public int compare(@Nullable String v1, @Nullable String v2) {
         if (v1 == null) {
             v1 = "";
         }
