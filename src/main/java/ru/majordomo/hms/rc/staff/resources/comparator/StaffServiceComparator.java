@@ -25,20 +25,22 @@ public class StaffServiceComparator implements Comparator<Service> {
         if (s1 == null || s2 == null) {
             return s1 == s2 ? 0 : (s1 != null)  ? -1 : 1;
         }
-        if (!Objects.equal(s1.switchedOn, s2.switchedOn)) {
-            return s1.switchedOn ? -1 : 1;
+        int compareResult = Boolean.compare(s2.switchedOn, s1.switchedOn);
+        if (compareResult != 0) {
+            return compareResult;
         }
-        boolean isPersonal1 = StringUtils.isNotEmpty(s1.getAccountId());
-        boolean isPersonal2 = StringUtils.isNotEmpty(s2.getAccountId());
-        if (isPersonal1 != isPersonal2) {
-            return isPersonal1 ? -1 : 1;
+        compareResult = Boolean.compare(StringUtils.isEmpty(s1.getAccountId()), StringUtils.isEmpty(s2.getAccountId()));
+        if (compareResult != 0) {
+            return compareResult;
         }
+
         Template t1 = s1.getTemplate();
         Template t2 = s2.getTemplate();
-        int templateCmp = templateRating(s1.getTemplate()) - templateRating(s2.getTemplate());
-        if (templateCmp != 0) {
-            return templateCmp;
+        compareResult = templateRating(s1.getTemplate()) - templateRating(s2.getTemplate());
+        if (compareResult != 0) {
+            return compareResult;
         }
+
         if (t1 instanceof ApplicationServer && t2 instanceof ApplicationServer) {
             ApplicationServer a1 = (ApplicationServer) t1;
             ApplicationServer a2 = (ApplicationServer) t2;
