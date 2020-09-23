@@ -36,7 +36,10 @@ public class ApplicationServer extends Template {
         PHP,
         PERL,
         PYTHON,
-        JAVASCRIPT
+        JAVASCRIPT,
+        RUBY,
+        JAVA,
+        GO
     }
 
     public static class Spec {
