@@ -1,5 +1,7 @@
 package ru.majordomo.hms.rc.staff.managers;
 
+import lombok.Setter;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -10,10 +12,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nullable;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 
+import ru.majordomo.hms.personmgr.exception.InternalApiException;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
@@ -36,21 +40,25 @@ public class GovernorOfServer extends LordOfResources<Server> {
     private Cleaner cleaner;
     private Validator validator;
 
-    private String activeSharedHostingName;
     private String activeMailStorageName;
     private String activeMjMailStorageName;
     private String activeMysqlDatabaseServerName;
     private String activePostgresqlDatabaseServerName;
     private String activeMailboxStorageMountPoint;
 
+    @Setter
+    @Nullable
+    @Value("${server.active.name.shared-hosting-business:#{null}}")
+    private String activeSharedHostingBusinessName;
+
+    @Setter
+    @Value("${server.active.name.shared-hosting}")
+    private String activeSharedHostingName;
+
+
     @Value("${server.active.mail-storage.active-storage-mountpoint}")
     public void setActiveMailboxStorageMountPoint(String activeMailboxStorageMountPoint) {
         this.activeMailboxStorageMountPoint = activeMailboxStorageMountPoint;
-    }
-
-    @Value("${server.active.name.shared-hosting}")
-    public void setActiveSharedHostingName(String activeSharedHostingName) {
-        this.activeSharedHostingName = activeSharedHostingName;
     }
 
     @Value("${server.active.name.mail-storage}")
@@ -182,11 +190,19 @@ public class GovernorOfServer extends LordOfResources<Server> {
             if (serverRole == null) {
                 throw new ResourceNotFoundException("ServerRole с именем: " + keyValue.get("server-role") + " не найдена");
             }
+            boolean businessServices = Boolean.parseBoolean(keyValue.getOrDefault("businessServices", "false"));
 
             String activeServerName;
             switch (keyValue.get("server-role")) {
                 case "shared-hosting":
-                    activeServerName = activeSharedHostingName;
+                    if (businessServices) {
+                        activeServerName = StringUtils.isNotEmpty(activeSharedHostingBusinessName) ? activeSharedHostingBusinessName : activeSharedHostingName;
+                    } else {
+                        activeServerName = activeSharedHostingName;
+                    }
+                    if (StringUtils.isEmpty(activeServerName)) {
+                        throw new InternalApiException("Не удалось получить имя активного сервера");
+                    }
                     break;
                 case "mail-storage":
                     activeServerName = byMj ? activeMjMailStorageName : activeMailStorageName;
