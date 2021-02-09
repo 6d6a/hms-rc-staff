@@ -2,67 +2,45 @@ package ru.majordomo.hms.rc.staff.api.message;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+@Getter
+@Setter
 public class ServiceMessage {
     static final Logger logger = LoggerFactory.getLogger(ServiceMessage.class);
+
+    /** personmgr.ProcessingBusinessOperation.id */
+    @Nullable
     private String operationIdentity;
+
+    /** personmgr.ProcessingBusinessAction.id */
+    @Nullable
     private String actionIdentity;
+
+    /** ссылка на ресурс, например: http://rc-staff/service/MONGO_ID */
     private String objRef;
+
+    @Nonnull
     private Map<Object,Object> params = new HashMap<>();
+
+    @Nullable
     private String accountId;
-
-    public String getOperationIdentity() {
-        return operationIdentity;
-    }
-
-    public void setOperationIdentity(String operationIdentity) {
-        this.operationIdentity = operationIdentity;
-    }
-
-    public String getActionIdentity() {
-        return actionIdentity;
-    }
-
-    public void setActionIdentity(String actionIdentity) {
-        this.actionIdentity = actionIdentity;
-    }
-
-    public String getObjRef() {
-        return objRef;
-    }
-
-    public void setObjRef(String objRef) {
-        this.objRef = objRef;
-    }
 
     public Object getParam(String param) {
         return params.get(param);
     }
 
-    public Map<Object, Object> getParams() {
-        return params;
-    }
-
-    public void setParams(Map<Object, Object> params) {
-        this.params = params;
-    }
-
     public void addParam(Object name, Object value) {
         params.put(name,value);
-    }
-
-    public String getAccountId() {
-        return accountId;
-    }
-
-    public void setAccountId(String accountId) {
-        this.accountId = accountId;
     }
 
     public String toJson() {

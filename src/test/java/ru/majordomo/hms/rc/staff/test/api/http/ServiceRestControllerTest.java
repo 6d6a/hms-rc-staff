@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import ru.majordomo.hms.rc.staff.event.service.listener.ServiceMongoEventListener;
@@ -71,6 +72,8 @@ public class ServiceRestControllerTest {
     private ConfigTemplateRepository configTemplateRepository;
     @Autowired
     private ServiceTypeRepository serviceTypeRepository;
+    @Autowired
+    private ServerRepository serverRepository;
 
     @Value("${spring.application.name}")
     private String applicationName;
@@ -98,6 +101,13 @@ public class ServiceRestControllerTest {
     };
 
     private void generateBatchOfServices() {
+        Server server = new Server();
+        server.setName("server_ServiceRestControllerTest");
+        server.setSwitchedOn(true);
+        server.setServices(Collections.emptyList());
+        server.setServerRoles(Collections.emptyList());
+        server.setStorages(Collections.emptyList());
+        server = serverRepository.save(server);
         for (int i = 2; i < 6; i++) {
             // Создать сокет
             NetworkSocket socket = new NetworkSocket();
@@ -125,7 +135,7 @@ public class ServiceRestControllerTest {
             service.setSwitchedOn(Boolean.TRUE);
             service.setTemplate(applicationServer);
             service.addSocket(socket);
-
+            service.setServerId(server.getId());
             serviceRepository.save(service);
             testServices.add(service);
         }

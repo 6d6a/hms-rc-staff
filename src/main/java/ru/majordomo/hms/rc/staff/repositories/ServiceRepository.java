@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 
 import ru.majordomo.hms.rc.staff.resources.Service;
 
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -17,4 +18,7 @@ public interface ServiceRepository extends ResourceRepository<Service, String> {
     boolean existsByTemplateId(String templateId);
     boolean existsByAccountIdAndTemplateId(String accountId, String templateId);
     List<Service> findByAccountIdAndTemplateId(String accountId, String templateId);
+    List<Service> findServicesByTemplateId(String templateId);
+    List<Service> findServicesBySocketIds(String socketId);
+    boolean existsBySocketIds(String socketId);
 }

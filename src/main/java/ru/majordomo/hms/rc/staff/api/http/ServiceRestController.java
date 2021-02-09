@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +25,7 @@ import ru.majordomo.hms.rc.staff.resources.template.Template;
 public class ServiceRestController extends RestControllerTemplate<Service> {
     private TemplateRepository templateRepository;
     private MongoOperations mongoOperations;
+    private GovernorOfService governorOfService;
 
     @Autowired
     public void setTemplateRepository(TemplateRepository templateRepository) {
@@ -38,6 +40,7 @@ public class ServiceRestController extends RestControllerTemplate<Service> {
     @Autowired
     public void setGovernor(GovernorOfService governor) {
         this.governor = governor;
+        governorOfService = governor;
     }
 
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVICE_VIEW')")
@@ -188,5 +191,17 @@ public class ServiceRestController extends RestControllerTemplate<Service> {
         });
 
         return services;
+    }
+
+    @Override
+    protected ResponseEntity<Service> processUpdateQuery(String resourceId, Service resource) throws ParameterValidateException {
+        if (governorOfService.exists(resourceId)) {
+            resource.setId(resourceId);
+            governorOfService.isValid(resource);
+            governorOfService.save(resource, true);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }

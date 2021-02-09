@@ -1,7 +1,9 @@
 package ru.majordomo.hms.rc.staff.test.config;
 
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import ru.majordomo.hms.rc.staff.api.amqp.ServiceAmqpController;
 import ru.majordomo.hms.rc.staff.cleaner.Cleaner;
 import ru.majordomo.hms.rc.staff.managers.*;
 
@@ -52,7 +54,11 @@ public class ConfigOfGovernors {
     public GovernorOfStorage governorOfStorage() {
         return new GovernorOfStorage();
     }
-
+    @MockBean
+    ServiceAmqpController serviceAmqpController;
+    public ServiceAmqpController serviceAmqpController() {
+        return serviceAmqpController;
+    }
     @Bean
     public Cleaner cleaner() {
         return new Cleaner();

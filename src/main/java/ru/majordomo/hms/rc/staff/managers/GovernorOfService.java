@@ -1,5 +1,6 @@
 package ru.majordomo.hms.rc.staff.managers;
 
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
@@ -15,7 +16,8 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 
 import ru.majordomo.hms.personmgr.exception.ParameterValidationException;
-import ru.majordomo.hms.rc.staff.common.Constants;
+import ru.majordomo.hms.rc.staff.api.amqp.ServiceAmqpController;
+import ru.majordomo.hms.rc.staff.common.MessageKeys;
 import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.resources.*;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
@@ -35,6 +37,10 @@ public class GovernorOfService extends LordOfResources<Service> {
     private GovernorOfTemplate governorOfTemplate;
     private Cleaner cleaner;
     private Validator validator;
+
+    @Setter
+    @Autowired
+    private ServiceAmqpController serviceAmqpController;
 
     @Autowired
     public void setRepository(ServiceRepository repository) {
@@ -77,7 +83,7 @@ public class GovernorOfService extends LordOfResources<Service> {
             String templateId = (String) serviceMessage.getParam("templateId");
             String serverId = (String) serviceMessage.getParam("serverId");
             String accountId = serviceMessage.getAccountId() != null ? cleaner.cleanString(serviceMessage.getAccountId()) : null;
-            String homedir = Objects.toString(serviceMessage.getParam(Constants.UNIX_ACCOUNT_HOMEDIR_KEY), "");
+            String homedir = Objects.toString(serviceMessage.getParam(MessageKeys.UNIX_ACCOUNT_HOMEDIR), "");
 
             if (accountId == null || accountId.equals("")) {
                 throw new ParameterValidationException("Не указан accountId");
@@ -314,5 +320,16 @@ public class GovernorOfService extends LordOfResources<Service> {
         }
 
         return filteredServices;
+    }
+
+    /**
+     * @param service
+     * @param sendTeUpdate отправить сообщение об обновлении в TE через RabbitMQ
+     */
+    public void save(Service service, boolean sendTeUpdate) {
+        save(service);
+        if (sendTeUpdate) {
+            serviceAmqpController.sendStaffToTEUpdate(service);
+        }
     }
 }
