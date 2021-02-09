@@ -13,8 +13,10 @@ import ru.majordomo.hms.personmgr.exception.ParameterValidationException;
 import ru.majordomo.hms.rc.staff.api.dto.Error;
 import ru.majordomo.hms.rc.staff.api.clients.Sender;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
+import ru.majordomo.hms.rc.staff.common.MessageKeys;
 import ru.majordomo.hms.rc.staff.common.ResourceAction;
 import ru.majordomo.hms.rc.staff.common.ResourceActionContext;
+import ru.majordomo.hms.rc.staff.exception.ResourceNotFoundException;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfServer;
 import ru.majordomo.hms.rc.staff.managers.LordOfResources;
 import ru.majordomo.hms.rc.staff.resourceProcessor.ResourceProcessor;
@@ -31,6 +33,7 @@ import ru.majordomo.hms.rc.staff.resources.ConnectableToAccount;
 import ru.majordomo.hms.rc.staff.resources.ConnectableToServer;
 import ru.majordomo.hms.rc.staff.resources.Resource;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Path;
@@ -42,6 +45,7 @@ import static ru.majordomo.hms.rc.staff.common.Constants.TE;
 
 @Component
 @EnableRabbit
+@ParametersAreNonnullByDefault
 abstract class BaseAmqpController<T extends Resource> implements ResourceProcessorContext<T> {
     private String applicationName;
     private String instanceName;
@@ -211,7 +215,7 @@ abstract class BaseAmqpController<T extends Resource> implements ResourceProcess
         return "http://" + applicationName + "/" + getResourceType() + "/" + resource.getId();
     }
 
-    String getTaskExecutorRoutingKey(T resource) throws ParameterValidationException {
+    protected String getTaskExecutorRoutingKey(T resource) throws ParameterValidationException, InternalApiException, ResourceNotFoundException {
         try {
             String serverName;
             if (resource instanceof ConnectableToServer) {
@@ -304,5 +308,22 @@ abstract class BaseAmqpController<T extends Resource> implements ResourceProcess
                     errors.put(c.getPropertyPath(), error);
                 });
         return errors.values();
+    }
+
+    /**
+     * Особое сообщение в TE о том что необходимо обновить сервис из-за изменения конфигурации на стороне rc-staff
+     *
+     * todo перед отправкой нужно заблокировать ресурс, корректно обработать если он заблокирован и снять блокировку в конце
+     * @param resource
+     */
+    public void sendStaffToTEUpdate(T resource) {
+        ServiceMessage message = new ServiceMessage();
+        message.setObjRef(getObjRef(resource));
+        message.addParam(MessageKeys.STAFF_UPDATE, true);
+        message.addParam(MessageKeys.ISOLATED, true);
+
+        String exchange = getResourceType() + ResourceAction.UPDATE.getExchangeSuffix();
+        String routingKey = getTaskExecutorRoutingKey(resource);
+        sendToAmqp(exchange, routingKey, message);
     }
 }

@@ -1,8 +1,10 @@
 package ru.majordomo.hms.rc.staff.managers;
 
+import lombok.Setter;
 import org.apache.commons.lang.NotImplementedException;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.GroupOperation;
@@ -11,7 +13,9 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import ru.majordomo.hms.rc.staff.common.IntegersContainer;
+import ru.majordomo.hms.rc.staff.event.socket.SocketUpdateEvent;
 import ru.majordomo.hms.rc.staff.exception.ParameterValidateException;
+import ru.majordomo.hms.rc.staff.repositories.ServiceRepository;
 import ru.majordomo.hms.rc.staff.repositories.socket.SocketRepository;
 import ru.majordomo.hms.rc.staff.resources.Service;
 import ru.majordomo.hms.rc.staff.resources.socket.NetworkSocket;
@@ -32,18 +36,20 @@ public class GovernorOfSocket extends LordOfResources<Socket> {
     private static final int minPortForAccount = 10000;
     private static final int maxPortForAccount = 20000;
 
-    private GovernorOfService governorOfService;
     private Validator validator;
     private MongoOperations mongoOperations;
+
+    @Setter
+    @Autowired
+    private ServiceRepository serviceRepository;
+
+    @Setter
+    @Autowired
+    private ApplicationEventPublisher publisher;
 
     @Autowired
     public void setServiceSocketRepository(SocketRepository repository) {
         this.repository = repository;
-    }
-
-    @Autowired
-    public void setGovernorOfService(GovernorOfService governorOfService) {
-        this.governorOfService = governorOfService;
     }
 
     @Autowired
@@ -164,5 +170,14 @@ public class GovernorOfSocket extends LordOfResources<Socket> {
             }
         }
         return name;
+    }
+
+    @Override
+    public void save(Socket socket) {
+        isValid(socket);
+        repository.save(socket);
+        if (serviceRepository.existsBySocketIds(socket.getId())) {
+            publisher.publishEvent(new SocketUpdateEvent(socket.getId()));
+        }
     }
 }

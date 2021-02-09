@@ -2,6 +2,7 @@ package ru.majordomo.hms.rc.staff.resources;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -11,6 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -21,22 +24,28 @@ import ru.majordomo.hms.rc.staff.resources.validation.ObjectIdCollection;
 
 @Document
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class Service extends Resource implements ConnectableToAccount, ConnectableToServer {
     @Indexed
+    @Nullable
     private String accountId;
 
     @Indexed
+    @NotEmpty(message = "Отсутствует Server")
+    @ObjectId(Server.class)
     private String serverId;
 
     @Deprecated
     @ObjectId(ServiceTemplate.class)
     private String serviceTemplateId;
 
+    @Nullable
     @NotNull(message = "Отсутствует Template")
     @ObjectId(Template.class)
     private String templateId;
 
+    @Nonnull
     @ObjectIdCollection(Socket.class)
     private List<String> socketIds = new ArrayList<>();
 
@@ -50,9 +59,11 @@ public class Service extends Resource implements ConnectableToAccount, Connectab
     @Transient
     private ServiceTemplate serviceTemplate;
 
+    @Nullable
     @Transient
     private Template template;
 
+    @Nonnull
     @Transient
     private List<Socket> sockets = new ArrayList<>();
 

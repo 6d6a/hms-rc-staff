@@ -1,11 +1,11 @@
 package ru.majordomo.hms.rc.staff.api.clients;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
@@ -13,24 +13,16 @@ import ru.majordomo.hms.rc.staff.api.message.ServiceMessage;
 import static ru.majordomo.hms.rc.staff.common.Constants.TE;
 
 @Service
+@RequiredArgsConstructor
 public class Sender {
 
     private final static Logger logger = LoggerFactory.getLogger(Sender.class);
 
-    private RabbitTemplate rabbitTemplate;
-    private String instanceName;
-    private String fullApplicationName;
-
-    @Autowired
-    public Sender(
-            RabbitTemplate rabbitTemplate,
-            @Value("${spring.application.name}") String applicationName,
-            @Value("${hms.instance.name}") String instanceName
-    ) {
-        this.rabbitTemplate = rabbitTemplate;
-        this.instanceName = instanceName;
-        this.fullApplicationName = instanceName + "." + applicationName;
-    }
+    private final RabbitTemplate rabbitTemplate;
+    @Value("${hms.instance.name}")
+    private final String instanceName;
+    @Value("${hms.instance.name}.${spring.application.name}")
+    private final String fullApplicationName;
 
     public void send(String exchange, String routingKey, ServiceMessage payload) {
         send(exchange, routingKey, payload, fullApplicationName);

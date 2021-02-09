@@ -6,10 +6,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
@@ -64,11 +62,14 @@ public class GovernorOfServiceTest {
     private ServiceRepository serviceRepository;
     @Autowired
     private ServiceTypeRepository serviceTypeRepository;
-    @MockBean(name="governorOfServer")
+    @Autowired
+    private ServerRepository serverRepository;
+    @Autowired
     private GovernorOfServer governorOfServer;
 
     private ServiceMessage testServiceMessage;
     private Service testService;
+    private Server server;
 
     private ServiceMessage generateServiceMessage(String name, Boolean switchedOn,
                                                  Template template,
@@ -78,7 +79,7 @@ public class GovernorOfServiceTest {
         ServiceMessage serviceMessage = new ServiceMessage();
         serviceMessage.setAccountId("1");
         serviceMessage.addParam("name", name);
-        serviceMessage.addParam("serverId", "1");
+        serviceMessage.addParam("serverId", server.getId());
         serviceMessage.addParam("switchedOn", switchedOn);
         serviceMessage.addParam("templateId", template.getId());
         serviceMessage.addParam("socketIds", socketIds);
@@ -92,7 +93,7 @@ public class GovernorOfServiceTest {
         List<String> socketIds = sockets.stream().map(Resource::getId).collect(Collectors.toList());
 
         Service service = new Service();
-        service.setServerId("1");
+        service.setServerId(this.server.getId());
         service.setName(name);
         service.setSwitchedOn(switchedOn);
         service.setTemplate(template);
@@ -104,15 +105,12 @@ public class GovernorOfServiceTest {
     @Before
     public void setUp() {
         Server server = new Server();
-        server.setId("1");
-        server.setName("server_1");
+        server.setName("server_GovernorOfServiceTest");
         server.setSwitchedOn(true);
         server.setServices(Collections.emptyList());
         server.setServerRoles(Collections.emptyList());
         server.setStorages(Collections.emptyList());
-
-        Mockito.when(governorOfServer.build(eq("1")))
-                .thenReturn(server);
+        this.server = serverRepository.save(server);
 
         NetworkSocket socket = new NetworkSocket();
         socket.setAddress("10.10.10.1");
@@ -134,7 +132,7 @@ public class GovernorOfServiceTest {
         templateRepository.save(applicationServer);
 
         // Создать сервис и сервисное сообщение
-        String name = "1-php@server_1";
+        String name = "1-php@" + this.server.getName();
         Boolean switchedOn = Boolean.TRUE;
         List<Socket> sockets = new ArrayList<>();
         sockets.add(socket);

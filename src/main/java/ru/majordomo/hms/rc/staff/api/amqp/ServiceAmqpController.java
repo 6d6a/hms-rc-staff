@@ -11,11 +11,14 @@ import ru.majordomo.hms.rc.staff.common.ResourceActionContext;
 import ru.majordomo.hms.rc.staff.managers.GovernorOfService;
 import ru.majordomo.hms.rc.staff.resources.Service;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import static ru.majordomo.hms.rc.staff.config.RabbitMqConfig.Exchanges.*;
 import static ru.majordomo.hms.rc.staff.common.Constants.PM;
 import static ru.majordomo.hms.rc.staff.common.Constants.TE;
 
 @Component
+@ParametersAreNonnullByDefault
 public class ServiceAmqpController extends BaseAmqpController<Service> {
 
     @Autowired
