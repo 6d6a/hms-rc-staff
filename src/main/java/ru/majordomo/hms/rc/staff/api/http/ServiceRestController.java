@@ -43,7 +43,7 @@ public class ServiceRestController extends RestControllerTemplate<Service> {
         governorOfService = governor;
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVICE_VIEW')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('SERVICE_VIEW') or hasRole('OPERATOR')")
     @RequestMapping(value = "/service/{serviceId}", method = RequestMethod.GET)
     public Service readOne(@PathVariable String serviceId) {
         return processReadOneQuery(serviceId);
