@@ -1,10 +1,11 @@
 buildscript {
     repositories {
         maven {
-            url 'http://nexus.intr/repository/mavengroup'
-        }
-        maven {
-            url "https://plugins.gradle.org/m2/"
+            url uri(MAVEN_URL)
+            credentials {
+                username = MAVEN_USER
+                password = MAVEN_PASSWORD
+            }
         }
     }
     configurations.all {
@@ -94,9 +95,12 @@ task resourceJar(type: Jar, dependsOn: compileJava) {
 
 repositories {
     maven {
-        url 'http://nexus.intr/repository/mavengroup'
+        url MAVEN_URL
+        credentials {
+            username = MAVEN_USER
+            password = MAVEN_PASSWORD
+        }
     }
-    maven { url 'http://nexus.intr/repository/spring_milestone' }
 }
 
 dependencies {
